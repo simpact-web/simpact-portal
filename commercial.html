@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simpact - Commercial PRO</title>
+    <title>Simpact - Commercial</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -46,19 +46,19 @@
                 <label>Produit</label>
                 <select id="product-type">
                     <option value="">-- Sélectionner --</option>
-                    <option value="flyer">Flyers</option>
+                    <option value="flyer">Flyers (A5/A4...)</option>
                     <option value="carte">Cartes de visite</option>
                     <option value="depliant">Dépliants 3 volets</option>
-                    <option value="entete">Papier En-tête</option>
-                    <option value="brochure">Brochures</option>
-                    <option value="livre">Livres / Dossiers</option>
-                    <option value="affiches">Affiches</option>
+                    <option value="entete">Papier à en-tête</option>
+                    <option value="brochure">Brochure couleur</option>
+                    <option value="livre">Livre N&B</option>
+                    <option value="affiches">Affiches Grand Format</option>
                 </select>
             </div>
             <div class="form-group"><label>Quantité</label><input type="number" id="quantity" min="1" placeholder="Ex: 500"></div>
 
             <div id="flyer-options" class="option-group">
-                <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">R/V</label></div></div></div>
+                <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto/Verso</label></div></div></div>
                 <div class="form-group"><label>Papier</label>
                     <select id="flyer-paper">
                         <option value="couche-90-mat">Couché 90gr Mat</option>
@@ -110,17 +110,17 @@
             </div>
 
             <div id="brochure-options" class="option-group">
-                <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (Fermé)</option><option value="a5">A5 (Fermé)</option></select></div>
+                <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
                 <div class="form-group"><label>Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16..."></div>
                 
                 <div class="form-group"><label>Papier Intérieur</label>
                     <select id="brochure-interior-paper">
-                        <option value="couche-135-mat">Couché 135gr Mat</option>
-                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                        <option value="couche-115-mat">Couché 115gr Mat</option>
-                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
                         <option value="couche-90-mat">Couché 90gr Mat</option>
                         <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
                         <option value="couche-170-mat">Couché 170gr Mat</option>
                         <option value="couche-170-brillant">Couché 170gr Brillant</option>
                         <option value="offset-80">Offset 80gr</option>
@@ -140,7 +140,7 @@
                 </div>
                 
                 <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
-                <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="piquee">Agrafée (Piquée)</option><option value="dos-carre">Dos Carré Collé</option><option value="spirale">Spirale</option></select></div>
+                <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="piquee">Piquée à cheval (Agrafé)</option><option value="dos-carre">Dos carré collé</option><option value="spirale">Spirale</option></select></div>
                 <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
             </div>
 
@@ -163,7 +163,7 @@
             </div>
 
             <div id="affiches-options" class="option-group">
-                <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select></div>
+                <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div>
                 <div class="form-group"><label>Papier</label>
                     <select id="affiche-paper">
                         <option value="couche-135-mat">Couché 135gr Mat</option>
@@ -257,8 +257,12 @@
             if(!paperType || numSheets === 0) return 0;
             if(paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
             if(paperType.startsWith('couche-')) {
-                const grammage = parseInt(paperType.split('-')[1]);
-                if(grammage > 90) return numSheets * (grammage - 90) * PRIX_FIXES.gramme_couche;
+                const parts = paperType.split('-');
+                if (parts.length >= 2) {
+                    const grammage = parseInt(parts[1]);
+                    const grammesSup = grammage - 90;
+                    if (grammesSup > 0) return numSheets * grammesSup * PRIX_FIXES.gramme_couche;
+                }
             }
             return 0;
         }
@@ -267,6 +271,10 @@
             if(sheets < 25) return 3; if(sheets < 50) return 2.5; if(sheets < 100) return 2;
             if(sheets < 200) return 1.9; if(sheets < 300) return 1.8; if(sheets < 400) return 1.7;
             if(sheets < 500) return 1.6; return 1.5;
+        }
+        
+        function getPricePerSheetRecto(sheets) {
+            return getPricePerSheetCouleur(sheets) - 0.2;
         }
 
         function calculatePriceWithSmoothing(tarifArray, quantity) {
@@ -325,7 +333,7 @@
                     let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
                     let totalSheets = sheetsInt + sheetsCov;
                     let priceSheetInt = getPricePerSheetCouleur(totalSheets);
-                    let priceSheetCov = (coverType === 'recto') ? (priceSheetInt - 0.2) : priceSheetInt;
+                    let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets);
                     
                     let costInt = sheetsInt * priceSheetInt;
                     let costCov = sheetsCov * priceSheetCov;
@@ -351,7 +359,7 @@
                     let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
 
                     totalPrice = costInt + surcharge + costCov + costPell;
-                    config = `Livre ${format.toUpperCase()} ${pages}p N&B - Spirale - Couv: ${getPaperName(paperCov)}`;
+                    config = `Livre N&B ${format.toUpperCase()} ${pages}p - Spirale - Couv: ${getPaperName(paperCov)}`;
                 }
                 else if(type === 'affiches') {
                     const format = document.getElementById('affiche-format').value;
