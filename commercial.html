@@ -7,243 +7,370 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --accent: #f97316; --text: #1e293b; --bg: #f1f5f9; }
+        :root { --primary: #2563eb; --accent: #f97316; --text: #1e293b; --bg: #f1f5f9; --white: #ffffff; --border: #e2e8f0; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2rem; }
-        header { grid-column: 1 / -1; background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary); }
+        .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+        header { grid-column: 1 / -1; background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary); }
         .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
         /* Formulaire */
         .form-group { margin-bottom: 1.2rem; }
         label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
-        select, input { width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; font-family: inherit; }
-        .btn { width: 100%; padding: 1rem; background: #1e293b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        select, input { width: 100%; padding: 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; }
         
-        /* Résultat et Actions */
-        .price-box { text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 8px; }
-        .price-val { font-size: 2.5rem; font-weight: 700; color: var(--primary); font-family: 'Space Mono', monospace; }
-        
-        .actions-pdf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-pdf { padding: 15px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .btn-compta { background: #10b981; } .btn-compta:hover { background: #059669; }
-        .btn-prod { background: #f59e0b; } .btn-prod:hover { background: #d97706; }
-
-        /* Options dynamiques */
-        .option-group { display: none; }
+        /* Options Cachées */
+        .option-group { display: none; padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
         .option-group.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MODÈLE PDF (Caché à l'écran) */
-        #pdf-template { display: none; padding: 30px; background: white; color: black; font-family: sans-serif; }
-        .pdf-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .pdf-table th { background: #eee; text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
-        .pdf-table td { padding: 10px; border-bottom: 1px solid #ddd; }
-        .badge-prod { background: #fffbeb; color: #b45309; padding: 5px 10px; border: 1px solid #fcd34d; border-radius: 4px; display: inline-block; margin-top: 5px; }
+        /* Radios */
+        .radio-group { display: flex; gap: 10px; }
+        .radio-option { flex: 1; }
+        .radio-option input { display: none; }
+        .radio-option label { display: block; padding: 10px; background: white; border: 1px solid #cbd5e1; text-align: center; border-radius: 6px; cursor: pointer; }
+        .radio-option input:checked + label { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Resultat */
+        .summary-card { position: sticky; top: 2rem; }
+        .price-display { font-size: 3rem; font-weight: 700; color: var(--primary); font-family: 'Space Mono', monospace; }
+        .btn { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 1rem; }
+        .btn-calc { background: var(--text); color: white; }
         
-        @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+        .pdf-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-pdf { padding: 15px; color: white; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-compta { background: #10b981; }
+        .btn-prod { background: #f59e0b; }
+
+        /* PDF Hidden Template */
+        #pdf-template { display: none; padding: 30px; font-family: sans-serif; background: white; color: black; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>💼 Espace Commercial</h1>
-            <a href="index.html" style="text-decoration: none; color: #64748b;">← Retour Portail</a>
+            <h1>💼 Espace Commercial <span style="font-size:0.8rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:10px;">PRO</span></h1>
+            <a href="index.html" style="text-decoration:none; color:#64748b;">← Retour Portail</a>
         </header>
 
         <div class="card">
-            <h2>📝 Configuration</h2>
+            <h2>🛠️ Configuration Technique</h2>
             <div class="form-group">
-                <label>Client / Dossier</label>
+                <label>Client / Référence Dossier</label>
                 <input type="text" id="client-name" placeholder="Nom du client...">
             </div>
-            
+
             <div class="form-group">
                 <label>Produit</label>
                 <select id="product-type">
                     <option value="">-- Sélectionner --</option>
                     <option value="flyer">Flyers</option>
                     <option value="carte">Cartes de visite</option>
-                    <option value="depliant">Dépliants</option>
-                    <option value="entete">En-tête</option>
-                    <option value="brochure">Brochures</option>
-                    <option value="livre">Livres / Dossiers</option>
-                    <option value="affiches">Affiches</option>
+                    <option value="depliant">Dépliants 3 volets</option>
+                    <option value="entete">Papier En-tête</option>
+                    <option value="brochure">Brochures (Agrafée/Dos Carré)</option>
+                    <option value="livre">Livres / Dossiers (Spirale)</option>
+                    <option value="affiches">Affiches Grand Format</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Quantité</label>
-                <input type="number" id="quantity" min="1" placeholder="Ex: 100">
+                <input type="number" id="quantity" placeholder="Ex: 100, 500...">
             </div>
 
             <div id="flyer-options" class="option-group">
-                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option>Couché 135gr Brillant</option><option>Couché 170gr Mat</option></select></div>
-            </div>
-            <div class="form-group">
-                <label>Détails techniques (Pour l'atelier)</label>
-                <input type="text" id="tech-details" placeholder="Ex: Finition spécifique, coupe, emballage...">
+                <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto/Verso</label></div></div></div>
+                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-90-mat">Couché 90gr Mat</option><option value="couche-135-brillant">135gr Brillant</option><option value="couche-170-mat">170gr Mat</option><option value="couche-300-mat">300gr Mat</option></select></div>
             </div>
 
-            <button class="btn" onclick="calculate()">Calculer</button>
+            <div id="carte-options" class="option-group">
+                <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
+                <div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-350-mat">350gr Mat</option><option value="couche-350-brillant">350gr Brillant</option></select></div>
+            </div>
+
+            <div id="depliant-options" class="option-group">
+                <div class="form-group"><label>Papier</label><select id="depliant-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-135-brillant">135gr Brillant</option><option value="couche-170-mat">170gr Mat</option></select></div>
+            </div>
+
+            <div id="entete-options" class="option-group">
+                <div class="form-group"><label>Papier</label><select id="entete-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr Premium</option></select></div>
+            </div>
+
+            <div id="brochure-options" class="option-group">
+                <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (Fermé)</option><option value="a5">A5 (Fermé)</option></select></div>
+                <div class="form-group"><label>Pages (Total)</label><input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16..."></div>
+                <div class="form-group"><label>Papier Intérieur</label><select id="brochure-interior-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-90-mat">90gr Mat</option><option value="offset-80">Offset 80gr</option></select></div>
+                <div class="form-group"><label>Papier Couverture</label><select id="brochure-cover-paper"><option value="couche-250-mat">250gr Mat</option><option value="couche-300-mat">300gr Mat</option></select></div>
+                <div class="form-group"><label>Couverture Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
+                <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="piquee">Agrafée (Piquée)</option><option value="dos-carre">Dos Carré Collé</option><option value="spirale">Spirale</option></select></div>
+                <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
+            </div>
+
+            <div id="livre-options" class="option-group">
+                <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
+                <div class="form-group"><label>Pages</label><input type="number" id="livre-pages"></div>
+                <div class="form-group"><label>Papier Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
+                <div class="form-group"><label>Couverture</label><select id="livre-cover-paper"><option value="couche-300-mat">300gr Mat</option></select></div>
+                <div class="form-group"><label>Couleur Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
+                <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
+            </div>
+
+            <div id="affiches-options" class="option-group">
+                <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select></div>
+                <div class="form-group"><label>Papier</label><select id="affiche-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-200-mat">200gr Mat</option></select></div>
+            </div>
+
+            <button class="btn btn-calc" onclick="calculateQuote()">⚡ Calculer Prix</button>
         </div>
 
         <div class="card summary-card">
             <h2>Résultat</h2>
-            <div class="price-box">
-                <div class="price-val"><span id="total-price">0.00</span> DT</div>
-                <small>Prix unitaire: <span id="unit-price">--</span></small>
+            <div class="price-display"><span id="total-price">--</span> <span style="font-size:1.5rem">DT</span></div>
+            <p>Prix unitaire: <strong id="unit-price">--</strong></p>
+            
+            <div style="background:#f1f5f9; padding:15px; border-radius:8px; margin:20px 0; font-size:0.9rem;">
+                <strong>Détails techniques :</strong><br>
+                <span id="config-summary">--</span>
             </div>
 
-            <h3>🖨️ Générer Documents</h3>
-            <div class="actions-pdf">
+            <div class="pdf-actions">
                 <button class="btn-pdf btn-compta" onclick="generatePDF('compta')">📄 Bon de<br>Commande</button>
                 <button class="btn-pdf btn-prod" onclick="generatePDF('prod')">🏭 Fiche<br>Atelier</button>
             </div>
-            <p style="font-size: 0.8rem; color: #64748b; margin-top: 1rem; text-align: center;">
-                Vert : Pour la facturation (avec prix)<br>
-                Orange : Pour la production (technique)
-            </p>
         </div>
     </div>
 
     <div id="pdf-template">
-        <div class="pdf-header">
+        <div style="border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between;">
             <div>
-                <h1 id="pdf-doc-title" style="margin:0; text-transform:uppercase;">TITRE</h1>
-                <p>Date : <span id="pdf-date"></span></p>
-                <p>Ref : <strong id="pdf-ref"></strong></p>
+                <h1 id="pdf-title" style="margin:0; color:#2563eb;">DOCUMENT</h1>
+                <p>Date: <span id="pdf-date"></span> | Ref: <span id="pdf-ref"></span></p>
             </div>
-            <div style="text-align: right;">
-                <h2 style="margin:0;">SIMPACT</h2>
-                <p>Impression Numérique</p>
-            </div>
+            <div style="text-align: right;"><strong>SIMPACT NUMERIQUE</strong></div>
         </div>
-
-        <div style="background: #f8fafc; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-            <strong>Client :</strong> <span id="pdf-client"></span>
-        </div>
-
-        <table class="pdf-table">
+        <div style="background: #f8fafc; padding: 15px; margin-bottom: 20px;"><strong>Client:</strong> <span id="pdf-client"></span></div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background:#eee;"><th style="padding:10px; text-align:left;">Désignation</th><th style="padding:10px;">Qté</th><th class="col-price" style="padding:10px; text-align:right;">Prix HT</th></tr>
             <tr>
-                <th width="60%">Désignation</th>
-                <th>Quantité</th>
-                <th class="col-price" style="text-align: right;">Montant HT</th>
-            </tr>
-            <tr>
-                <td>
-                    <strong id="pdf-prod-name" style="font-size: 1.1rem;"></strong><br>
-                    <span id="pdf-desc" style="color: #475569; font-size: 0.9rem;"></span>
-                    <div id="pdf-tech-box" class="badge-prod"></div>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">
+                    <strong id="pdf-prod"></strong><br>
+                    <span id="pdf-details" style="font-size:0.9rem; color:#666;"></span>
                 </td>
-                <td id="pdf-qty" style="font-size: 1.1rem;"></td>
-                <td id="pdf-price" class="col-price" style="text-align: right; font-weight: bold;"></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;" id="pdf-qty"></td>
+                <td class="col-price" style="padding:10px; border-bottom:1px solid #ddd; text-align:right;" id="pdf-price"></td>
             </tr>
         </table>
-
-        <div id="pdf-total-box" style="text-align: right; margin-top: 40px; border-top: 2px solid #333; padding-top: 10px;">
-            <h2 style="margin:0;">TOTAL : <span id="pdf-total"></span> DT</h2>
-        </div>
-
-        <div id="pdf-footer-prod" style="margin-top: 50px; display: none; border: 2px dashed #f59e0b; padding: 20px;">
-            <h3 style="margin-top:0; color: #b45309;">⚠️ INSTRUCTIONS ATELIER</h3>
-            <p>1. Vérifier le fichier avant impression.</p>
-            <p>2. Respecter les quantités et le type de papier indiqué.</p>
-            <p>3. Emballage soigné.</p>
+        <div class="col-price" style="text-align: right; margin-top: 30px; font-size: 1.5rem; font-weight: bold;">Total: <span id="pdf-total"></span> DT</div>
+        <div id="pdf-prod-instr" style="margin-top:40px; border:2px dashed #f59e0b; padding:15px; display:none;">
+            <h3 style="margin-top:0; color:#b45309;">Instructions Atelier</h3>
+            <p id="pdf-tech-instr"></p>
         </div>
     </div>
 
     <script>
-        let currentData = {};
+        let TARIFS = {};
+        let currentQuote = {};
+        const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
 
-        // 1. CHARGEMENT PRIX (Même logique que vous aviez)
+        // 1. CHARGEMENT PRIX
         async function loadPrices() {
-            // Ici le script va chercher votre fichier JSON existant
             try {
-                const r = await fetch('prix_config.json'); 
-                window.tarifs = await r.json();
-            } catch(e) { console.log("Attente du fichier JSON..."); }
+                const r = await fetch('prix_config.json');
+                const data = await r.json();
+                TARIFS = {
+                    flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
+                    carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
+                    depliant: data.tarifs.depliant,
+                    entete: data.tarifs.entete,
+                    prix_couverture_livre: data.prix_couverture_livre
+                };
+            } catch(e) { alert("Erreur chargement prix_config.json"); }
         }
         loadPrices();
 
-        // 2. CALCUL (Simplifié pour l'exemple, mais fonctionnel)
-        function calculate() {
-            const qty = document.getElementById('quantity').value || 0;
-            const type = document.getElementById('product-type').value;
-            
-            // Simulation de prix (Remplacez par votre logique complexe si besoin)
-            // Dans votre vrai fichier, copiez la fonction calculateQuote() complète ici
-            let price = qty * 0.5; // Exemple: 0.5 DT par unité par défaut
-            if(type === 'carte') price = qty * 0.2;
-            if(type === 'livre') price = qty * 5;
+        // 2. UI MANAGER
+        document.getElementById('product-type').addEventListener('change', function() {
+            document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
+            if(this.value) document.getElementById(this.value + '-options').classList.add('active');
+        });
 
-            document.getElementById('total-price').textContent = price.toFixed(2);
-            document.getElementById('unit-price').textContent = (price/qty).toFixed(3) + ' DT';
-            
-            // Sauvegarde pour le PDF
-            currentData = {
-                client: document.getElementById('client-name').value || "Client Comptoir",
-                product: document.getElementById('product-type').selectedOptions[0].text,
-                qty: qty,
-                price: price.toFixed(2),
-                tech: document.getElementById('tech-details').value || "Standard",
-                ref: "CMD-" + Math.floor(Math.random() * 10000)
-            };
+        // 3. FONCTIONS CALCUL (Le Vrai Moteur)
+        function calculatePaperSurcharge(paperType, numSheets) {
+            if (!paperType || numSheets === 0) return 0;
+            if (paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
+            if (paperType.startsWith('couche-')) {
+                const parts = paperType.split('-');
+                if (parts.length >= 2) {
+                    const grammage = parseInt(parts[1]);
+                    const grammesSup = grammage - 90;
+                    if (grammesSup > 0) return numSheets * grammesSup * PRIX_FIXES.gramme_couche;
+                }
+            }
+            return 0;
         }
 
-        // 3. GENERATION PDF
+        function getPaperName(paperType) {
+            if (!paperType) return '';
+            if (paperType === 'offset-80') return 'Offset 80gr';
+            if (paperType === 'offset-100') return 'Offset 100gr Premium';
+            if (paperType.startsWith('couche-')) {
+                const parts = paperType.split('-');
+                return `Couché ${parts[1]}gr ${parts[2] === 'mat' ? 'Mat' : 'Brillant'}`;
+            }
+            return paperType;
+        }
+
+        function getPricePerSheetCouleur(sheets) {
+            if (sheets < 25) return 3; if (sheets < 50) return 2.5; if (sheets < 100) return 2;
+            if (sheets < 200) return 1.9; if (sheets < 300) return 1.8; if (sheets < 400) return 1.7;
+            if (sheets < 500) return 1.6; return 1.5;
+        }
+
+        function calculatePriceWithSmoothing(tarifArray, quantity) {
+            if (!tarifArray) return { totalPrice: 0 };
+            let lower = tarifArray[0], upper = tarifArray[0];
+            for (let t of tarifArray) { if (t.qty <= quantity) lower = t; if (t.qty >= quantity && upper === tarifArray[0]) upper = t; }
+            if (lower.qty === upper.qty) return { totalPrice: lower.price };
+            const ratio = (quantity - lower.qty) / (upper.qty - lower.qty);
+            return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
+        }
+
+        // 4. CALCUL PRINCIPAL
+        function calculateQuote() {
+            const type = document.getElementById('product-type').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            if(!type || !qty) return alert("Remplissez les champs");
+
+            let totalPrice = 0, config = "";
+
+            try {
+                if(type === 'flyer') {
+                    const mode = document.querySelector('input[name="flyer-type"]:checked').value;
+                    const paper = document.getElementById('flyer-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer[mode], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `Flyer ${mode} - ${getPaperName(paper)}`;
+                }
+                else if(type === 'carte') {
+                    const finish = document.querySelector('input[name="carte-finish"]:checked').value;
+                    const paper = document.getElementById('carte-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.carte[finish], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, Math.ceil(qty/10));
+                    config = `Carte ${finish} - ${getPaperName(paper)}`;
+                }
+                else if(type === 'depliant') {
+                    const paper = document.getElementById('depliant-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.depliant, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `Dépliant - ${getPaperName(paper)}`;
+                }
+                else if(type === 'entete') {
+                    const paper = document.getElementById('entete-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.entete, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `En-tête - ${getPaperName(paper)}`;
+                }
+                else if(type === 'brochure') {
+                    const pages = parseInt(document.getElementById('brochure-pages').value);
+                    const format = document.getElementById('brochure-format').value;
+                    const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
+                    const paperInt = document.getElementById('brochure-interior-paper').value;
+                    const paperCov = document.getElementById('brochure-cover-paper').value;
+
+                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
+                    let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
+                    let totalSheets = sheetsInt + sheetsCov;
+                    let priceSheet = getPricePerSheetCouleur(totalSheets);
+                    
+                    let costInt = sheetsInt * priceSheet;
+                    let costCov = sheetsCov * (coverType === 'recto' ? priceSheet - 0.2 : priceSheet);
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
+                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
+
+                    totalPrice = costInt + costCov + surcharge + costPell;
+                    config = `Brochure ${format.toUpperCase()} - ${pages}p - ${getPaperName(paperInt)}`;
+                }
+                else if(type === 'livre') {
+                    const pages = parseInt(document.getElementById('livre-pages').value);
+                    const format = document.getElementById('livre-format').value;
+                    const coverType = document.querySelector('input[name="livre-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
+                    const paperInt = document.getElementById('livre-interior-paper').value;
+
+                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
+                    let costInt = sheetsInt * PRIX_FIXES.feuille_nb;
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt);
+                    let unitCovPrice = coverType === 'recto' ? TARIFS.prix_couverture_livre[format].recto : TARIFS.prix_couverture_livre[format].rectoVerso;
+                    let costCov = qty * unitCovPrice;
+                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
+
+                    totalPrice = costInt + surcharge + costCov + costPell;
+                    config = `Livre ${format.toUpperCase()} - ${pages}p N&B - Spirale`;
+                }
+                else if(type === 'affiches') {
+                    const format = document.getElementById('affiche-format').value;
+                    const paper = document.getElementById('affiche-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer.recto, qty);
+                    let price = res.totalPrice;
+                    if(format === 'a3plus') price *= 1.2;
+                    totalPrice = price + calculatePaperSurcharge(paper, qty);
+                    config = `Affiche ${format === 'a3' ? 'A3' : 'A3+'}`;
+                }
+
+                totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
+                
+                // Affichage
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+                document.getElementById('unit-price').textContent = (totalPrice/qty).toFixed(3) + " DT";
+                document.getElementById('config-summary').textContent = config;
+
+                // Sauvegarde pour PDF
+                currentQuote = {
+                    client: document.getElementById('client-name').value || "Client",
+                    prod: document.getElementById('product-type').selectedOptions[0].text,
+                    qty: qty,
+                    config: config,
+                    price: totalPrice.toFixed(2),
+                    ref: "D-" + Date.now().toString().slice(-5)
+                };
+
+            } catch(e) {
+                console.error(e);
+                alert("Vérifiez les données (Pages, Quantité...)");
+            }
+        }
+
+        // 5. PDF GENERATION
         function generatePDF(mode) {
-            if(!currentData.qty) return alert("Veuillez faire un calcul d'abord.");
+            if(!currentQuote.price) return alert("Calculez d'abord !");
             
-            const element = document.getElementById('pdf-template');
-            element.style.display = 'block'; // Rendre visible pour la capture
+            const el = document.getElementById('pdf-template');
+            el.style.display = 'block';
 
-            // Remplissage
             document.getElementById('pdf-date').textContent = new Date().toLocaleDateString();
-            document.getElementById('pdf-client').textContent = currentData.client;
-            document.getElementById('pdf-ref').textContent = currentData.ref;
-            document.getElementById('pdf-prod-name').textContent = currentData.product;
-            document.getElementById('pdf-qty').textContent = currentData.qty;
-            document.getElementById('pdf-tech-box').textContent = "Config: " + currentData.tech;
+            document.getElementById('pdf-ref').textContent = currentQuote.ref;
+            document.getElementById('pdf-client').textContent = currentQuote.client;
+            document.getElementById('pdf-prod').textContent = currentQuote.prod;
+            document.getElementById('pdf-details').textContent = currentQuote.config;
+            document.getElementById('pdf-qty').textContent = currentQuote.qty;
 
-            // Mode BON DE COMMANDE (Compta)
             if(mode === 'compta') {
-                document.getElementById('pdf-doc-title').textContent = "BON DE COMMANDE";
-                document.getElementById('pdf-doc-title').style.color = "#2563eb";
-                
-                // Afficher les prix
-                document.querySelectorAll('.col-price').forEach(el => el.style.display = 'table-cell');
-                document.getElementById('pdf-price').textContent = currentData.price + " DT";
-                document.getElementById('pdf-total-box').style.display = 'block';
-                document.getElementById('pdf-total').textContent = currentData.price;
-                
-                document.getElementById('pdf-footer-prod').style.display = 'none';
-            }
-            
-            // Mode FICHE ATELIER (Production)
-            if(mode === 'prod') {
-                document.getElementById('pdf-doc-title').textContent = "FICHE DE FABRICATION";
-                document.getElementById('pdf-doc-title').style.color = "#d97706";
-                
-                // Cacher les prix
-                document.querySelectorAll('.col-price').forEach(el => el.style.display = 'none');
-                document.getElementById('pdf-total-box').style.display = 'none';
-                
-                document.getElementById('pdf-footer-prod').style.display = 'block';
+                document.getElementById('pdf-title').textContent = "BON DE COMMANDE";
+                document.getElementById('pdf-title').style.color = "#2563eb";
+                document.querySelectorAll('.col-price').forEach(e => e.style.display = 'table-cell');
+                document.getElementById('pdf-price').textContent = currentQuote.price;
+                document.getElementById('pdf-total').textContent = currentQuote.price;
+                document.getElementById('pdf-prod-instr').style.display = 'none';
+            } else {
+                document.getElementById('pdf-title').textContent = "FICHE ATELIER";
+                document.getElementById('pdf-title').style.color = "#d97706";
+                document.querySelectorAll('.col-price').forEach(e => e.style.display = 'none');
+                document.getElementById('pdf-prod-instr').style.display = 'block';
+                document.getElementById('pdf-tech-instr').textContent = currentQuote.config;
             }
 
-            // Création du PDF
-            const opt = {
-                margin: 0.5,
-                filename: mode === 'compta' ? `Bon_Commande_${currentData.ref}.pdf` : `Fiche_Atelier_${currentData.ref}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none'; // Recacher après téléchargement
-            });
+            html2pdf().from(el).save().then(() => el.style.display = 'none');
         }
     </script>
 </body>
