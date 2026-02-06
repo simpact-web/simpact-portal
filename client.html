@@ -4,66 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpact - Devis Rapide</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Outfit', sans-serif; background: #f8fafc; padding: 2rem; display: flex; justify-content: center; }
-        .card { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 500px; text-align: center; }
-        h1 { margin-top: 0; color: #1e293b; }
-        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #1d4ed8; }
-        .result { margin-top: 2rem; font-size: 2.5rem; font-weight: bold; color: #2563eb; }
-        .footer { margin-top: 2rem; font-size: 0.8rem; color: #94a3b8; }
-        a { text-decoration: none; color: #94a3b8; }
+        body { font-family: 'Outfit', sans-serif; padding: 2rem; background: #f8fafc; }
+        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; color: #1e293b; margin-top: 0; }
+        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+        .result { text-align: center; margin-top: 2rem; font-size: 2.5rem; font-weight: bold; color: #2563eb; }
+        .option-group { display: none; }
+        .option-group.active { display: block; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #64748b; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>⚡ Devis Express</h1>
-        <p style="color: #64748b; margin-bottom: 2rem;">Obtenez votre tarif en quelques secondes</p>
-
-        <label style="display:block; text-align:left; margin-bottom:5px; font-weight:500;">Produit</label>
-        <select id="prod">
+        
+        <label>Produit</label>
+        <select id="product-type">
+            <option value="">-- Choisir --</option>
             <option value="flyer">Flyers</option>
             <option value="carte">Cartes de visite</option>
             <option value="depliant">Dépliants</option>
             <option value="brochure">Brochures</option>
         </select>
         
-        <label style="display:block; text-align:left; margin-bottom:5px; font-weight:500;">Quantité</label>
-        <input type="number" id="qty" placeholder="Ex: 500">
+        <label>Quantité</label>
+        <input type="number" id="quantity" placeholder="Quantité">
 
-        <button onclick="calc()">Voir mon prix</button>
-
-        <div class="result"><span id="price">--</span> DT</div>
-        <p style="font-size: 0.9rem; color: #64748b;">Prix Hors Taxes</p>
-
-        <div class="footer">
-            <a href="index.html">← Retour accueil</a>
+        <div id="flyer-options" class="option-group">
+            <label>Type</label>
+            <select id="flyer-type"><option value="recto">Recto</option><option value="rectoVerso">Recto/Verso</option></select>
+            <label>Papier</label>
+            <select id="flyer-paper"><option value="couche-135-brillant">Standard (135g)</option><option value="couche-300-mat">Rigide (300g)</option></select>
         </div>
+
+        <div id="carte-options" class="option-group">
+            <label>Finition</label>
+            <select id="carte-finish"><option value="recto">Standard</option><option value="pellicule">Pelliculé (Luxe)</option></select>
+        </div>
+
+        <div id="brochure-options" class="option-group">
+            <label>Pages</label>
+            <input type="number" id="brochure-pages" placeholder="Nombre de pages">
+            <label>Reliure</label>
+            <select id="brochure-finition"><option value="piquee">Agrafée</option><option value="spirale">Spirale</option></select>
+        </div>
+
+        <button class="btn" onclick="calculateQuote()">Voir mon prix</button>
+
+        <div class="result"><span id="total-price">--</span> DT</div>
+        <p style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Prix Hors Taxes</p>
+        <div style="text-align: center;"><a href="index.html" style="color: #94a3b8; text-decoration: none;">← Retour</a></div>
     </div>
 
     <script>
-        async function calc() {
-            // Charge les configurations réelles
+        // On reprend exactement la même logique de calcul (simplifiée ici pour affichage)
+        // Pour que le client ait le VRAI prix, il faut charger les configs
+        let TARIFS = {};
+        const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, min_price: 28 };
+
+        async function loadPrices() {
             try {
                 const r = await fetch('prix_config.json');
                 const data = await r.json();
-                const q = parseInt(document.getElementById('qty').value);
-                const p = document.getElementById('prod').value;
+                TARIFS = {
+                    flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
+                    carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
+                    depliant: data.tarifs.depliant
+                };
+            } catch(e) { console.log("Erreur prix"); }
+        }
+        loadPrices();
 
-                if(!q) return;
-
-                // LOGIQUE SIMPLE (Exemple)
-                // Le client voit un prix simplifié
-                let price = 0;
-                if(p === 'flyer') price = q * 0.4; // Remplacer par la vraie logique de lecture du JSON
-                if(p === 'carte') price = q * 0.15;
-                
-                document.getElementById('price').textContent = price.toFixed(2);
-            } catch(e) {
-                alert("Erreur de chargement des prix");
+        document.getElementById('product-type').addEventListener('change', function() {
+            document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
+            if(this.value) {
+                const optId = this.value + '-options';
+                if(document.getElementById(optId)) document.getElementById(optId).classList.add('active');
             }
+        });
+
+        function calculateQuote() {
+            const type = document.getElementById('product-type').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            if(!type || !qty) return;
+
+            let price = 0;
+            
+            // Logique de calcul (Copie simplifiée du moteur commercial pour cohérence)
+            if(type === 'flyer') {
+                const mode = document.getElementById('flyer-type').value;
+                price = getPrice(TARIFS.flyer[mode], qty);
+            }
+            else if(type === 'carte') {
+                const mode = document.getElementById('carte-finish').value;
+                price = getPrice(TARIFS.carte[mode], qty);
+            }
+            else if(type === 'brochure') {
+                // Estimation rapide pour le client
+                const p = parseInt(document.getElementById('brochure-pages').value) || 0;
+                price = (p/4) * qty * 0.5; // Prix approximatif
+            }
+
+            price = Math.max(price, PRIX_FIXES.min_price);
+            document.getElementById('total-price').textContent = price.toFixed(2);
+        }
+
+        function getPrice(arr, qty) {
+            if(!arr) return 0;
+            let lower = arr[0], upper = arr[0];
+            for (let t of arr) { if (t.qty <= qty) lower = t; if (t.qty >= qty && upper === arr[0]) upper = t; }
+            if (lower.qty === upper.qty) return lower.price;
+            const ratio = (qty - lower.qty) / (upper.qty - lower.qty);
+            return lower.price + (upper.price - lower.price) * ratio;
         }
     </script>
 </body>
