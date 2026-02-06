@@ -57,24 +57,41 @@
             <label>Type</label>
             <select id="flyer-type"><option value="recto">Recto</option><option value="rectoVerso">Recto/Verso</option></select>
             <label>Papier</label>
-            <select id="flyer-paper"><option value="couche-90-mat">Standard (90g)</option><option value="couche-135-brillant">Supérieur (135g)</option><option value="couche-170-mat">Rigide (170g)</option></select>
+            <select id="flyer-paper">
+                <option value="couche-90-mat">Couché 90gr Mat</option>
+                <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                <option value="couche-135-mat">Couché 135gr Mat</option>
+                <option value="couche-170-mat">Couché 170gr Mat</option>
+                <option value="couche-200-mat">Couché 200gr Mat</option>
+            </select>
         </div>
 
         <div id="carte-options" class="option-group">
             <label>Finition</label>
             <select id="carte-finish"><option value="recto">Standard</option><option value="pellicule">Pelliculé (Luxe)</option></select>
             <label>Papier</label>
-            <select id="carte-paper"><option value="couche-300-mat">Mat 300g</option><option value="couche-350-mat">Mat 350g (Rigide)</option><option value="couche-350-brillant">Brillant 350g</option></select>
+            <select id="carte-paper">
+                <option value="couche-300-mat">Mat 300g</option>
+                <option value="couche-350-mat">Mat 350g (Rigide)</option>
+                <option value="couche-350-brillant">Brillant 350g</option>
+            </select>
         </div>
 
         <div id="depliant-options" class="option-group">
             <label>Papier</label>
-            <select id="depliant-paper"><option value="couche-135-mat">Standard (135g)</option><option value="couche-170-mat">Rigide (170g)</option></select>
+            <select id="depliant-paper">
+                <option value="couche-115-mat">Couché 115gr Mat</option>
+                <option value="couche-135-mat">Couché 135gr Mat</option>
+                <option value="couche-170-mat">Couché 170gr Mat</option>
+            </select>
         </div>
 
         <div id="entete-options" class="option-group">
             <label>Papier</label>
-            <select id="entete-paper"><option value="offset-80">Standard (80g)</option><option value="offset-100">Premium (100g)</option></select>
+            <select id="entete-paper">
+                <option value="offset-80">Standard (80g)</option>
+                <option value="offset-100">Premium (100g)</option>
+            </select>
         </div>
 
         <div id="brochure-options" class="option-group">
@@ -83,9 +100,17 @@
             <label>Pages (Multiple de 4)</label>
             <input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16...">
             <label>Papier Intérieur</label>
-            <select id="brochure-interior-paper"><option value="couche-135-mat">Standard (135g)</option><option value="couche-90-mat">Eco (90g)</option></select>
+            <select id="brochure-interior-paper">
+                <option value="couche-135-mat">Standard (135g)</option>
+                <option value="couche-90-mat">Eco (90g)</option>
+                <option value="couche-115-mat">Intermédiaire (115g)</option>
+                <option value="offset-80">Offset 80g</option>
+            </select>
             <label>Couverture</label>
-            <select id="brochure-cover-paper"><option value="couche-250-mat">Rigide (250g)</option><option value="couche-300-mat">Très Rigide (300g)</option></select>
+            <select id="brochure-cover-paper">
+                <option value="couche-250-mat">Rigide (250g)</option>
+                <option value="couche-300-mat">Très Rigide (300g)</option>
+            </select>
             <label>Impression Couverture</label>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <label><input type="radio" name="brochure-cover-type" value="recto" checked> Recto</label>
@@ -106,7 +131,7 @@
             <label>Pages</label>
             <input type="number" id="livre-pages" placeholder="Nombre de pages">
             <label>Papier Intérieur</label>
-            <select id="livre-interior-paper"><option value="offset-80">Standard (80g)</option></select>
+            <select id="livre-interior-paper"><option value="offset-80">Standard (80g)</option><option value="offset-100">Premium (100g)</option></select>
             <label>Couverture</label>
             <select id="livre-cover-paper"><option value="couche-300-mat">Rigide (300g)</option></select>
             <div style="display:none;">
@@ -119,7 +144,10 @@
             <label>Format</label>
             <select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select>
             <label>Papier</label>
-            <select id="affiche-paper"><option value="couche-135-mat">135g</option><option value="couche-200-mat">200g</option></select>
+            <select id="affiche-paper">
+                <option value="couche-135-mat">Standard 135g</option>
+                <option value="couche-200-mat">Rigide 200g</option>
+            </select>
         </div>
 
         <button class="btn" onclick="calculateQuote()">Voir mon prix</button>
@@ -146,7 +174,7 @@
                     carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
                     depliant: data.tarifs.depliant,
                     entete: data.tarifs.entete,
-                    prix_couverture_livre: data.prix_couverture_livre
+                    prix_couverture_livre: data.prix_couverture_livre || { a4: { recto: 1.3, rectoVerso: 1.5 }, a5: { recto: 0.65, rectoVerso: 0.75 } }
                 };
             } catch(e) { console.log("Erreur chargement prix"); }
         }
@@ -177,6 +205,10 @@
             if (sheets < 200) return 1.9; if (sheets < 300) return 1.8; if (sheets < 400) return 1.7;
             if (sheets < 500) return 1.6; return 1.5;
         }
+        
+        function getPricePerSheetRecto(sheets) {
+            return getPricePerSheetCouleur(sheets) - 0.2;
+        }
 
         function calculatePriceWithSmoothing(tarifArray, quantity) {
             if (!tarifArray) return { totalPrice: 0 };
@@ -196,7 +228,7 @@
 
             try {
                 if(type === 'flyer') {
-                    const mode = document.getElementById('flyer-type').value; // Client select ID changed a bit? No, fixed below
+                    const mode = document.getElementById('flyer-type').value; 
                     const paper = document.getElementById('flyer-paper').value;
                     let res = calculatePriceWithSmoothing(TARIFS.flyer[mode], qty);
                     totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
@@ -228,10 +260,11 @@
                     let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
                     let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
                     let totalSheets = sheetsInt + sheetsCov;
-                    let priceSheet = getPricePerSheetCouleur(totalSheets);
+                    let priceSheetInt = getPricePerSheetCouleur(totalSheets);
+                    let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets);
                     
-                    let costInt = sheetsInt * priceSheet;
-                    let costCov = sheetsCov * (coverType === 'recto' ? priceSheet - 0.2 : priceSheet);
+                    let costInt = sheetsInt * priceSheetInt;
+                    let costCov = sheetsCov * priceSheetCov;
                     let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
                     let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
 
