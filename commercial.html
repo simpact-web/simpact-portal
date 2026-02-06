@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --text: #1e293b; --bg: #f1f5f9; --border: #cbd5e1; }
+        :root { --primary: #2563eb; --accent: #f97316; --text: #1e293b; --bg: #f1f5f9; --border: #cbd5e1; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
         .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
         
@@ -84,16 +84,45 @@
 
             <div id="flyer-options" class="option-group">
                 <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto/Verso</label></div></div></div>
-                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-90-mat">Couché 90gr Mat</option><option value="couche-90-brillant">Couché 90gr Brillant</option><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option><option value="couche-200-mat">Couché 200gr Mat</option><option value="couche-200-brillant">Couché 200gr Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="flyer-paper">
+                        <option value="couche-90-mat">Couché 90gr Mat</option>
+                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="couche-200-mat">Couché 200gr Mat</option>
+                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
             <div id="carte-options" class="option-group">
                 <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
-                <div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-300-mat">300gr Mat</option><option value="couche-300-brillant">300gr Brillant</option><option value="couche-350-mat">350gr Mat</option><option value="couche-350-brillant">350gr Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="carte-paper">
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
             <div id="depliant-options" class="option-group">
-                <div class="form-group"><label>Papier</label><select id="depliant-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-135-brillant">135gr Brillant</option><option value="couche-170-mat">170gr Mat</option><option value="couche-170-brillant">170gr Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="depliant-paper">
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
             <div id="entete-options" class="option-group">
@@ -103,25 +132,62 @@
             <div id="brochure-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (Fermé)</option><option value="a5">A5 (Fermé)</option></select></div>
                 <div class="form-group"><label>Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16..."></div>
-                <div class="form-group"><label>Papier Intérieur</label><select id="brochure-interior-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-135-brillant">135gr Brillant</option><option value="couche-90-mat">90gr Mat</option><option value="couche-90-brillant">90gr Brillant</option><option value="offset-80">Offset 80gr</option></select></div>
-                <div class="form-group"><label>Papier Couverture</label><select id="brochure-cover-paper"><option value="couche-250-mat">250gr Mat</option><option value="couche-250-brillant">250gr Brillant</option><option value="couche-300-mat">300gr Mat</option><option value="couche-300-brillant">300gr Brillant</option></select></div>
+                <div class="form-group"><label>Papier Intérieur</label>
+                    <select id="brochure-interior-paper">
+                        <option value="couche-90-mat">Couché 90gr Mat</option>
+                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="offset-80">Offset 80gr</option>
+                        <option value="offset-100">Offset 100gr</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Papier Couverture</label>
+                    <select id="brochure-cover-paper">
+                        <option value="couche-250-mat">Couché 250gr Mat</option>
+                        <option value="couche-250-brillant">Couché 250gr Brillant</option>
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="piquee">Agrafée (Piquée)</option><option value="dos-carre">Dos Carré Collé</option><option value="spirale">Spirale</option></select></div>
-                <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
+                <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
             </div>
 
             <div id="livre-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
                 <div class="form-group"><label>Pages</label><input type="number" id="livre-pages"></div>
                 <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
-                <div class="form-group"><label>Couverture</label><select id="livre-cover-paper"><option value="couche-300-mat">300gr Mat</option><option value="couche-300-brillant">300gr Brillant</option></select></div>
+                <div class="form-group"><label>Couverture</label>
+                    <select id="livre-cover-paper">
+                        <option value="couche-250-mat">Couché 250gr Mat</option>
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
             </div>
 
             <div id="affiches-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select></div>
-                <div class="form-group"><label>Papier</label><select id="affiche-paper"><option value="couche-135-mat">135gr Mat</option><option value="couche-135-brillant">135gr Brillant</option><option value="couche-170-mat">170gr Mat</option><option value="couche-170-brillant">170gr Brillant</option><option value="couche-200-mat">200gr Mat</option><option value="couche-200-brillant">200gr Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="affiche-paper">
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="couche-200-mat">Couché 200gr Mat</option>
+                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
             <button class="btn btn-calc" onclick="calculateQuote()">⚡ Calculer le prix</button>
@@ -246,6 +312,10 @@
             if (sheets < 200) return 1.9; if (sheets < 300) return 1.8; if (sheets < 400) return 1.7;
             if (sheets < 500) return 1.6; return 1.5;
         }
+        
+        function getPricePerSheetRecto(sheets) {
+            return getPricePerSheetCouleur(sheets) - 0.2;
+        }
 
         function calculatePriceWithSmoothing(tarifArray, quantity) {
             if (!tarifArray) return { totalPrice: 0 };
@@ -303,10 +373,11 @@
                     let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
                     let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
                     let totalSheets = sheetsInt + sheetsCov;
-                    let priceSheet = getPricePerSheetCouleur(totalSheets);
+                    let priceSheetInt = getPricePerSheetCouleur(totalSheets);
+                    let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets);
                     
-                    let costInt = sheetsInt * priceSheet;
-                    let costCov = sheetsCov * (coverType === 'recto' ? priceSheet - 0.2 : priceSheet);
+                    let costInt = sheetsInt * priceSheetInt;
+                    let costCov = sheetsCov * priceSheetCov;
                     let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
                     let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
 
