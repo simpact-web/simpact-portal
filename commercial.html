@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Commercial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --accent: #f97316; --text: #1e293b; --bg: #f1f5f9; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2rem; }
+        header { grid-column: 1 / -1; background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary); }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        /* Formulaire */
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+        select, input { width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; font-family: inherit; }
+        .btn { width: 100%; padding: 1rem; background: #1e293b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        
+        /* Résultat et Actions */
+        .price-box { text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 8px; }
+        .price-val { font-size: 2.5rem; font-weight: 700; color: var(--primary); font-family: 'Space Mono', monospace; }
+        
+        .actions-pdf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-pdf { padding: 15px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-compta { background: #10b981; } .btn-compta:hover { background: #059669; }
+        .btn-prod { background: #f59e0b; } .btn-prod:hover { background: #d97706; }
+
+        /* Options dynamiques */
+        .option-group { display: none; }
+        .option-group.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* MODÈLE PDF (Caché à l'écran) */
+        #pdf-template { display: none; padding: 30px; background: white; color: black; font-family: sans-serif; }
+        .pdf-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .pdf-table th { background: #eee; text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+        .pdf-table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .badge-prod { background: #fffbeb; color: #b45309; padding: 5px 10px; border: 1px solid #fcd34d; border-radius: 4px; display: inline-block; margin-top: 5px; }
+        
+        @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💼 Espace Commercial</h1>
+            <a href="index.html" style="text-decoration: none; color: #64748b;">← Retour Portail</a>
+        </header>
+
+        <div class="card">
+            <h2>📝 Configuration</h2>
+            <div class="form-group">
+                <label>Client / Dossier</label>
+                <input type="text" id="client-name" placeholder="Nom du client...">
+            </div>
+            
+            <div class="form-group">
+                <label>Produit</label>
+                <select id="product-type">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="flyer">Flyers</option>
+                    <option value="carte">Cartes de visite</option>
+                    <option value="depliant">Dépliants</option>
+                    <option value="entete">En-tête</option>
+                    <option value="brochure">Brochures</option>
+                    <option value="livre">Livres / Dossiers</option>
+                    <option value="affiches">Affiches</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantité</label>
+                <input type="number" id="quantity" min="1" placeholder="Ex: 100">
+            </div>
+
+            <div id="flyer-options" class="option-group">
+                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option>Couché 135gr Brillant</option><option>Couché 170gr Mat</option></select></div>
+            </div>
+            <div class="form-group">
+                <label>Détails techniques (Pour l'atelier)</label>
+                <input type="text" id="tech-details" placeholder="Ex: Finition spécifique, coupe, emballage...">
+            </div>
+
+            <button class="btn" onclick="calculate()">Calculer</button>
+        </div>
+
+        <div class="card summary-card">
+            <h2>Résultat</h2>
+            <div class="price-box">
+                <div class="price-val"><span id="total-price">0.00</span> DT</div>
+                <small>Prix unitaire: <span id="unit-price">--</span></small>
+            </div>
+
+            <h3>🖨️ Générer Documents</h3>
+            <div class="actions-pdf">
+                <button class="btn-pdf btn-compta" onclick="generatePDF('compta')">📄 Bon de<br>Commande</button>
+                <button class="btn-pdf btn-prod" onclick="generatePDF('prod')">🏭 Fiche<br>Atelier</button>
+            </div>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 1rem; text-align: center;">
+                Vert : Pour la facturation (avec prix)<br>
+                Orange : Pour la production (technique)
+            </p>
+        </div>
+    </div>
+
+    <div id="pdf-template">
+        <div class="pdf-header">
+            <div>
+                <h1 id="pdf-doc-title" style="margin:0; text-transform:uppercase;">TITRE</h1>
+                <p>Date : <span id="pdf-date"></span></p>
+                <p>Ref : <strong id="pdf-ref"></strong></p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin:0;">SIMPACT</h2>
+                <p>Impression Numérique</p>
+            </div>
+        </div>
+
+        <div style="background: #f8fafc; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+            <strong>Client :</strong> <span id="pdf-client"></span>
+        </div>
+
+        <table class="pdf-table">
+            <tr>
+                <th width="60%">Désignation</th>
+                <th>Quantité</th>
+                <th class="col-price" style="text-align: right;">Montant HT</th>
+            </tr>
+            <tr>
+                <td>
+                    <strong id="pdf-prod-name" style="font-size: 1.1rem;"></strong><br>
+                    <span id="pdf-desc" style="color: #475569; font-size: 0.9rem;"></span>
+                    <div id="pdf-tech-box" class="badge-prod"></div>
+                </td>
+                <td id="pdf-qty" style="font-size: 1.1rem;"></td>
+                <td id="pdf-price" class="col-price" style="text-align: right; font-weight: bold;"></td>
+            </tr>
+        </table>
+
+        <div id="pdf-total-box" style="text-align: right; margin-top: 40px; border-top: 2px solid #333; padding-top: 10px;">
+            <h2 style="margin:0;">TOTAL : <span id="pdf-total"></span> DT</h2>
+        </div>
+
+        <div id="pdf-footer-prod" style="margin-top: 50px; display: none; border: 2px dashed #f59e0b; padding: 20px;">
+            <h3 style="margin-top:0; color: #b45309;">⚠️ INSTRUCTIONS ATELIER</h3>
+            <p>1. Vérifier le fichier avant impression.</p>
+            <p>2. Respecter les quantités et le type de papier indiqué.</p>
+            <p>3. Emballage soigné.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentData = {};
+
+        // 1. CHARGEMENT PRIX (Même logique que vous aviez)
+        async function loadPrices() {
+            // Ici le script va chercher votre fichier JSON existant
+            try {
+                const r = await fetch('prix_config.json'); 
+                window.tarifs = await r.json();
+            } catch(e) { console.log("Attente du fichier JSON..."); }
+        }
+        loadPrices();
+
+        // 2. CALCUL (Simplifié pour l'exemple, mais fonctionnel)
+        function calculate() {
+            const qty = document.getElementById('quantity').value || 0;
+            const type = document.getElementById('product-type').value;
+            
+            // Simulation de prix (Remplacez par votre logique complexe si besoin)
+            // Dans votre vrai fichier, copiez la fonction calculateQuote() complète ici
+            let price = qty * 0.5; // Exemple: 0.5 DT par unité par défaut
+            if(type === 'carte') price = qty * 0.2;
+            if(type === 'livre') price = qty * 5;
+
+            document.getElementById('total-price').textContent = price.toFixed(2);
+            document.getElementById('unit-price').textContent = (price/qty).toFixed(3) + ' DT';
+            
+            // Sauvegarde pour le PDF
+            currentData = {
+                client: document.getElementById('client-name').value || "Client Comptoir",
+                product: document.getElementById('product-type').selectedOptions[0].text,
+                qty: qty,
+                price: price.toFixed(2),
+                tech: document.getElementById('tech-details').value || "Standard",
+                ref: "CMD-" + Math.floor(Math.random() * 10000)
+            };
+        }
+
+        // 3. GENERATION PDF
+        function generatePDF(mode) {
+            if(!currentData.qty) return alert("Veuillez faire un calcul d'abord.");
+            
+            const element = document.getElementById('pdf-template');
+            element.style.display = 'block'; // Rendre visible pour la capture
+
+            // Remplissage
+            document.getElementById('pdf-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('pdf-client').textContent = currentData.client;
+            document.getElementById('pdf-ref').textContent = currentData.ref;
+            document.getElementById('pdf-prod-name').textContent = currentData.product;
+            document.getElementById('pdf-qty').textContent = currentData.qty;
+            document.getElementById('pdf-tech-box').textContent = "Config: " + currentData.tech;
+
+            // Mode BON DE COMMANDE (Compta)
+            if(mode === 'compta') {
+                document.getElementById('pdf-doc-title').textContent = "BON DE COMMANDE";
+                document.getElementById('pdf-doc-title').style.color = "#2563eb";
+                
+                // Afficher les prix
+                document.querySelectorAll('.col-price').forEach(el => el.style.display = 'table-cell');
+                document.getElementById('pdf-price').textContent = currentData.price + " DT";
+                document.getElementById('pdf-total-box').style.display = 'block';
+                document.getElementById('pdf-total').textContent = currentData.price;
+                
+                document.getElementById('pdf-footer-prod').style.display = 'none';
+            }
+            
+            // Mode FICHE ATELIER (Production)
+            if(mode === 'prod') {
+                document.getElementById('pdf-doc-title').textContent = "FICHE DE FABRICATION";
+                document.getElementById('pdf-doc-title').style.color = "#d97706";
+                
+                // Cacher les prix
+                document.querySelectorAll('.col-price').forEach(el => el.style.display = 'none');
+                document.getElementById('pdf-total-box').style.display = 'none';
+                
+                document.getElementById('pdf-footer-prod').style.display = 'block';
+            }
+
+            // Création du PDF
+            const opt = {
+                margin: 0.5,
+                filename: mode === 'compta' ? `Bon_Commande_${currentData.ref}.pdf` : `Fiche_Atelier_${currentData.ref}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.display = 'none'; // Recacher après téléchargement
+            });
+        }
+    </script>
+</body>
+</html>
