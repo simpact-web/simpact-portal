@@ -3,18 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simpact - Devis Rapide</title>
+    <title>Simpact - Devis Express</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Outfit', sans-serif; padding: 2rem; background: #f8fafc; }
-        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
-        h1 { text-align: center; color: #1e293b; margin-top: 0; }
-        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-        .result { text-align: center; margin-top: 2rem; font-size: 2.5rem; font-weight: bold; color: #2563eb; }
-        .option-group { display: none; }
+        body { font-family: 'Outfit', sans-serif; padding: 2rem; background: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .card { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 550px; border: 1px solid #e2e8f0; }
+        
+        h1 { text-align: center; color: #1e293b; margin: 0 0 1.5rem 0; font-size: 1.8rem; }
+        
+        /* Inputs et Selects */
+        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: #fff; font-family: inherit; }
+        select:focus, input:focus { outline: none; border-color: #2563eb; }
+        
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #64748b; font-size: 0.9rem; }
+        
+        /* Bouton */
+        .btn { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+        
+        /* Résultat */
+        .result-box { margin-top: 2rem; text-align: center; padding: 1.5rem; background: #f1f5f9; border-radius: 12px; }
+        .price { font-size: 2.5rem; font-weight: 800; color: #0f172a; line-height: 1; }
+        .tax-info { color: #94a3b8; font-size: 0.8rem; margin-top: 5px; }
+        
+        /* Sections dynamiques */
+        .option-group { display: none; animation: fadeIn 0.3s; }
         .option-group.active { display: block; }
-        label { display: block; margin-bottom: 5px; font-weight: 500; color: #64748b; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        a { text-decoration: none; color: #94a3b8; font-size: 0.9rem; display: block; text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -27,43 +44,98 @@
             <option value="flyer">Flyers</option>
             <option value="carte">Cartes de visite</option>
             <option value="depliant">Dépliants</option>
+            <option value="entete">Papier En-tête</option>
             <option value="brochure">Brochures</option>
+            <option value="livre">Livres / Dossiers</option>
+            <option value="affiches">Affiches</option>
         </select>
         
         <label>Quantité</label>
-        <input type="number" id="quantity" placeholder="Quantité">
+        <input type="number" id="quantity" placeholder="Ex: 500">
 
         <div id="flyer-options" class="option-group">
             <label>Type</label>
             <select id="flyer-type"><option value="recto">Recto</option><option value="rectoVerso">Recto/Verso</option></select>
             <label>Papier</label>
-            <select id="flyer-paper"><option value="couche-135-brillant">Standard (135g)</option><option value="couche-300-mat">Rigide (300g)</option></select>
+            <select id="flyer-paper"><option value="couche-90-mat">Standard (90g)</option><option value="couche-135-brillant">Supérieur (135g)</option><option value="couche-170-mat">Rigide (170g)</option></select>
         </div>
 
         <div id="carte-options" class="option-group">
             <label>Finition</label>
             <select id="carte-finish"><option value="recto">Standard</option><option value="pellicule">Pelliculé (Luxe)</option></select>
+            <label>Papier</label>
+            <select id="carte-paper"><option value="couche-300-mat">Mat 300g</option><option value="couche-350-mat">Mat 350g (Rigide)</option><option value="couche-350-brillant">Brillant 350g</option></select>
+        </div>
+
+        <div id="depliant-options" class="option-group">
+            <label>Papier</label>
+            <select id="depliant-paper"><option value="couche-135-mat">Standard (135g)</option><option value="couche-170-mat">Rigide (170g)</option></select>
+        </div>
+
+        <div id="entete-options" class="option-group">
+            <label>Papier</label>
+            <select id="entete-paper"><option value="offset-80">Standard (80g)</option><option value="offset-100">Premium (100g)</option></select>
         </div>
 
         <div id="brochure-options" class="option-group">
+            <label>Format</label>
+            <select id="brochure-format"><option value="a4">A4 (Grand)</option><option value="a5">A5 (Petit)</option></select>
+            <label>Pages (Multiple de 4)</label>
+            <input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16...">
+            <label>Papier Intérieur</label>
+            <select id="brochure-interior-paper"><option value="couche-135-mat">Standard (135g)</option><option value="couche-90-mat">Eco (90g)</option></select>
+            <label>Couverture</label>
+            <select id="brochure-cover-paper"><option value="couche-250-mat">Rigide (250g)</option><option value="couche-300-mat">Très Rigide (300g)</option></select>
+            <label>Impression Couverture</label>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <label><input type="radio" name="brochure-cover-type" value="recto" checked> Recto</label>
+                <label><input type="radio" name="brochure-cover-type" value="rectoVerso"> Recto/Verso</label>
+            </div>
+            <label>Finition</label>
+            <select id="brochure-finition"><option value="piquee">Agrafée</option><option value="dos-carre">Dos Carré</option><option value="spirale">Spirale</option></select>
+            <label>Pelliculage Couv.</label>
+            <div style="display:flex; gap:10px;">
+                <label><input type="radio" name="brochure-pelliculage" value="sans" checked> Non</label>
+                <label><input type="radio" name="brochure-pelliculage" value="avec"> Oui</label>
+            </div>
+        </div>
+
+        <div id="livre-options" class="option-group">
+            <label>Format</label>
+            <select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select>
             <label>Pages</label>
-            <input type="number" id="brochure-pages" placeholder="Nombre de pages">
-            <label>Reliure</label>
-            <select id="brochure-finition"><option value="piquee">Agrafée</option><option value="spirale">Spirale</option></select>
+            <input type="number" id="livre-pages" placeholder="Nombre de pages">
+            <label>Papier Intérieur</label>
+            <select id="livre-interior-paper"><option value="offset-80">Standard (80g)</option></select>
+            <label>Couverture</label>
+            <select id="livre-cover-paper"><option value="couche-300-mat">Rigide (300g)</option></select>
+            <div style="display:none;">
+                <input type="radio" name="livre-cover-type" value="recto" checked>
+                <input type="radio" name="livre-pelliculage" value="sans" checked>
+            </div>
+        </div>
+
+        <div id="affiches-options" class="option-group">
+            <label>Format</label>
+            <select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select>
+            <label>Papier</label>
+            <select id="affiche-paper"><option value="couche-135-mat">135g</option><option value="couche-200-mat">200g</option></select>
         </div>
 
         <button class="btn" onclick="calculateQuote()">Voir mon prix</button>
 
-        <div class="result"><span id="total-price">--</span> DT</div>
-        <p style="text-align: center; color: #94a3b8; font-size: 0.9rem;">Prix Hors Taxes</p>
-        <div style="text-align: center;"><a href="index.html" style="color: #94a3b8; text-decoration: none;">← Retour</a></div>
+        <div class="result-box">
+            <div class="price"><span id="total-price">--</span> <small style="font-size:1rem; font-weight:400;">DT</small></div>
+            <div class="tax-info">Prix Hors Taxes • Hors frais techniques</div>
+        </div>
+        
+        <a href="index.html">← Retour accueil</a>
     </div>
 
     <script>
-        // On reprend exactement la même logique de calcul (simplifiée ici pour affichage)
-        // Pour que le client ait le VRAI prix, il faut charger les configs
+        // === MÊME MOTEUR DE CALCUL QUE COMMERCIAL (POUR LA PRÉCISION) ===
         let TARIFS = {};
-        const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, min_price: 28 };
+        const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
 
         async function loadPrices() {
             try {
@@ -72,53 +144,127 @@
                 TARIFS = {
                     flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
                     carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
-                    depliant: data.tarifs.depliant
+                    depliant: data.tarifs.depliant,
+                    entete: data.tarifs.entete,
+                    prix_couverture_livre: data.prix_couverture_livre
                 };
-            } catch(e) { console.log("Erreur prix"); }
+            } catch(e) { console.log("Erreur chargement prix"); }
         }
         loadPrices();
 
         document.getElementById('product-type').addEventListener('change', function() {
             document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
-            if(this.value) {
-                const optId = this.value + '-options';
-                if(document.getElementById(optId)) document.getElementById(optId).classList.add('active');
-            }
+            if(this.value) document.getElementById(this.value + '-options').classList.add('active');
         });
+
+        // Fonctions techniques
+        function calculatePaperSurcharge(paperType, numSheets) {
+            if (!paperType || numSheets === 0) return 0;
+            if (paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
+            if (paperType.startsWith('couche-')) {
+                const parts = paperType.split('-');
+                if (parts.length >= 2) {
+                    const grammage = parseInt(parts[1]);
+                    const grammesSup = grammage - 90;
+                    if (grammesSup > 0) return numSheets * grammesSup * PRIX_FIXES.gramme_couche;
+                }
+            }
+            return 0;
+        }
+
+        function getPricePerSheetCouleur(sheets) {
+            if (sheets < 25) return 3; if (sheets < 50) return 2.5; if (sheets < 100) return 2;
+            if (sheets < 200) return 1.9; if (sheets < 300) return 1.8; if (sheets < 400) return 1.7;
+            if (sheets < 500) return 1.6; return 1.5;
+        }
+
+        function calculatePriceWithSmoothing(tarifArray, quantity) {
+            if (!tarifArray) return { totalPrice: 0 };
+            let lower = tarifArray[0], upper = tarifArray[0];
+            for (let t of tarifArray) { if (t.qty <= quantity) lower = t; if (t.qty >= quantity && upper === tarifArray[0]) upper = t; }
+            if (lower.qty === upper.qty) return { totalPrice: lower.price };
+            const ratio = (quantity - lower.qty) / (upper.qty - lower.qty);
+            return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
+        }
 
         function calculateQuote() {
             const type = document.getElementById('product-type').value;
             const qty = parseInt(document.getElementById('quantity').value);
             if(!type || !qty) return;
 
-            let price = 0;
-            
-            // Logique de calcul (Copie simplifiée du moteur commercial pour cohérence)
-            if(type === 'flyer') {
-                const mode = document.getElementById('flyer-type').value;
-                price = getPrice(TARIFS.flyer[mode], qty);
-            }
-            else if(type === 'carte') {
-                const mode = document.getElementById('carte-finish').value;
-                price = getPrice(TARIFS.carte[mode], qty);
-            }
-            else if(type === 'brochure') {
-                // Estimation rapide pour le client
-                const p = parseInt(document.getElementById('brochure-pages').value) || 0;
-                price = (p/4) * qty * 0.5; // Prix approximatif
-            }
+            let totalPrice = 0;
 
-            price = Math.max(price, PRIX_FIXES.min_price);
-            document.getElementById('total-price').textContent = price.toFixed(2);
-        }
+            try {
+                if(type === 'flyer') {
+                    const mode = document.getElementById('flyer-type').value; // Client select ID changed a bit? No, fixed below
+                    const paper = document.getElementById('flyer-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer[mode], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                }
+                else if(type === 'carte') {
+                    const finish = document.getElementById('carte-finish').value;
+                    const paper = document.getElementById('carte-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.carte[finish], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, Math.ceil(qty/10));
+                }
+                else if(type === 'depliant') {
+                    const paper = document.getElementById('depliant-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.depliant, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                }
+                else if(type === 'entete') {
+                    const paper = document.getElementById('entete-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.entete, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                }
+                else if(type === 'brochure') {
+                    const pages = parseInt(document.getElementById('brochure-pages').value);
+                    const format = document.getElementById('brochure-format').value;
+                    const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
+                    const paperInt = document.getElementById('brochure-interior-paper').value;
+                    const paperCov = document.getElementById('brochure-cover-paper').value;
 
-        function getPrice(arr, qty) {
-            if(!arr) return 0;
-            let lower = arr[0], upper = arr[0];
-            for (let t of arr) { if (t.qty <= qty) lower = t; if (t.qty >= qty && upper === arr[0]) upper = t; }
-            if (lower.qty === upper.qty) return lower.price;
-            const ratio = (qty - lower.qty) / (upper.qty - lower.qty);
-            return lower.price + (upper.price - lower.price) * ratio;
+                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
+                    let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
+                    let totalSheets = sheetsInt + sheetsCov;
+                    let priceSheet = getPricePerSheetCouleur(totalSheets);
+                    
+                    let costInt = sheetsInt * priceSheet;
+                    let costCov = sheetsCov * (coverType === 'recto' ? priceSheet - 0.2 : priceSheet);
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
+                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
+
+                    totalPrice = costInt + costCov + surcharge + costPell;
+                }
+                else if(type === 'livre') {
+                    const pages = parseInt(document.getElementById('livre-pages').value);
+                    const format = document.getElementById('livre-format').value;
+                    const paperInt = document.getElementById('livre-interior-paper').value;
+                    // Simplifié pour client (toujours couv recto couleur + pas de pelliculage sauf demande)
+                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
+                    let costInt = sheetsInt * PRIX_FIXES.feuille_nb;
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt);
+                    let unitCovPrice = TARIFS.prix_couverture_livre[format].recto;
+                    let costCov = qty * unitCovPrice;
+
+                    totalPrice = costInt + surcharge + costCov;
+                }
+                else if(type === 'affiches') {
+                    const format = document.getElementById('affiche-format').value;
+                    const paper = document.getElementById('affiche-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer.recto, qty);
+                    let price = res.totalPrice;
+                    if(format === 'a3plus') price *= 1.2;
+                    totalPrice = price + calculatePaperSurcharge(paper, qty);
+                }
+
+                totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+
+            } catch(e) {
+                console.log("Calcul impossible (données manquantes)");
+            }
         }
     </script>
 </body>
