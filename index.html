@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Portail Central</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #f8fafc; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1100px; padding: 2rem; }
+        .card { background: white; padding: 3rem 2rem; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-decoration: none; color: #1e293b; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px rgba(0,0,0,0.1); border-color: #2563eb; }
+        .icon { font-size: 3.5rem; margin-bottom: 1.5rem; display: block; }
+        h2 { margin: 0 0 1rem 0; color: #0f172a; font-size: 1.5rem; }
+        p { color: #64748b; margin: 0; line-height: 1.6; font-size: 0.95rem; }
+        .badge { position: absolute; top: 1rem; right: 1rem; font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-free { background: #dcfce7; color: #166534; }
+        .badge-lock { background: #fee2e2; color: #991b1b; }
+        
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="client.html" class="card">
+            <span class="badge badge-free">Accès Libre</span>
+            <span class="icon">👤</span>
+            <h2>Espace Client</h2>
+            <p>Calculateur de devis rapide.<br>Prix publics instantanés.</p>
+        </a>
+
+        <div onclick="checkPass('commercial')" class="card">
+            <span class="badge badge-lock">🔒 Équipe</span>
+            <span class="icon">💼</span>
+            <h2>Espace Commercial</h2>
+            <p>Calculateur détaillé.<br>Génération <strong>Bon de Commande</strong><br>& <strong>Fiche de Production</strong>.</p>
+        </div>
+
+        <div onclick="checkPass('admin')" class="card">
+            <span class="badge badge-lock">🔒 Admin</span>
+            <span class="icon">⚙️</span>
+            <h2>Administration</h2>
+            <p>Configuration des tarifs.<br>Mise à jour des paliers.</p>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION DES MOTS DE PASSE
+        const PASSWORDS = {
+            'commercial': 'simpact2024', 
+            'admin': 'admin123'
+        };
+
+        function checkPass(role) {
+            const input = prompt("🔐 Mot de passe " + role.toUpperCase() + " :");
+            if (input === PASSWORDS[role]) {
+                if(role === 'commercial') window.location.href = 'commercial.html';
+                if(role === 'admin') window.location.href = 'admin_prix.html';
+            } else {
+                if(input !== null) alert("⛔ Accès refusé.");
+            }
+        }
+    </script>
+</body>
+</html>
