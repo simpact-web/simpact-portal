@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simpact - Commercial</title>
+    <title>Simpact - Espace Commercial</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="users.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -25,10 +25,10 @@
         label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: #475569; }
         select, input { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
         
-        /* OPTIONS */
-        .option-group { display: none; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
-        .option-group.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* OPTIONS DYNAMIQUES */
+        .option-group { display: none; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; animation: fadeIn 0.3s ease; }
+        .option-group.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
         /* RADIOS */
         .radio-group { display: flex; gap: 10px; }
@@ -42,17 +42,23 @@
         .btn { width: 100%; padding: 1rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 1rem; background: #0f172a; color: white; transition: 0.2s; }
         .btn:hover { transform: translateY(-2px); }
         
+        /* BOUTONS ACTIONS */
         .btn-validate { background: #10b981; color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .btn-validate:hover { background: #059669; transform: translateY(-2px); }
-
         .btn-action { width: 100%; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; }
         .btn-compta { background: #dcfce7; color: #166534; } 
         .btn-atelier { background: #ffedd5; color: #9a3412; }
         .btn-email { background: #2563eb; color: white; }
 
         /* --- ZONE DE GENERATION PDF (OVERLAY) --- */
-        #pdf-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px; }
-        #pdf-template { background: white; width: 210mm; min-height: 297mm; padding: 20mm; box-shadow: 0 0 20px rgba(0,0,0,0.5); font-family: Arial, sans-serif; color: #000; box-sizing: border-box; position: relative; }
+        #pdf-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            z-index: 9999; display: none; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px;
+        }
+        #pdf-template { 
+            background: white; width: 210mm; min-height: 297mm; padding: 20mm; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); font-family: Arial, sans-serif; color: #000; box-sizing: border-box; position: relative;
+        }
         .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
         .pdf-title { font-size: 24px; text-transform: uppercase; margin: 0; font-weight: 800; }
         .pdf-info-box { border: 1px solid #000; padding: 15px; margin-bottom: 20px; background: #f8f8f8; }
@@ -60,7 +66,10 @@
         .pdf-table th { background: #eee; border: 1px solid #000; padding: 10px; text-align: left; font-weight: bold; }
         .pdf-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
         .pdf-price-col { width: 20%; text-align: right; font-weight: bold; }
-        .mode-prod .pdf-price-col { display: none; } .mode-prod .pdf-price-header { display: none; } .mode-compta #atelier-notes { display: none; } .mode-prod #atelier-notes { display: block; }
+        .mode-prod .pdf-price-col { display: none; }
+        .mode-prod .pdf-price-header { display: none; }
+        .mode-compta #atelier-notes { display: none; }
+        .mode-prod #atelier-notes { display: block; }
         #pdf-actions { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 15px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; gap: 10px; z-index: 10000; }
     </style>
 </head>
@@ -96,86 +105,23 @@
 
             <div id="flyer-options" class="option-group">
                 <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">R/V</label></div></div></div>
-                <div class="form-group"><label>Papier</label>
-                    <select id="flyer-paper">
-                        <option value="couche-90-mat">Couché 90gr Mat</option>
-                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
-                        <option value="couche-115-mat">Couché 115gr Mat</option>
-                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                        <option value="couche-135-mat">Couché 135gr Mat</option>
-                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                        <option value="couche-170-mat">Couché 170gr Mat</option>
-                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                        <option value="couche-200-mat">Couché 200gr Mat</option>
-                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
-                    </select>
-                </div>
+                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-170-brillant">170g Brillant</option></select></div>
             </div>
 
             <div id="carte-options" class="option-group">
                 <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
-                <div class="form-group"><label>Papier</label>
-                    <select id="carte-paper">
-                        <option value="couche-300-mat">Couché 300gr Mat</option>
-                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                        <option value="couche-350-mat">Couché 350gr Mat</option>
-                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
-                    </select>
-                </div>
+                <div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-350-mat">350g Mat</option><option value="couche-350-brillant">350g Brillant</option></select></div>
             </div>
 
-            <div id="depliant-options" class="option-group">
-                <div class="form-group"><label>Papier</label>
-                    <select id="depliant-paper">
-                        <option value="couche-115-mat">Couché 115gr Mat</option>
-                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                        <option value="couche-135-mat">Couché 135gr Mat</option>
-                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                        <option value="couche-170-mat">Couché 170gr Mat</option>
-                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="entete-options" class="option-group">
-                <div class="form-group"><label>Papier</label>
-                    <select id="entete-paper">
-                        <option value="offset-80">Offset 80gr Standard</option>
-                        <option value="offset-100">Offset 100gr Premium</option>
-                    </select>
-                </div>
-            </div>
+            <div id="depliant-options" class="option-group"><div class="form-group"><label>Papier</label><select id="depliant-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-170-brillant">170g Brillant</option></select></div></div>
+            <div id="entete-options" class="option-group"><div class="form-group"><label>Papier</label><select id="entete-paper"><option value="offset-80">Offset 80g</option><option value="offset-100">Offset 100g</option></select></div></div>
+            <div id="affiches-options" class="option-group"><div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select></div><div class="form-group"><label>Papier</label><select id="affiche-paper"><option value="couche-200-brillant">200g Brillant</option></select></div></div>
 
             <div id="brochure-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
                 <div class="form-group"><label>Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16..."></div>
-                
-                <div class="form-group"><label>Papier Intérieur</label>
-                    <select id="brochure-interior-paper">
-                        <option value="couche-90-mat">Couché 90gr Mat</option>
-                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
-                        <option value="couche-115-mat">Couché 115gr Mat</option>
-                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                        <option value="couche-135-mat">Couché 135gr Mat</option>
-                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                        <option value="couche-170-mat">Couché 170gr Mat</option>
-                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                        <option value="offset-80">Offset 80gr</option>
-                        <option value="offset-100">Offset 100gr</option>
-                    </select>
-                </div>
-                
-                <div class="form-group"><label>Papier Couverture</label>
-                    <select id="brochure-cover-paper">
-                        <option value="couche-250-mat">Couché 250gr Mat</option>
-                        <option value="couche-250-brillant">Couché 250gr Brillant</option>
-                        <option value="couche-300-mat">Couché 300gr Mat</option>
-                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                        <option value="couche-350-mat">Couché 350gr Mat</option>
-                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
-                    </select>
-                </div>
-                
+                <div class="form-group"><label>Papier Intérieur</label><select id="brochure-interior-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-115-brillant">115g Brillant</option><option value="offset-80">Offset 80g</option></select></div>
+                <div class="form-group"><label>Papier Couverture</label><select id="brochure-cover-paper"><option value="couche-250-brillant">250g Brillant</option><option value="couche-300-mat">300g Mat</option></select></div>
                 <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="Piquée à cheval">Piquée à cheval (Agrafé)</option><option value="Dos carré collé">Dos carré collé</option><option value="Spirale">Spirale</option></select></div>
                 <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
@@ -184,33 +130,10 @@
             <div id="livre-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
                 <div class="form-group"><label>Pages</label><input type="number" id="livre-pages"></div>
-                <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
-                <div class="form-group"><label>Couverture</label>
-                    <select id="livre-cover-paper">
-                        <option value="couche-250-mat">Couché 250gr Mat</option>
-                        <option value="couche-250-brillant">Couché 250gr Brillant</option>
-                        <option value="couche-300-mat">Couché 300gr Mat</option>
-                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                        <option value="couche-350-mat">Couché 350gr Mat</option>
-                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
-                    </select>
-                </div>
+                <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80g</option><option value="offset-100">Offset 100g</option></select></div>
+                <div class="form-group"><label>Couverture</label><select id="livre-cover-paper"><option value="couche-250-brillant">250g Brillant</option></select></div>
                 <div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
-            </div>
-
-            <div id="affiches-options" class="option-group">
-                <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div>
-                <div class="form-group"><label>Papier</label>
-                    <select id="affiche-paper">
-                        <option value="couche-135-mat">Couché 135gr Mat</option>
-                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                        <option value="couche-170-mat">Couché 170gr Mat</option>
-                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                        <option value="couche-200-mat">Couché 200gr Mat</option>
-                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
-                    </select>
-                </div>
             </div>
 
             <button class="btn" onclick="calculateQuote()">⚡ Calculer le prix</button>
@@ -223,7 +146,7 @@
             
             <div id="workflow-panel" style="opacity: 0.5; pointer-events: none;">
                 <button class="btn-validate" onclick="sendOrderToSystem()">✅ VALIDER LA COMMANDE</button>
-                <p style="font-size:0.8rem; color:#64748b; text-align:center; margin-top:5px;">Envoie direct à la Prod & Compta</p>
+                <p style="font-size:0.8rem; color:#64748b; text-align:center; margin-top:5px;">Envoie direct à la Prod & Compta (Drive)</p>
 
                 <hr style="border:0; border-top:1px dashed #cbd5e1; margin: 20px 0;">
 
@@ -243,51 +166,20 @@
     <div id="pdf-overlay">
         <div id="pdf-template">
             <div class="pdf-header">
-                <div>
-                    <h1 class="pdf-title" id="pdf-doc-title">TITRE</h1>
-                    <p style="margin: 5px 0;">Réf: <span id="pdf-ref"></span> | Date: <span id="pdf-date"></span></p>
-                </div>
-                <div style="text-align:right;">
-                    <h2 style="margin:0; color:#2563eb;">SIMPACT</h2>
-                    <p style="margin:0; font-size:12px;">Impression Numérique & Offset</p>
-                </div>
+                <div><h1 class="pdf-title" id="pdf-doc-title">TITRE</h1><p style="margin: 5px 0;">Réf: <span id="pdf-ref"></span> | Date: <span id="pdf-date"></span></p></div>
+                <div style="text-align:right;"><h2 style="margin:0; color:#2563eb;">SIMPACT</h2><p style="margin:0; font-size:12px;">Impression Numérique & Offset</p></div>
             </div>
-
-            <div class="pdf-info-box">
-                <strong>Client :</strong> <span id="pdf-client"></span><br>
-                <strong>Commercial :</strong> <span id="pdf-commercial"></span>
-            </div>
-
+            <div class="pdf-info-box"><strong>Client :</strong> <span id="pdf-client"></span><br><strong>Commercial :</strong> <span id="pdf-commercial"></span></div>
             <table class="pdf-table">
-                <thead>
-                    <tr>
-                        <th style="width: 60%;">Désignation</th>
-                        <th style="width: 20%; text-align:center;">Quantité</th>
-                        <th class="pdf-price-header" style="width: 20%; text-align:right;">Prix HT</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <strong id="pdf-prod" style="font-size: 1.2em; display:block; margin-bottom:10px;"></strong>
-                            <div id="pdf-desc" style="white-space: pre-line; line-height: 1.5;"></div>
-                        </td>
-                        <td style="text-align:center; font-size: 1.2em; font-weight: bold;" id="pdf-qty"></td>
-                        <td class="pdf-price-col" style="font-size: 1.2em; font-weight: bold;" id="pdf-price"></td>
-                    </tr>
-                </tbody>
+                <thead><tr><th style="width: 60%;">Désignation</th><th style="width: 20%; text-align:center;">Quantité</th><th class="pdf-price-header" style="width: 20%; text-align:right;">Prix HT</th></tr></thead>
+                <tbody><tr><td><strong id="pdf-prod" style="font-size: 1.2em; display:block; margin-bottom:10px;"></strong><div id="pdf-desc" style="white-space: pre-line; line-height: 1.5;"></div></td><td style="text-align:center; font-size: 1.2em; font-weight: bold;" id="pdf-qty"></td><td class="pdf-price-col" style="font-size: 1.2em; font-weight: bold;" id="pdf-price"></td></tr></tbody>
             </table>
-
             <div id="atelier-notes" style="border: 2px dashed #ea580c; padding: 20px; margin-top: 30px;">
                 <h3 style="margin-top:0; color:#ea580c; border-bottom: 1px solid #ea580c; padding-bottom: 5px;">⚠️ INSTRUCTIONS ATELIER</h3>
                 <div id="pdf-atelier-content" style="font-size: 14px; line-height: 1.6;"></div>
             </div>
         </div>
-
-        <div id="pdf-actions">
-            <button onclick="downloadPdf()" style="background: #2563eb; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">💾 TÉLÉCHARGER</button>
-            <button onclick="closeOverlay()" style="background: #e2e8f0; color: #1e293b; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">❌ FERMER</button>
-        </div>
+        <div id="pdf-actions"><button onclick="downloadPdf()" style="background: #2563eb; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">💾 TÉLÉCHARGER</button><button onclick="closeOverlay()" style="background: #e2e8f0; color: #1e293b; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">❌ FERMER</button></div>
     </div>
 
     <script>
@@ -297,10 +189,11 @@
         
         let currentQuoteData = null;
         let currentMode = '';
-
-        // --- 2. DONNEES ET CALCULS ---
         let TARIFS = {};
         const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
+
+        // ⚠️ REMETTRE VOTRE LIEN GOOGLE SCRIPT ICI !!! ⚠️
+        const GOOGLE_SCRIPT_URL = "VOTRE_LIEN_GOOGLE_SCRIPT_ICI"; 
 
         async function loadPrices() {
             try {
@@ -316,12 +209,16 @@
         }
         loadPrices();
 
+        // GESTION AFFICHAGE OPTIONS (C'est ce qui manquait !)
         document.getElementById('product-type').addEventListener('change', function() {
             document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
-            if(this.value) document.getElementById(this.value + '-options').classList.add('active');
+            if(this.value) {
+                const group = document.getElementById(this.value + '-options');
+                if(group) group.classList.add('active');
+            }
         });
 
-        // Helpers
+        // Helpers de calcul
         function getPaperName(paperType) {
             if(!paperType) return '';
             if(paperType === 'offset-80') return 'Offset 80gr Standard';
@@ -364,7 +261,6 @@
             return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
         }
 
-        // --- MOTEUR DE CALCUL COMPLET ---
         function calculateQuote() {
             const type = document.getElementById('product-type').value;
             const qty = parseInt(document.getElementById('quantity').value);
@@ -464,18 +360,16 @@
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
                 const ref = "D-" + Date.now().toString().slice(-6);
 
-                // UI Update
                 document.getElementById('total-price').textContent = totalPrice.toFixed(2);
                 document.getElementById('quote-ref').textContent = ref;
                 document.getElementById('workflow-panel').style.opacity = "1";
                 document.getElementById('workflow-panel').style.pointerEvents = "auto";
 
-                // Data Store
                 currentQuoteData = {
                     client: document.getElementById('client-name').value || "Client Comptoir",
                     prod: prodName,
                     qty: qty,
-                    price: totalPrice.toFixed(2), // Juste le chiffre
+                    price: totalPrice.toFixed(2),
                     ref: ref,
                     desc: config,
                     user: user.name,
@@ -487,24 +381,15 @@
             } catch(e) { console.error(e); alert("Erreur de calcul. Vérifiez les champs."); }
         }
 
-        // --- 3. WORKFLOW CONNECTÉ GOOGLE DRIVE ---
-        
-        // ⚠️ COLLEZ VOTRE URL GOOGLE ICI ENTRE LES GUILLEMETS :
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
-
+        // WORKFLOW DRIVE
         function sendOrderToSystem() {
-            if(!currentQuoteData) return alert("Veuillez d'abord faire un calcul !");
-            
-            if(confirm("Valider cette commande et l'enregistrer dans le Drive ?")) {
-                
-                // Change le texte du bouton pour montrer que ça charge
-                const btn = document.querySelector('.btn-validate');
-                const originalText = btn.textContent;
-                btn.textContent = "⏳ Envoi en cours...";
-                btn.disabled = true;
+            if(!currentQuoteData) return alert("Veuillez calculer d'abord.");
+            if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec") return alert("Erreur: Lien Google Script manquant dans le code.");
 
-                // Préparation des données pour Google Sheets
-                // Les noms à gauche doivent correspondre EXACTEMENT aux colonnes du Sheet
+            if(confirm("Valider cette commande ?")) {
+                const btn = document.querySelector('.btn-validate');
+                btn.textContent = "⏳ Envoi..."; btn.disabled = true;
+
                 const formData = new FormData();
                 formData.append("Date", new Date().toLocaleString());
                 formData.append("Ref", currentQuoteData.ref);
@@ -512,84 +397,49 @@
                 formData.append("Produit", currentQuoteData.prod);
                 formData.append("Quantité", currentQuoteData.qty);
                 formData.append("Prix HT", currentQuoteData.price);
-                formData.append("Détails", currentQuoteData.desc); // Description technique
+                formData.append("Détails", currentQuoteData.desc);
                 formData.append("Commercial", currentQuoteData.user);
 
                 fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
-                .then(response => {
-                    // Sauvegarde locale aussi (pour affichage immédiat Prod/Compta sur le même PC)
-                    saveOrder(currentQuoteData); 
-                    
-                    alert("✅ Succès ! Commande enregistrée dans Google Drive et Système Local.");
+                .then(r => {
+                    saveOrder(currentQuoteData);
+                    alert("✅ Commande envoyée au Drive et à l'Atelier !");
                     window.location.reload();
                 })
-                .catch(error => {
-                    console.error('Erreur!', error.message);
-                    alert("⚠️ Erreur lors de l'envoi vers le Drive. Vérifiez votre connexion.");
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                });
+                .catch(e => { alert("Erreur connexion Drive."); btn.disabled = false; btn.textContent = "Réessayer"; });
             }
         }
-        // --- 4. GESTION PDF (OVERLAY) ---
+
         function openPdfPreview(mode) {
             if(!currentQuoteData) return;
             currentMode = mode;
-            
             const overlay = document.getElementById('pdf-overlay');
             const template = document.getElementById('pdf-template');
-            
-            // Reset classes
             template.className = (mode === 'compta') ? 'mode-compta' : 'mode-prod';
             
-            // Remplissage
             document.getElementById('pdf-ref').textContent = currentQuoteData.ref;
             document.getElementById('pdf-date').textContent = new Date().toLocaleDateString();
             document.getElementById('pdf-client').textContent = currentQuoteData.client;
             document.getElementById('pdf-commercial').textContent = currentQuoteData.user;
             document.getElementById('pdf-prod').textContent = currentQuoteData.prod.toUpperCase();
-            document.getElementById('pdf-desc').textContent = currentQuoteData.desc; // Le CSS white-space: pre-line gère les \n
+            document.getElementById('pdf-desc').textContent = currentQuoteData.desc;
             document.getElementById('pdf-qty').textContent = currentQuoteData.qty;
             document.getElementById('pdf-price').textContent = currentQuoteData.price + " DT";
             
-            // Titre et Couleurs
             const titleEl = document.getElementById('pdf-doc-title');
-            if(mode === 'compta') {
-                titleEl.textContent = "BON DE COMMANDE";
-                titleEl.style.color = "#2563eb";
-            } else {
-                titleEl.textContent = "ORDRE DE FABRICATION";
-                titleEl.style.color = "#ea580c";
-                document.getElementById('pdf-atelier-content').innerHTML = currentQuoteData.desc.replace(/\n/g, '<br>');
-            }
-
-            overlay.style.display = 'flex'; // Afficher l'overlay
+            if(mode === 'compta') { titleEl.textContent = "BON DE COMMANDE"; titleEl.style.color = "#2563eb"; } 
+            else { titleEl.textContent = "ORDRE DE FABRICATION"; titleEl.style.color = "#ea580c"; document.getElementById('pdf-atelier-content').innerHTML = currentQuoteData.desc.replace(/\n/g, '<br>'); }
+            overlay.style.display = 'flex';
         }
 
         function downloadPdf() {
             const element = document.getElementById('pdf-template');
-            const opt = {
-                margin: 10,
-                filename: `Simpact_${currentMode}_${currentQuoteData.ref}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().from(element).set(opt).save().then(() => {
-                closeOverlay();
-            });
+            const opt = { margin: 10, filename: `Simpact_${currentMode}_${currentQuoteData.ref}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            html2pdf().from(element).set(opt).save().then(() => closeOverlay());
         }
 
-        function closeOverlay() {
-            document.getElementById('pdf-overlay').style.display = 'none';
-        }
-
-        function prepareEmail() {
-            if(!currentQuoteData) return;
-            const subject = `Commande ${currentQuoteData.ref} - ${currentQuoteData.client}`;
-            window.location.href = `mailto:?subject=${subject}&body=Voir fichiers joints.`;
-        }
+        function closeOverlay() { document.getElementById('pdf-overlay').style.display = 'none'; }
+        function prepareEmail() { if(currentQuoteData) window.location.href = `mailto:?subject=Commande ${currentQuoteData.ref}&body=Voir PDF joint.`; }
     </script>
 </body>
 </html>
