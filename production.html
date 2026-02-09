@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Atelier</title>
+    <script src="users.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #1e293b; color: white; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+        
+        .order-card { background: #334155; margin-bottom: 1rem; padding: 1.5rem; border-radius: 8px; border-left: 5px solid #f59e0b; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; align-items: center; }
+        .order-card.done { border-left-color: #10b981; opacity: 0.6; }
+        
+        h3 { margin: 0 0 5px 0; color: #f59e0b; }
+        .tech-details { background: #0f172a; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.9rem; white-space: pre-line; color: #cbd5e1; }
+        
+        .actions button { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-start { background: #f59e0b; color: black; }
+        .btn-finish { background: #10b981; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 File de Production</h1>
+            <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Quitter</button>
+        </div>
+
+        <div id="orders-list">
+            </div>
+    </div>
+
+    <script>
+        checkAuth(['production', 'admin']);
+
+        function renderOrders() {
+            const orders = getOrders(); // Depuis users.js
+            const list = document.getElementById('orders-list');
+            list.innerHTML = '';
+
+            if(orders.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#64748b;">Aucune commande en attente.</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const isDone = order.statusProd === 'Terminé';
+                const html = `
+                    <div class="order-card ${isDone ? 'done' : ''}">
+                        <div>
+                            <h3>${order.prod}</h3>
+                            <div style="font-weight:bold; font-size:1.2rem;">Qté: ${order.qty}</div>
+                            <div style="margin-top:5px; font-size:0.8rem; color:#94a3b8;">${order.client}</div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">Ref: ${order.ref}</div>
+                        </div>
+                        <div class="tech-details">${order.desc}</div>
+                        <div class="actions" style="text-align:right;">
+                            <div style="margin-bottom:10px; font-weight:bold;">${order.statusProd}</div>
+                            ${!isDone ? `<button class="btn-finish" onclick="setStatus('${order.ref}', 'Terminé')">✅ Terminer</button>` : '<span>Archivé</span>'}
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += html;
+            });
+        }
+
+        function setStatus(ref, status) {
+            updateOrderStatus(ref, status, 'prod'); // users.js
+            renderOrders();
+        }
+
+        // Rafraichir toutes les 5 secondes (simulation temps réel)
+        setInterval(renderOrders, 5000);
+        renderOrders();
+    </script>
+</body>
+</html>
