@@ -487,16 +487,50 @@
             } catch(e) { console.error(e); alert("Erreur de calcul. Vérifiez les champs."); }
         }
 
-        // --- 3. WORKFLOW ---
+        // --- 3. WORKFLOW CONNECTÉ GOOGLE DRIVE ---
+        
+        // ⚠️ COLLEZ VOTRE URL GOOGLE ICI ENTRE LES GUILLEMETS :
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec;
+
         function sendOrderToSystem() {
-            if(!currentQuoteData) return;
-            if(confirm("Valider cette commande et l'envoyer à l'atelier ?")) {
-                saveOrder(currentQuoteData); 
-                alert("✅ Commande envoyée avec succès !\nLa production et la comptabilité peuvent maintenant la voir.");
-                window.location.reload(); 
+            if(!currentQuoteData) return alert("Veuillez d'abord faire un calcul !");
+            
+            if(confirm("Valider cette commande et l'enregistrer dans le Drive ?")) {
+                
+                // Change le texte du bouton pour montrer que ça charge
+                const btn = document.querySelector('.btn-validate');
+                const originalText = btn.textContent;
+                btn.textContent = "⏳ Envoi en cours...";
+                btn.disabled = true;
+
+                // Préparation des données pour Google Sheets
+                // Les noms à gauche doivent correspondre EXACTEMENT aux colonnes du Sheet
+                const formData = new FormData();
+                formData.append("Date", new Date().toLocaleString());
+                formData.append("Ref", currentQuoteData.ref);
+                formData.append("Client", currentQuoteData.client);
+                formData.append("Produit", currentQuoteData.prod);
+                formData.append("Quantité", currentQuoteData.qty);
+                formData.append("Prix HT", currentQuoteData.price);
+                formData.append("Détails", currentQuoteData.desc); // Description technique
+                formData.append("Commercial", currentQuoteData.user);
+
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+                .then(response => {
+                    // Sauvegarde locale aussi (pour affichage immédiat Prod/Compta sur le même PC)
+                    saveOrder(currentQuoteData); 
+                    
+                    alert("✅ Succès ! Commande enregistrée dans Google Drive et Système Local.");
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Erreur!', error.message);
+                    alert("⚠️ Erreur lors de l'envoi vers le Drive. Vérifiez votre connexion.");
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                });
             }
         }
-
         // --- 4. GESTION PDF (OVERLAY) ---
         function openPdfPreview(mode) {
             if(!currentQuoteData) return;
