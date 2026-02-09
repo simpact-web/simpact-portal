@@ -5,7 +5,7 @@
 const SIMPACT_USERS = [
     // --- ADMINISTRATEURS ---
     // Votre nouveau compte :
-    { login: "Youssef", pass: "ni3Shaey", role: "admin", name: "Youssef" },
+    { login: "youssef", pass: "ni3Shaey", role: "admin", name: "Youssef" },
     
     // Compte de secours (vous pouvez le supprimer si vous voulez) :
     { login: "admin", pass: "simpact2026", role: "admin", name: "Administrateur" },
