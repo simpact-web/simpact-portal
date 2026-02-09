@@ -1,25 +1,29 @@
 /* FICHIER DE CONFIGURATION DES UTILISATEURS
-   Pour ajouter un utilisateur, copiez une ligne et changez :
-   - l'identifiant (login)
-   - le mot de passe (password)
-   - le rôle (admin, commercial, ou client)
-   - le nom complet (name)
+   Gère les accès au portail Simpact.
 */
 
 const SIMPACT_USERS = [
-    // ADMINISTRATEURS (Accès total)
+    // --- ADMINISTRATEURS ---
+    // Votre nouveau compte :
+    { login: "Youssef", pass: "ni3Shaey", role: "admin", name: "Youssef" },
+    
+    // Compte de secours (vous pouvez le supprimer si vous voulez) :
     { login: "admin", pass: "simpact2026", role: "admin", name: "Administrateur" },
     
-    // COMMERCIAUX (Accès calculs + PDF)
-    { login: "ichraf", pass: "com2026", role: "commercial", name: "Ichraf Mestiri" },
+    // --- COMMERCIAUX ---
+    { login: "slim", pass: "slim2026", role: "commercial", name: "Slim Bouraoui" },
     { login: "commercial", pass: "test", role: "commercial", name: "Commercial Test" },
 
-    // CLIENTS (Accès devis simple)
+    // --- CLIENTS ---
     { login: "client", pass: "client", role: "client", name: "Client Visiteur" }
 ];
 
+// --- LOGIQUE DE CONNEXION (NE PAS TOUCHER) ---
+
 function loginUser(user, pass) {
+    // Recherche de l'utilisateur correspondant (sensible à la casse)
     const foundUser = SIMPACT_USERS.find(u => u.login === user && u.pass === pass);
+    
     if (foundUser) {
         // On sauvegarde la session dans le navigateur
         localStorage.setItem('simpactUser', JSON.stringify(foundUser));
@@ -29,16 +33,28 @@ function loginUser(user, pass) {
 }
 
 function checkAuth(requiredRole) {
-    const user = JSON.parse(localStorage.getItem('simpactUser'));
-    if (!user) {
+    const userStr = localStorage.getItem('simpactUser');
+    
+    if (!userStr) {
         window.location.href = 'index.html';
         return false;
     }
-    if (requiredRole && user.role !== requiredRole && user.role !== 'admin') {
-        alert("Accès non autorisé pour votre profil.");
-        window.location.href = 'index.html';
-        return false;
+
+    const user = JSON.parse(userStr);
+
+    // Si on demande un rôle spécifique
+    if (requiredRole) {
+        // L'admin a accès à tout
+        if (user.role === 'admin') return user;
+
+        // Sinon, on vérifie si le rôle correspond exactement
+        if (user.role !== requiredRole) {
+            alert("⛔ Accès non autorisé pour votre profil.");
+            window.location.href = 'index.html';
+            return false;
+        }
     }
+    
     return user;
 }
 
