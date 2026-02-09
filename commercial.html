@@ -50,15 +50,31 @@
         .btn-atelier { background: #ffedd5; color: #9a3412; }
         .btn-email { background: #2563eb; color: white; }
 
-        /* STYLE PDF (Invisible à l'écran) */
+        /* STYLE PDF (CORRECTION: On ne utilise pas display:none pour éviter les bugs d'affichage vide) */
+        #pdf-container {
+            position: fixed;
+            left: -9999px; /* Hors écran mais "visible" pour le moteur de rendu */
+            top: 0;
+            width: 800px;
+            background: white;
+            z-index: -1;
+        }
+
         #pdf-template { 
-            display: none; 
             padding: 40px; 
             font-family: sans-serif; 
-            color: #000; /* Force noir */
+            color: #000; 
             background: white; 
             width: 100%;
         }
+
+        /* Tableaux PDF solides */
+        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 2px solid #000; }
+        .pdf-table th { background: #e5e7eb; border: 1px solid #000; padding: 10px; text-align: left; font-weight: bold; color: #000; }
+        .pdf-table td { border: 1px solid #000; padding: 12px; color: #000; vertical-align: top; }
+        .pdf-price-cell { text-align: right; font-weight: bold; }
+        .pdf-center { text-align: center; }
+
     </style>
 </head>
 <body>
@@ -233,43 +249,52 @@
         </div>
     </div>
 
-    <div id="pdf-template">
-        <div style="display:flex; justify-content:space-between; border-bottom:3px solid #000; padding-bottom:20px; margin-bottom:30px;">
-            <div>
-                <h1 id="pdf-doc-title" style="margin:0; font-size:24px; text-transform:uppercase;">TITRE DOCUMENT</h1>
-                <p style="margin:5px 0; color: #000;">Réf: <span id="pdf-ref"></span> | Date: <span id="pdf-date"></span></p>
-            </div>
-            <div style="text-align:right;">
-                <h2 style="margin:0; color:#2563eb;">SIMPACT</h2>
-                <p style="margin:0; font-size:12px; color: #000;">Impression Numérique & Offset</p>
-            </div>
-        </div>
-
-        <div style="background:#f3f4f6; padding:15px; border-radius:5px; margin-bottom:20px; border: 1px solid #ddd;">
-            <strong style="color: #000;">Client :</strong> <span id="pdf-client" style="color: #000;"></span><br>
-            <strong style="color: #000;">Commercial :</strong> <span id="pdf-commercial" style="color: #000;"></span>
-        </div>
-
-        <table style="width:100%; border-collapse:collapse; margin-bottom:30px; border: 1px solid #000;">
-            <tr style="background:#e5e7eb;">
-                <th style="padding:10px; text-align:left; border:1px solid #000; color: #000;">Désignation</th>
-                <th style="padding:10px; text-align:center; border:1px solid #000; color: #000;">Quantité</th>
-                <th class="price-col" style="padding:10px; text-align:right; border:1px solid #000; color: #000;">Prix HT</th>
-            </tr>
-            <tr>
-                <td style="padding:15px; border:1px solid #000; vertical-align: top;">
-                    <strong id="pdf-prod" style="font-size: 1.1em; color: #000;"></strong><br><br>
-                    <span id="pdf-desc" style="font-size:14px; color:#000; line-height: 1.5;"></span>
-                </td>
-                <td style="padding:15px; text-align:center; border:1px solid #000; font-weight:bold; font-size:1.2em; color: #000;" id="pdf-qty"></td>
-                <td class="price-col" style="padding:15px; text-align:right; border:1px solid #000; font-weight:bold; color: #000;" id="pdf-price"></td>
-            </tr>
-        </table>
-
-        <div id="atelier-notes" style="display:none; border:2px dashed #f97316; padding:15px; margin-top:30px;">
-            <h3 style="margin-top:0; color:#c2410c;">⚠️ INSTRUCTIONS ATELIER</h3>
-            <div id="pdf-atelier-content" style="font-size: 14px; line-height: 1.6; color: #000;">
+    <div id="pdf-container">
+        <div id="pdf-template">
+            <div style="display:flex; justify-content:space-between; border-bottom:3px solid #000; padding-bottom:20px; margin-bottom:30px;">
+                <div>
+                    <h1 id="pdf-doc-title" style="margin:0; font-size:24px; text-transform:uppercase;">TITRE DOCUMENT</h1>
+                    <p style="margin:5px 0; color: #000;">Réf: <span id="pdf-ref"></span> | Date: <span id="pdf-date"></span></p>
                 </div>
+                <div style="text-align:right;">
+                    <h2 style="margin:0; color:#2563eb;">SIMPACT</h2>
+                    <p style="margin:0; font-size:12px; color: #000;">Impression Numérique & Offset</p>
+                </div>
+            </div>
+
+            <div style="background:#f3f4f6; padding:15px; margin-bottom:20px; border: 1px solid #000;">
+                <strong style="color: #000;">Client :</strong> <span id="pdf-client" style="color: #000;"></span><br>
+                <strong style="color: #000;">Commercial :</strong> <span id="pdf-commercial" style="color: #000;"></span>
+            </div>
+
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60%;">Désignation</th>
+                        <th style="width: 20%;" class="pdf-center">Quantité</th>
+                        <th style="width: 20%;" class="pdf-price-cell price-col">Prix HT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong id="pdf-prod" style="font-size: 1.1em; color: #000; display:block; margin-bottom:5px;"></strong>
+                            <div id="pdf-desc" style="font-size:12px; color:#000; line-height: 1.5;"></div>
+                        </td>
+                        <td class="pdf-center" id="pdf-qty"></td>
+                        <td class="pdf-price-cell price-col" id="pdf-price"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div id="atelier-notes" style="display:none; border:2px dashed #ea580c; padding:15px; margin-top:30px;">
+                <h3 style="margin-top:0; color:#ea580c;">⚠️ INSTRUCTIONS ATELIER</h3>
+                <div id="pdf-atelier-content" style="font-size: 14px; line-height: 1.6; color: #000;"></div>
+            </div>
+            
+            <div style="margin-top: 40px; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                Document généré automatiquement par Simpact Portal.
+            </div>
         </div>
     </div>
 
@@ -384,6 +409,7 @@
                 else if(type === 'brochure') {
                     const pages = parseInt(document.getElementById('brochure-pages').value);
                     const format = document.getElementById('brochure-format').value;
+                    // Récupération explicite des valeurs boutons radio
                     const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
                     const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
                     const paperInt = document.getElementById('brochure-interior-paper').value;
@@ -403,16 +429,16 @@
 
                     totalPrice = costInt + costCov + surcharge + costPell;
                     
-                    // DESCRIPTION DÉTAILLÉE POUR ATELIER
-                    const coverPrintText = coverType === 'recto' ? 'Couv Recto' : 'Couv Recto/Verso';
-                    const pellText = pell === 'avec' ? 'AVEC Pelliculage' : 'SANS Pelliculage';
+                    // DESCRIPTION DÉTAILLÉE EXPLICITE
+                    const coverPrintText = (coverType === 'recto') ? 'RECTO Seul' : 'RECTO / VERSO';
+                    const pellText = (pell === 'avec') ? 'AVEC Pelliculage' : 'SANS Pelliculage';
                     
                     config = `Brochure ${format.toUpperCase()} - ${pages} pages\n` + 
                              `Finition: ${finition}\n` +
-                             `Intérieur: ${getPaperName(paperInt)}\n` + 
-                             `Couverture: ${getPaperName(paperCov)}\n` +
-                             `Impression Couv: ${coverPrintText}\n` +
-                             `Finition Couv: ${pellText}`;
+                             `Papier Intérieur: ${getPaperName(paperInt)}\n` + 
+                             `Papier Couverture: ${getPaperName(paperCov)}\n` +
+                             `>>> Impression Couverture: ${coverPrintText}\n` +
+                             `>>> Finition Couverture: ${pellText}`;
                 }
                 else if(type === 'livre') {
                     const pages = parseInt(document.getElementById('livre-pages').value);
@@ -431,15 +457,15 @@
 
                     totalPrice = costInt + surcharge + costCov + costPell;
                     
-                    const coverPrintText = coverType === 'recto' ? 'Couv Recto' : 'Couv Recto/Verso';
-                    const pellText = pell === 'avec' ? 'AVEC Pelliculage' : 'SANS Pelliculage';
+                    const coverPrintText = (coverType === 'recto') ? 'RECTO Seul' : 'RECTO / VERSO';
+                    const pellText = (pell === 'avec') ? 'AVEC Pelliculage' : 'SANS Pelliculage';
                     
                     config = `Livre N&B ${format.toUpperCase()} - ${pages} pages\n` +
-                             `Reliure: Spirale\n` +
-                             `Intérieur: ${getPaperName(paperInt)}\n` +
-                             `Couverture: ${getPaperName(paperCov)}\n` +
-                             `Impression Couv: ${coverPrintText}\n` +
-                             `Finition Couv: ${pellText}`;
+                             `Reliure: Spirale Plastique\n` +
+                             `Papier Intérieur: ${getPaperName(paperInt)}\n` +
+                             `Papier Couverture: ${getPaperName(paperCov)}\n` +
+                             `>>> Impression Couverture: ${coverPrintText}\n` +
+                             `>>> Finition Couverture: ${pellText}`;
                 }
                 else if(type === 'affiches') {
                     const format = document.getElementById('affiche-format').value;
@@ -474,12 +500,11 @@
             } catch(e) { console.error(e); alert("Erreur de calcul."); }
         }
 
-        // 3. GENERATION PDF OPTIMISEE
+        // 3. GENERATION PDF ROBUSTE
         function generatePDF(mode) {
             if(!currentQuoteData) return;
-            const el = document.getElementById('pdf-template');
-            el.style.display = 'block';
-
+            // On ne touche pas au style display, il est positionné hors écran
+            
             // Remplissage Données
             document.getElementById('pdf-ref').textContent = currentQuoteData.ref;
             document.getElementById('pdf-date').textContent = new Date().toLocaleDateString('fr-FR');
@@ -487,7 +512,7 @@
             document.getElementById('pdf-commercial').textContent = currentQuoteData.user;
             document.getElementById('pdf-prod').textContent = currentQuoteData.prod.toUpperCase();
             
-            // Formatage de la description (remplace \n par <br>)
+            // Formatage propre de la description (remplace \n par <br>)
             const descHtml = currentQuoteData.config.replace(/\n/g, '<br>');
             document.getElementById('pdf-desc').innerHTML = descHtml;
             document.getElementById('pdf-qty').textContent = currentQuoteData.qty;
@@ -497,7 +522,7 @@
                 document.getElementById('pdf-doc-title').textContent = "BON DE COMMANDE";
                 document.getElementById('pdf-doc-title').style.color = "#2563eb";
                 
-                // Montrer les prix
+                // Montrer les prix (via style direct pour forcer l'affichage)
                 document.querySelectorAll('.price-col').forEach(e => e.style.display = 'table-cell');
                 document.getElementById('pdf-price').textContent = currentQuoteData.price;
                 
@@ -506,7 +531,7 @@
             } else {
                 // FICHE ATELIER
                 document.getElementById('pdf-doc-title').textContent = "ORDRE DE FABRICATION";
-                document.getElementById('pdf-doc-title').style.color = "#ea580c"; // Orange
+                document.getElementById('pdf-doc-title').style.color = "#ea580c"; 
                 
                 // Cacher les prix
                 document.querySelectorAll('.price-col').forEach(e => e.style.display = 'none');
@@ -516,11 +541,13 @@
                 document.getElementById('pdf-atelier-content').innerHTML = 
                     `<strong>Produit:</strong> ${currentQuoteData.prod}<br>` +
                     `<strong>Quantité:</strong> ${currentQuoteData.qty}<br><br>` +
-                    `<strong>DÉTAILS TECHNIQUES:</strong><br>` +
+                    `<strong>DÉTAILS TECHNIQUES COMPLETS:</strong><br>` +
                     descHtml;
             }
 
-            // Génération
+            // Génération (avec sélection explicite de l'élément)
+            const element = document.getElementById('pdf-template');
+            
             const opt = { 
                 margin: 10, 
                 filename: `Simpact_${mode}_${currentQuoteData.ref}.pdf`, 
@@ -529,9 +556,7 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
             };
 
-            html2pdf().from(el).set(opt).save().then(() => { 
-                el.style.display = 'none'; // Cacher après génération
-            });
+            html2pdf().from(element).set(opt).save();
         }
 
         // 4. EMAIL
