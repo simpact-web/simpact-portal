@@ -488,8 +488,8 @@
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
                 const ref = "D-" + Date.now().toString().slice(-6);
 
-                // UI Update
-                document.getElementById('total-price').textContent = totalPrice.toFixed(2) + " DT";
+                // UI Update - CORRECTION ICI (Suppression du " DT" en trop)
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2);
                 document.getElementById('quote-ref').textContent = ref;
                 document.getElementById('workflow-panel').style.opacity = "1";
                 document.getElementById('workflow-panel').style.pointerEvents = "auto";
