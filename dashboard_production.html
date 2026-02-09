@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Production - File d'attente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00B8D4;
+            --magenta: #E91E63;
+            --yellow: #FFC107;
+            --black: #1a1a1a;
+            --dark-gray: #2d2d2d;
+            --medium-gray: #5a5a5a;
+            --light-gray: #e8e8e8;
+            --white: #ffffff;
+            --green: #4CAF50;
+            --orange: #FF9800;
+            --red: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--white);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--black);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            color: var(--black);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .stat-card.urgent .stat-value {
+            color: var(--red);
+        }
+
+        .stat-card.production .stat-value {
+            color: var(--orange);
+        }
+
+        .stat-card.completed .stat-value {
+            color: var(--green);
+        }
+
+        .queue-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            color: var(--black);
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .queue-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--light-gray);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--cyan);
+            color: white;
+            border-color: var(--cyan);
+        }
+
+        .order-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--medium-gray);
+            cursor: move;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .order-card.dragging {
+            opacity: 0.5;
+        }
+
+        .order-card.urgency-5 {
+            border-left-color: var(--red);
+            background: #ffebee;
+        }
+
+        .order-card.urgency-3 {
+            border-left-color: var(--orange);
+            background: #fff8e1;
+        }
+
+        .order-card.urgency-1 {
+            border-left-color: var(--green);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .order-id {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .order-badges {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.urgent {
+            background: var(--red);
+            color: white;
+        }
+
+        .badge.normal {
+            background: var(--green);
+            color: white;
+        }
+
+        .badge.medium {
+            background: var(--orange);
+            color: white;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-complete {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: var(--red);
+            color: white;
+        }
+
+        .drag-handle {
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--medium-gray);
+            cursor: move;
+        }
+
+        .order-position {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--dark-gray);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--medium-gray);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>⚙️ Dashboard Production</h1>
+                <p style="color: var(--medium-gray); margin-top: 0.5rem;">Gestion de la file d'attente</p>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 600; font-size: 1.1rem;" id="current-date">--</div>
+                <div style="color: var(--medium-gray); font-size: 0.9rem;">Responsable Production</div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">📋 Total commandes</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card urgent">
+                <div class="stat-label">🔥 Urgentes (Express)</div>
+                <div class="stat-value" id="stat-urgent">0</div>
+            </div>
+            <div class="stat-card production">
+                <div class="stat-label">⏳ En production</div>
+                <div class="stat-value" id="stat-production">0</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-label">✅ Terminées aujourd'hui</div>
+                <div class="stat-value" id="stat-completed">0</div>
+            </div>
+        </div>
+
+        <div class="queue-container">
+            <div class="queue-header">
+                <h2>📦 File d'attente de production</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterOrders('all')">Toutes</button>
+                    <button class="filter-btn" onclick="filterOrders('urgent')">Urgentes</button>
+                    <button class="filter-btn" onclick="filterOrders('normal')">Normales</button>
+                </div>
+            </div>
+
+            <div id="orders-queue">
+                <!-- Les commandes seront insérées ici -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let orders = [];
+        let draggedElement = null;
+        let currentFilter = 'all';
+
+        // Charger les commandes
+        function loadOrders() {
+            orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            // Trier par urgence puis par date
+            orders.sort((a, b) => {
+                if (b.urgency !== a.urgency) {
+                    return b.urgency - a.urgency;
+                }
+                return new Date(a.date_commande) - new Date(b.date_commande);
+            });
+
+            // Assigner l'ordre de production
+            orders.forEach((order, index) => {
+                if (order.statut !== 'termine') {
+                    order.ordre_production = index + 1;
+                }
+            });
+
+            updateStats();
+            renderOrders();
+        }
+
+        function updateStats() {
+            const total = orders.filter(o => o.statut !== 'termine').length;
+            const urgent = orders.filter(o => o.urgency === 5 && o.statut !== 'termine').length;
+            const production = orders.filter(o => o.statut === 'en_production').length;
+            const completed = orders.filter(o => {
+                const today = new Date().toDateString();
+                const orderDate = new Date(o.date_commande).toDateString();
+                return o.statut === 'termine' && orderDate === today;
+            }).length;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-urgent').textContent = urgent;
+            document.getElementById('stat-production').textContent = production;
+            document.getElementById('stat-completed').textContent = completed;
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('orders-queue');
+            
+            let filteredOrders = orders.filter(o => o.statut !== 'termine');
+            
+            if (currentFilter === 'urgent') {
+                filteredOrders = filteredOrders.filter(o => o.urgency === 5);
+            } else if (currentFilter === 'normal') {
+                filteredOrders = filteredOrders.filter(o => o.urgency < 5);
+            }
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Aucune commande dans la file d'attente</h3>
+                        <p style="margin-top: 0.5rem;">Les nouvelles commandes apparaîtront ici automatiquement</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredOrders.map((order, index) => `
+                <div class="order-card urgency-${order.urgency}" 
+                     draggable="true" 
+                     data-order-id="${order.id}"
+                     ondragstart="handleDragStart(event)"
+                     ondragover="handleDragOver(event)"
+                     ondrop="handleDrop(event)"
+                     ondragend="handleDragEnd(event)">
+                    <div class="drag-handle">⋮⋮</div>
+                    <div class="order-position">${index + 1}</div>
+                    
+                    <div class="order-header">
+                        <div class="order-id">${order.id}</div>
+                        <div class="order-badges">
+                            ${getUrgencyBadge(order.urgency)}
+                            ${getStatusBadge(order.statut)}
+                        </div>
+                    </div>
+
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Client</div>
+                            <div class="detail-value">${order.client_name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Produit</div>
+                            <div class="detail-value">${order.productName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Quantité</div>
+                            <div class="detail-value">${order.quantity} ex</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Configuration</div>
+                            <div class="detail-value">${order.config}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Prix total</div>
+                            <div class="detail-value">${order.totalPrice.toFixed(2)} DT</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Date commande</div>
+                            <div class="detail-value">${new Date(order.date_commande).toLocaleDateString('fr-FR')}</div>
+                        </div>
+                    </div>
+
+                    ${order.notes ? `<div style="background: white; padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem;"><strong>Notes:</strong> ${order.notes}</div>` : ''}
+
+                    <div class="order-actions">
+                        ${order.statut === 'en_attente' ? 
+                            `<button class="action-btn btn-start" onclick="startProduction('${order.id}')">▶️ Démarrer</button>` : 
+                            `<button class="action-btn btn-complete" onclick="completeOrder('${order.id}')">✅ Terminer</button>`}
+                        <button class="action-btn btn-cancel" onclick="cancelOrder('${order.id}')">❌ Annuler</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getUrgencyBadge(urgency) {
+            if (urgency === 5) return '<span class="badge urgent">🔴 Express</span>';
+            if (urgency === 3) return '<span class="badge medium">🟡 Urgent</span>';
+            return '<span class="badge normal">🟢 Normal</span>';
+        }
+
+        function getStatusBadge(statut) {
+            if (statut === 'en_production') return '<span class="badge" style="background: #2196F3; color: white;">⚙️ En production</span>';
+            return '';
+        }
+
+        function filterOrders(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderOrders();
+        }
+
+        function startProduction(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.statut = 'en_production';
+                saveOrders();
+                loadOrders();
+            }
+        }
+
+        function completeOrder(orderId) {
+            if (confirm('Marquer cette commande comme terminée ?')) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.statut = 'termine';
+                    order.date_fin = new Date().toISOString();
+                    saveOrders();
+                    loadOrders();
+                }
+            }
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                saveOrders();
+                loadOrders();
+            }
+        }
+
+        // Drag and Drop
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            if (draggedElement !== e.target.closest('.order-card')) {
+                const draggedId = draggedElement.getAttribute('data-order-id');
+                const targetId = e.target.closest('.order-card').getAttribute('data-order-id');
+                
+                const draggedIndex = orders.findIndex(o => o.id === draggedId);
+                const targetIndex = orders.findIndex(o => o.id === targetId);
+                
+                // Réorganiser
+                const temp = orders[draggedIndex];
+                orders.splice(draggedIndex, 1);
+                orders.splice(targetIndex, 0, temp);
+                
+                saveOrders();
+                loadOrders();
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function saveOrders() {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        // Mise à jour de la date
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Initialisation
+        updateDate();
+        loadOrders();
+
+        // Rafraîchir toutes les 30 secondes
+        setInterval(loadOrders, 30000);
+    </script>
+</body>
+</html>

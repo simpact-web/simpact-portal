@@ -80,14 +80,8 @@
     ]
   },
   "prix_couverture_livre": {
-    "a4": {
-      "recto": 1.3,
-      "rectoVerso": 1.5
-    },
-    "a5": {
-      "recto": 0.65,
-      "rectoVerso": 0.75
-    }
+    "a4": { "recto": 1.3, "rectoVerso": 1.5 },
+    "a5": { "recto": 0.65, "rectoVerso": 0.75 }
   },
   "prix_fixes": {
     "pelliculage": 0.1,
@@ -107,6 +101,6 @@
       {"min": 500, "max": 999999, "price": 1.5}
     ]
   },
-  "derniere_modification": "2026-02-04T10:00:00Z",
-  "version": "1.0"
+  "derniere_modification": "2026-02-06T12:00:00Z",
+  "version": "1.1"
 }

@@ -3,477 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration - Gestion des Prix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Simpact Admin - Configuration</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="users.js"></script> <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cyan: #00B8D4;
-            --magenta: #E91E63;
-            --yellow: #FFC107;
-            --black: #1a1a1a;
-            --dark-gray: #2d2d2d;
-            --medium-gray: #5a5a5a;
-            --light-gray: #e8e8e8;
-            --white: #ffffff;
-            --green: #4CAF50;
-            --red: #f44336;
+            --cyan: #00B8D4; --magenta: #E91E63; --black: #1a1a1a; --dark-gray: #2d2d2d;
+            --light-gray: #f1f5f9; --white: #ffffff; --green: #10b981; --red: #ef4444; --blue: #2563eb;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8fafc;
             min-height: 100vh;
-            padding: 2rem;
             color: var(--black);
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        /* En-tête Admin */
         header {
             background: var(--white);
-            padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 1rem 2rem;
+            border-bottom: 4px solid var(--magenta);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            color: var(--black);
-            font-size: 2rem;
-            font-weight: 700;
-        }
+        .header-left h1 { font-size: 1.5rem; font-weight: 700; color: var(--black); }
+        .header-left span { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-left: 10px; }
 
-        .save-btn {
-            background: linear-gradient(135deg, var(--green) 0%, #45a049 100%);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .user-name { font-weight: 600; color: var(--dark-gray); }
+        .btn-logout { background: var(--dark-gray); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
 
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-        }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
 
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
+        /* Navigation Onglets */
+        .tabs { display: flex; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
         .tab-btn {
-            background: var(--white);
-            color: var(--medium-gray);
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: white; border: 1px solid #e2e8f0; padding: 12px 20px; border-radius: 8px;
+            font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .tab-btn:hover { background: #f1f5f9; }
+        .tab-btn.active { background: var(--black); color: white; border-color: var(--black); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cartes et Tables */
+        .card { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .card h2 { margin-bottom: 1.5rem; color: var(--black); border-left: 4px solid var(--cyan); padding-left: 1rem; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #f8fafc; text-align: left; padding: 12px; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        input[type="number"], input[type="text"], input[type="password"], select {
+            width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit;
         }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
-            color: white;
-        }
+        /* Boutons Actions */
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: var(--cyan); color: white; margin-top: 15px; }
+        .btn-save { background: var(--green); color: white; font-size: 1.1rem; padding: 12px 25px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-delete { background: #fee2e2; color: #ef4444; padding: 6px 12px; font-size: 0.9rem; }
+        
+        /* Section Code Utilisateur */
+        .code-block { background: #1e293b; color: #a5b4fc; padding: 20px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; margin-top: 20px; display: none; position: relative; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--black);
-            border-left: 4px solid var(--cyan);
-            padding-left: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        th {
-            background: var(--light-gray);
-            font-weight: 600;
-            color: var(--dark-gray);
-        }
-
-        tr:hover {
-            background: #f5f5f5;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 2px solid var(--light-gray);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: var(--cyan);
-            box-shadow: 0 0 0 3px rgba(0, 184, 212, 0.1);
-        }
-
-        .add-row-btn {
-            background: var(--cyan);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-
-        .delete-btn {
-            background: var(--red);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .status-bar {
-            background: var(--white);
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--medium-gray);
-        }
-
+        /* Notification */
         .notification {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: var(--green);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            display: none;
-            animation: slideIn 0.3s ease-out;
+            position: fixed; top: 20px; right: 20px; background: var(--green); color: white; padding: 15px 25px;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateX(200%); transition: 0.5s; z-index: 1000;
         }
-
-        .notification.show {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+        .notification.show { transform: translateX(0); }
     </style>
 </head>
 <body>
+    <script>
+        // Vérifie si l'utilisateur est admin, sinon redirection
+        const currentUser = checkAuth('admin');
+    </script>
+
     <div class="notification" id="notification">✅ Modifications enregistrées avec succès !</div>
 
-    <div class="container">
-        <header>
-            <div>
-                <h1>🎛️ Administration - Gestion des Prix</h1>
-                <p style="color: var(--medium-gray); margin-top: 0.5rem;">Dernière modification: <span id="last-modified">--</span></p>
-            </div>
-            <button class="save-btn" onclick="saveAllPrices()">💾 Enregistrer les modifications</button>
-        </header>
+    <header>
+        <div class="header-left">
+            <h1>⚙️ Simpact Admin <span>Administration</span></h1>
+        </div>
+        <div class="header-right">
+            <span class="user-name">👤 <script>document.write(currentUser.name)</script></span>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </header>
 
-        <div class="status-bar">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>Système opérationnel</span>
-            </div>
-            <div>
-                <span style="color: var(--medium-gray);">Version: <strong id="version">--</strong></span>
-            </div>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <p>Dernière modification prix : <strong id="last-modified">--</strong></p>
+            <button class="btn btn-save" onclick="saveAllPrices()">💾 Sauvegarder la configuration JSON</button>
         </div>
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('flyers')">📄 Flyers</button>
-            <button class="tab-btn" onclick="switchTab('cartes')">🎴 Cartes de visite</button>
+            <button class="tab-btn" onclick="switchTab('cartes')">🎴 Cartes</button>
             <button class="tab-btn" onclick="switchTab('depliants')">📋 Dépliants</button>
             <button class="tab-btn" onclick="switchTab('entetes')">📝 En-têtes</button>
             <button class="tab-btn" onclick="switchTab('livres')">📚 Livres</button>
             <button class="tab-btn" onclick="switchTab('brochures')">📖 Brochures</button>
-            <button class="tab-btn" onclick="switchTab('fixes')">⚙️ Prix fixes</button>
+            <button class="tab-btn" onclick="switchTab('fixes')">⚙️ Paramètres</button>
+            <button class="tab-btn" onclick="switchTab('users')" style="color: var(--magenta); border-color: var(--magenta);">👥 Utilisateurs (Nouveau)</button>
         </div>
 
-        <!-- Flyers -->
         <div id="flyers" class="tab-content active">
             <div class="card">
                 <h2>Flyers - Recto</h2>
-                <table id="flyer-recto-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('flyer-recto')">+ Ajouter un palier</button>
+                <table id="flyer-recto-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('flyer-recto')">+ Ajouter palier</button>
             </div>
-
             <div class="card">
                 <h2>Flyers - Recto/Verso</h2>
-                <table id="flyer-rectoverso-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('flyer-rectoverso')">+ Ajouter un palier</button>
+                <table id="flyer-rectoverso-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('flyer-rectoverso')">+ Ajouter palier</button>
             </div>
         </div>
 
-        <!-- Cartes -->
         <div id="cartes" class="tab-content">
             <div class="card">
-                <h2>Cartes de visite - Recto</h2>
-                <table id="carte-recto-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('carte-recto')">+ Ajouter un palier</button>
+                <h2>Cartes de visite - Standard</h2>
+                <table id="carte-recto-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('carte-recto')">+ Ajouter palier</button>
             </div>
-
             <div class="card">
                 <h2>Cartes de visite - Pelliculées</h2>
-                <table id="carte-pellicule-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('carte-pellicule')">+ Ajouter un palier</button>
+                <table id="carte-pellicule-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('carte-pellicule')">+ Ajouter palier</button>
             </div>
         </div>
 
-        <!-- Dépliants -->
         <div id="depliants" class="tab-content">
             <div class="card">
                 <h2>Dépliants 3 volets</h2>
-                <table id="depliant-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('depliant')">+ Ajouter un palier</button>
+                <table id="depliant-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('depliant')">+ Ajouter palier</button>
             </div>
         </div>
 
-        <!-- En-têtes -->
         <div id="entetes" class="tab-content">
             <div class="card">
                 <h2>Papier à en-tête</h2>
-                <table id="entete-table">
-                    <thead>
-                        <tr>
-                            <th>Quantité</th>
-                            <th>Prix (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('entete')">+ Ajouter un palier</button>
+                <table id="entete-table"><thead><tr><th>Quantité</th><th>Prix (DT)</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('entete')">+ Ajouter palier</button>
             </div>
         </div>
 
-        <!-- Livres -->
         <div id="livres" class="tab-content">
             <div class="card">
-                <h2>Prix couvertures livres N&B</h2>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>A4 - Recto (DT)</label>
-                        <input type="number" id="livre-a4-recto" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>A4 - Recto/Verso (DT)</label>
-                        <input type="number" id="livre-a4-rectoverso" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>A5 - Recto (DT)</label>
-                        <input type="number" id="livre-a5-recto" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>A5 - Recto/Verso (DT)</label>
-                        <input type="number" id="livre-a5-rectoverso" step="0.01">
-                    </div>
+                <h2>Prix couvertures livres N&B (DT/unité)</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label>A4 - Recto</label><input type="number" id="livre-a4-recto" step="0.01"></div>
+                    <div><label>A4 - Recto/Verso</label><input type="number" id="livre-a4-rectoverso" step="0.01"></div>
+                    <div><label>A5 - Recto</label><input type="number" id="livre-a5-recto" step="0.01"></div>
+                    <div><label>A5 - Recto/Verso</label><input type="number" id="livre-a5-rectoverso" step="0.01"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Brochures -->
         <div id="brochures" class="tab-content">
             <div class="card">
-                <h2>Brochures - Paliers prix feuille couleur R/V</h2>
-                <table id="brochure-paliers-table">
-                    <thead>
-                        <tr>
-                            <th>Feuilles min</th>
-                            <th>Feuilles max</th>
-                            <th>Prix/feuille (DT)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button class="add-row-btn" onclick="addRow('brochure-paliers')">+ Ajouter un palier</button>
+                <h2>Brochures - Paliers prix feuille couleur</h2>
+                <table id="brochure-paliers-table"><thead><tr><th>Min</th><th>Max</th><th>Prix/feuille</th><th>Action</th></tr></thead><tbody></tbody></table>
+                <button class="btn btn-add" onclick="addRow('brochure-paliers')">+ Ajouter palier</button>
             </div>
         </div>
 
-        <!-- Prix fixes -->
         <div id="fixes" class="tab-content">
             <div class="card">
-                <h2>Prix fixes et coefficients</h2>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Prix pelliculage (DT/unité)</label>
-                        <input type="number" id="prix-pelliculage" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>Prix feuille N&B (DT)</label>
-                        <input type="number" id="prix-feuille-nb" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>Supplément offset 100gr (DT/feuille)</label>
-                        <input type="number" id="prix-offset-100" step="0.001">
-                    </div>
-                    <div class="form-group">
-                        <label>Prix par gramme couché (DT/g/feuille)</label>
-                        <input type="number" id="prix-gramme-couche" step="0.0001">
-                    </div>
+                <h2>Coefficients et Prix fixes</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label>Prix pelliculage (DT/unité)</label><input type="number" id="prix-pelliculage" step="0.01"></div>
+                    <div><label>Prix feuille N&B (DT)</label><input type="number" id="prix-feuille-nb" step="0.01"></div>
+                    <div><label>Supplément Offset 100gr</label><input type="number" id="prix-offset-100" step="0.001"></div>
+                    <div><label>Coeff Grammage Couché</label><input type="number" id="prix-gramme-couche" step="0.0001"></div>
                 </div>
             </div>
         </div>
+
+        <div id="users" class="tab-content">
+            <div class="card" style="border-left: 4px solid var(--magenta);">
+                <h2>➕ Créer un nouvel utilisateur</h2>
+                <p style="margin-bottom: 20px; color: #64748b;">Remplissez ce formulaire pour générer le code à ajouter dans le fichier <strong>users.js</strong>.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div><label>Nom Complet</label><input type="text" id="new-user-name" placeholder="Ex: Jean Commercial"></div>
+                    <div><label>Identifiant (Login)</label><input type="text" id="new-user-login" placeholder="Ex: jean"></div>
+                    <div><label>Mot de passe</label><input type="password" id="new-user-pass" placeholder="******"></div>
+                    <div>
+                        <label>Rôle</label>
+                        <select id="new-user-role">
+                            <option value="client">Client (Accès limité)</option>
+                            <option value="commercial">Commercial (Devis + PDF)</option>
+                            <option value="admin">Administrateur (Accès total)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-add" style="background: var(--magenta); width: 100%; margin-top: 20px;" onclick="generateUserCode()">🛠️ Générer le code utilisateur</button>
+
+                <div id="user-code-output" class="code-block">
+                    <button class="copy-btn" onclick="copyCode()">Copier</button>
+                    <code id="code-content"></code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Liste des utilisateurs actuels (Lecture seule)</h2>
+                <ul id="current-users-list" style="list-style: none; padding: 0;"></ul>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        // --- LOGIQUE UTILISATEURS ---
+        
+        // Afficher les utilisateurs existants (depuis users.js)
+        const userListEl = document.getElementById('current-users-list');
+        if(typeof SIMPACT_USERS !== 'undefined') {
+            SIMPACT_USERS.forEach(u => {
+                const li = document.createElement('li');
+                li.style.padding = "10px";
+                li.style.borderBottom = "1px solid #eee";
+                li.innerHTML = `<strong>${u.name}</strong> (${u.role}) - Login: <code>${u.login}</code>`;
+                userListEl.appendChild(li);
+            });
+        }
+
+        function generateUserCode() {
+            const name = document.getElementById('new-user-name').value;
+            const login = document.getElementById('new-user-login').value;
+            const pass = document.getElementById('new-user-pass').value;
+            const role = document.getElementById('new-user-role').value;
+
+            if(!name || !login || !pass) return alert("Remplissez tous les champs !");
+
+            const newCode = `    { login: "${login}", pass: "${pass}", role: "${role}", name: "${name}" },`;
+            
+            document.getElementById('code-content').textContent = "// Copiez cette ligne dans le fichier users.js :\n" + newCode;
+            document.getElementById('user-code-output').style.display = 'block';
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('code-content').textContent);
+            alert("Code copié ! Collez-le maintenant dans users.js sur GitHub.");
+        }
+
+        // --- LOGIQUE PRIX (Conserves tes fonctions existantes) ---
+        
         let prixData = {};
 
-        // Charger les prix depuis le JSON
         async function loadPrices() {
             try {
                 const response = await fetch('prix_config.json');
                 prixData = await response.json();
                 
-                // Mettre à jour l'interface
-                document.getElementById('last-modified').textContent = 
-                    new Date(prixData.derniere_modification).toLocaleString('fr-FR');
-                document.getElementById('version').textContent = prixData.version;
+                document.getElementById('last-modified').textContent = new Date(prixData.derniere_modification).toLocaleString('fr-FR');
 
-                // Charger toutes les tables
                 loadTable('flyer-recto', prixData.tarifs.flyer.recto);
                 loadTable('flyer-rectoverso', prixData.tarifs.flyer.rectoVerso);
                 loadTable('carte-recto', prixData.tarifs.carte.recto);
@@ -482,34 +279,31 @@
                 loadTable('entete', prixData.tarifs.entete);
                 loadBrochurePaliers(prixData.paliers_brochure.couleur_recto_verso);
                 
-                // Charger prix livres
+                // Champs simples
                 document.getElementById('livre-a4-recto').value = prixData.prix_couverture_livre.a4.recto;
                 document.getElementById('livre-a4-rectoverso').value = prixData.prix_couverture_livre.a4.rectoVerso;
                 document.getElementById('livre-a5-recto').value = prixData.prix_couverture_livre.a5.recto;
                 document.getElementById('livre-a5-rectoverso').value = prixData.prix_couverture_livre.a5.rectoVerso;
                 
-                // Charger prix fixes
                 document.getElementById('prix-pelliculage').value = prixData.prix_fixes.pelliculage;
                 document.getElementById('prix-feuille-nb').value = prixData.prix_fixes.feuille_nb;
                 document.getElementById('prix-offset-100').value = prixData.prix_fixes.offset_100;
                 document.getElementById('prix-gramme-couche').value = prixData.prix_fixes.gramme_couche;
-                
+
             } catch (error) {
                 console.error('Erreur chargement:', error);
-                alert('Erreur lors du chargement des prix');
             }
         }
 
         function loadTable(tableId, data) {
             const tbody = document.querySelector(`#${tableId}-table tbody`);
             tbody.innerHTML = '';
-            
             data.forEach((item, index) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td><input type="number" value="${item.qty}" data-field="qty" data-index="${index}"></td>
-                    <td><input type="number" value="${item.price}" step="0.01" data-field="price" data-index="${index}"></td>
-                    <td><button class="delete-btn" onclick="deleteRow('${tableId}', ${index})">🗑️ Supprimer</button></td>
+                    <td><input type="number" value="${item.qty}" data-field="qty"></td>
+                    <td><input type="number" value="${item.price}" step="0.01" data-field="price"></td>
+                    <td><button class="btn btn-delete" onclick="deleteRow(this)">🗑️</button></td>
                 `;
             });
         }
@@ -517,111 +311,71 @@
         function loadBrochurePaliers(data) {
             const tbody = document.querySelector('#brochure-paliers-table tbody');
             tbody.innerHTML = '';
-            
-            data.forEach((item, index) => {
+            data.forEach((item) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td><input type="number" value="${item.min}" data-field="min" data-index="${index}"></td>
-                    <td><input type="number" value="${item.max}" data-field="max" data-index="${index}"></td>
-                    <td><input type="number" value="${item.price}" step="0.01" data-field="price" data-index="${index}"></td>
-                    <td><button class="delete-btn" onclick="deleteRow('brochure-paliers', ${index})">🗑️ Supprimer</button></td>
+                    <td><input type="number" value="${item.min}"></td>
+                    <td><input type="number" value="${item.max}"></td>
+                    <td><input type="number" value="${item.price}" step="0.01"></td>
+                    <td><button class="btn btn-delete" onclick="deleteRow(this)">🗑️</button></td>
                 `;
             });
         }
 
         function switchTab(tabName) {
-            // Désactiver tous les onglets
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Activer l'onglet sélectionné
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
         }
 
         function addRow(tableId) {
             const tbody = document.querySelector(`#${tableId}-table tbody`);
-            const newIndex = tbody.rows.length;
             const row = tbody.insertRow();
-            
             if (tableId === 'brochure-paliers') {
-                row.innerHTML = `
-                    <td><input type="number" value="1" data-field="min" data-index="${newIndex}"></td>
-                    <td><input type="number" value="100" data-field="max" data-index="${newIndex}"></td>
-                    <td><input type="number" value="1.5" step="0.01" data-field="price" data-index="${newIndex}"></td>
-                    <td><button class="delete-btn" onclick="deleteRow('${tableId}', ${newIndex})">🗑️ Supprimer</button></td>
-                `;
+                row.innerHTML = `<td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><button class="btn btn-delete" onclick="deleteRow(this)">🗑️</button></td>`;
             } else {
-                row.innerHTML = `
-                    <td><input type="number" value="100" data-field="qty" data-index="${newIndex}"></td>
-                    <td><input type="number" value="50" step="0.01" data-field="price" data-index="${newIndex}"></td>
-                    <td><button class="delete-btn" onclick="deleteRow('${tableId}', ${newIndex})">🗑️ Supprimer</button></td>
-                `;
+                row.innerHTML = `<td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><button class="btn btn-delete" onclick="deleteRow(this)">🗑️</button></td>`;
             }
         }
 
-        function deleteRow(tableId, index) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')) {
-                const tbody = document.querySelector(`#${tableId}-table tbody`);
-                tbody.deleteRow(index);
-                // Réindexer les lignes
-                Array.from(tbody.rows).forEach((row, newIndex) => {
-                    row.querySelectorAll('input').forEach(input => {
-                        input.setAttribute('data-index', newIndex);
-                    });
-                    const deleteBtn = row.querySelector('.delete-btn');
-                    deleteBtn.setAttribute('onclick', `deleteRow('${tableId}', ${newIndex})`);
-                });
-            }
+        function deleteRow(btn) {
+            if(confirm('Supprimer cette ligne ?')) btn.closest('tr').remove();
         }
 
         function getTableData(tableId) {
             const tbody = document.querySelector(`#${tableId}-table tbody`);
             const data = [];
-            
             Array.from(tbody.rows).forEach(row => {
                 const inputs = row.querySelectorAll('input');
-                if (tableId === 'brochure-paliers') {
-                    data.push({
-                        min: parseInt(inputs[0].value),
-                        max: parseInt(inputs[1].value),
-                        price: parseFloat(inputs[2].value)
-                    });
-                } else {
-                    data.push({
-                        qty: parseInt(inputs[0].value),
-                        price: parseFloat(inputs[1].value)
-                    });
+                if(inputs.length === 2) {
+                    data.push({ qty: parseInt(inputs[0].value), price: parseFloat(inputs[1].value) });
                 }
             });
-            
+            return data;
+        }
+        
+        function getBrochureData() {
+            const tbody = document.querySelector(`#brochure-paliers-table tbody`);
+            const data = [];
+            Array.from(tbody.rows).forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                data.push({ min: parseInt(inputs[0].value), max: parseInt(inputs[1].value), price: parseFloat(inputs[2].value) });
+            });
             return data;
         }
 
         async function saveAllPrices() {
-            // Collecter toutes les données
             const updatedData = {
                 tarifs: {
-                    flyer: {
-                        recto: getTableData('flyer-recto'),
-                        rectoVerso: getTableData('flyer-rectoverso')
-                    },
-                    carte: {
-                        recto: getTableData('carte-recto'),
-                        pellicule: getTableData('carte-pellicule')
-                    },
+                    flyer: { recto: getTableData('flyer-recto'), rectoVerso: getTableData('flyer-rectoverso') },
+                    carte: { recto: getTableData('carte-recto'), pellicule: getTableData('carte-pellicule') },
                     depliant: getTableData('depliant'),
                     entete: getTableData('entete')
                 },
                 prix_couverture_livre: {
-                    a4: {
-                        recto: parseFloat(document.getElementById('livre-a4-recto').value),
-                        rectoVerso: parseFloat(document.getElementById('livre-a4-rectoverso').value)
-                    },
-                    a5: {
-                        recto: parseFloat(document.getElementById('livre-a5-recto').value),
-                        rectoVerso: parseFloat(document.getElementById('livre-a5-rectoverso').value)
-                    }
+                    a4: { recto: parseFloat(document.getElementById('livre-a4-recto').value), rectoVerso: parseFloat(document.getElementById('livre-a4-rectoverso').value) },
+                    a5: { recto: parseFloat(document.getElementById('livre-a5-recto').value), rectoVerso: parseFloat(document.getElementById('livre-a5-rectoverso').value) }
                 },
                 prix_fixes: {
                     pelliculage: parseFloat(document.getElementById('prix-pelliculage').value),
@@ -629,17 +383,11 @@
                     offset_100: parseFloat(document.getElementById('prix-offset-100').value),
                     gramme_couche: parseFloat(document.getElementById('prix-gramme-couche').value)
                 },
-                paliers_brochure: {
-                    couleur_recto_verso: getTableData('brochure-paliers')
-                },
+                paliers_brochure: { couleur_recto_verso: getBrochureData() },
                 derniere_modification: new Date().toISOString(),
                 version: prixData.version
             };
 
-            // Simuler la sauvegarde (à remplacer par un appel API)
-            console.log('Données à sauvegarder:', updatedData);
-            
-            // Télécharger le fichier JSON mis à jour
             const dataStr = JSON.stringify(updatedData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(dataBlob);
@@ -648,19 +396,11 @@
             link.download = 'prix_config.json';
             link.click();
             
-            // Afficher notification
-            showNotification();
-        }
-
-        function showNotification() {
             const notif = document.getElementById('notification');
             notif.classList.add('show');
-            setTimeout(() => {
-                notif.classList.remove('show');
-            }, 3000);
+            setTimeout(() => notif.classList.remove('show'), 3000);
         }
 
-        // Charger les prix au démarrage
         loadPrices();
     </script>
 </body>
