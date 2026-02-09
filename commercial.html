@@ -72,6 +72,7 @@
             font-family: Arial, sans-serif; 
             color: #000;
             box-sizing: border-box;
+            position: relative;
         }
 
         /* Styles internes du PDF pour impression parfaite */
@@ -88,6 +89,12 @@
         .mode-prod .pdf-price-header { display: none; }
         .mode-compta #atelier-notes { display: none; }
         .mode-prod #atelier-notes { display: block; }
+        
+        #pdf-actions {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 15px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex; gap: 10px; z-index: 10000;
+        }
 
     </style>
 </head>
@@ -123,23 +130,97 @@
 
             <div id="flyer-options" class="option-group">
                 <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">R/V</label></div></div></div>
-                <div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-170-brillant">170g Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="flyer-paper">
+                        <option value="couche-90-mat">Couché 90gr Mat</option>
+                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="couche-200-mat">Couché 200gr Mat</option>
+                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
             <div id="carte-options" class="option-group">
                 <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
-                <div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-350-mat">350g Mat</option><option value="couche-350-brillant">350g Brillant</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="carte-paper">
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                    </select>
+                </div>
             </div>
 
-            <div id="depliant-options" class="option-group"><div class="form-group"><label>Papier</label><select id="depliant-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-170-brillant">170g Brillant</option></select></div></div>
-            <div id="entete-options" class="option-group"><div class="form-group"><label>Papier</label><select id="entete-paper"><option value="offset-80">Offset 80g</option><option value="offset-100">Offset 100g</option></select></div></div>
-            <div id="affiches-options" class="option-group"><div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3</option><option value="a3plus">A3+</option></select></div><div class="form-group"><label>Papier</label><select id="affiche-paper"><option value="couche-200-brillant">200g Brillant</option></select></div></div>
+            <div id="depliant-options" class="option-group">
+                <div class="form-group"><label>Papier</label>
+                    <select id="depliant-paper">
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="entete-options" class="option-group">
+                <div class="form-group"><label>Papier</label>
+                    <select id="entete-paper">
+                        <option value="offset-80">Offset 80gr Standard</option>
+                        <option value="offset-100">Offset 100gr Premium</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="affiches-options" class="option-group">
+                <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div>
+                <div class="form-group"><label>Papier</label>
+                    <select id="affiche-paper">
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="couche-200-mat">Couché 200gr Mat</option>
+                        <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                    </select>
+                </div>
+            </div>
 
             <div id="brochure-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
                 <div class="form-group"><label>Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 8, 12, 16..."></div>
-                <div class="form-group"><label>Papier Intérieur</label><select id="brochure-interior-paper"><option value="couche-135-brillant">135g Brillant</option><option value="couche-115-brillant">115g Brillant</option><option value="offset-80">Offset 80g</option></select></div>
-                <div class="form-group"><label>Papier Couverture</label><select id="brochure-cover-paper"><option value="couche-250-brillant">250g Brillant</option><option value="couche-300-mat">300g Mat</option></select></div>
+                <div class="form-group"><label>Papier Intérieur</label>
+                    <select id="brochure-interior-paper">
+                        <option value="couche-90-mat">Couché 90gr Mat</option>
+                        <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                        <option value="couche-115-mat">Couché 115gr Mat</option>
+                        <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                        <option value="couche-135-mat">Couché 135gr Mat</option>
+                        <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                        <option value="couche-170-mat">Couché 170gr Mat</option>
+                        <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                        <option value="offset-80">Offset 80gr</option>
+                        <option value="offset-100">Offset 100gr</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Papier Couverture</label>
+                    <select id="brochure-cover-paper">
+                        <option value="couche-250-mat">Couché 250gr Mat</option>
+                        <option value="couche-250-brillant">Couché 250gr Brillant</option>
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="Piquée à cheval">Piquée à cheval (Agrafé)</option><option value="Dos carré collé">Dos carré collé</option><option value="Spirale">Spirale</option></select></div>
                 <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
@@ -148,8 +229,17 @@
             <div id="livre-options" class="option-group">
                 <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
                 <div class="form-group"><label>Pages</label><input type="number" id="livre-pages"></div>
-                <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80g</option></select></div>
-                <div class="form-group"><label>Couverture</label><select id="livre-cover-paper"><option value="couche-250-brillant">250g Brillant</option></select></div>
+                <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
+                <div class="form-group"><label>Couverture</label>
+                    <select id="livre-cover-paper">
+                        <option value="couche-250-mat">Couché 250gr Mat</option>
+                        <option value="couche-250-brillant">Couché 250gr Brillant</option>
+                        <option value="couche-300-mat">Couché 300gr Mat</option>
+                        <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                        <option value="couche-350-mat">Couché 350gr Mat</option>
+                        <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
                 <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
             </div>
@@ -217,11 +307,11 @@
                 <h3 style="margin-top:0; color:#ea580c; border-bottom: 1px solid #ea580c; padding-bottom: 5px;">⚠️ INSTRUCTIONS ATELIER</h3>
                 <div id="pdf-atelier-content" style="font-size: 14px; line-height: 1.6;"></div>
             </div>
-            
-            <div style="margin-top: 30px; text-align: center;">
-                <button onclick="downloadPdf()" style="background: #2563eb; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 TÉLÉCHARGER LE PDF</button>
-                <button onclick="closeOverlay()" style="background: #ccc; color: black; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin-left: 10px;">❌ FERMER</button>
-            </div>
+        </div>
+
+        <div id="pdf-actions">
+            <button onclick="downloadPdf()" style="background: #2563eb; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">💾 TÉLÉCHARGER</button>
+            <button onclick="closeOverlay()" style="background: #e2e8f0; color: #1e293b; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold;">❌ FERMER</button>
         </div>
     </div>
 
@@ -233,70 +323,189 @@
         let currentQuoteData = null;
         let currentMode = '';
 
-        // --- 2. GESTION DES OPTIONS ---
+        // --- 2. DONNEES ET CALCULS ---
+        let TARIFS = {};
+        const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
+
+        async function loadPrices() {
+            try {
+                const r = await fetch('prix_config.json');
+                const data = await r.json();
+                TARIFS = {
+                    flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
+                    carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
+                    depliant: data.tarifs.depliant, entete: data.tarifs.entete,
+                    prix_couverture_livre: data.prix_couverture_livre || { a4: { recto: 1.3, rectoVerso: 1.5 }, a5: { recto: 0.65, rectoVerso: 0.75 } }
+                };
+            } catch(e) { console.log("Erreur chargement prix"); }
+        }
+        loadPrices();
+
         document.getElementById('product-type').addEventListener('change', function() {
             document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
             if(this.value) document.getElementById(this.value + '-options').classList.add('active');
         });
 
-        // --- 3. CALCUL DU PRIX ---
-        // (Version simplifiée pour l'exemple - remettre ton moteur complet si besoin)
+        // Helpers
+        function getPaperName(paperType) {
+            if(!paperType) return '';
+            if(paperType === 'offset-80') return 'Offset 80gr Standard';
+            if(paperType === 'offset-100') return 'Offset 100gr Premium';
+            if(paperType.startsWith('couche-')) {
+                const parts = paperType.split('-');
+                return `Couché ${parts[1]}gr ${parts[2] === 'mat' ? 'Mat' : 'Brillant'}`;
+            }
+            return paperType;
+        }
+
+        function calculatePaperSurcharge(paperType, numSheets) {
+            if(!paperType || numSheets === 0) return 0;
+            if(paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
+            if(paperType.startsWith('couche-')) {
+                const parts = paperType.split('-');
+                if (parts.length >= 2) {
+                    const grammage = parseInt(parts[1]);
+                    const grammesSup = grammage - 90;
+                    if (grammesSup > 0) return numSheets * grammesSup * PRIX_FIXES.gramme_couche;
+                }
+            }
+            return 0;
+        }
+
+        function getPricePerSheetCouleur(sheets) {
+            if(sheets < 25) return 3; if(sheets < 50) return 2.5; if(sheets < 100) return 2;
+            if(sheets < 200) return 1.9; if(sheets < 300) return 1.8; if(sheets < 400) return 1.7;
+            if(sheets < 500) return 1.6; return 1.5;
+        }
+        
+        function getPricePerSheetRecto(sheets) { return getPricePerSheetCouleur(sheets) - 0.2; }
+
+        function calculatePriceWithSmoothing(tarifArray, quantity) {
+            if(!tarifArray) return { totalPrice: 0 };
+            let lower = tarifArray[0], upper = tarifArray[0];
+            for(let t of tarifArray) { if(t.qty <= quantity) lower = t; if(t.qty >= quantity && upper === tarifArray[0]) upper = t; }
+            if(lower.qty === upper.qty) return { totalPrice: lower.price };
+            const ratio = (quantity - lower.qty) / (upper.qty - lower.qty);
+            return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
+        }
+
         function calculateQuote() {
             const type = document.getElementById('product-type').value;
             const qty = parseInt(document.getElementById('quantity').value);
             if(!type || !qty) return alert("Remplissez les champs !");
 
-            // Récupération des données pour le PDF
-            let desc = "";
+            let totalPrice = 0, config = "";
             let prodName = document.getElementById('product-type').selectedOptions[0].text;
-            
-            // Logique de description DÉTAILLÉE
-            if(type === 'flyer') {
-                const mode = document.querySelector('input[name="flyer-type"]:checked').nextSibling.textContent;
-                const paper = document.getElementById('flyer-paper').selectedOptions[0].text;
-                desc = `Format: Standard\nImpression: ${mode}\nPapier: ${paper}`;
-            }
-            else if(type === 'brochure') {
-                const format = document.getElementById('brochure-format').value.toUpperCase();
-                const pages = document.getElementById('brochure-pages').value;
-                const fin = document.getElementById('brochure-finition').value;
-                const papInt = document.getElementById('brochure-interior-paper').selectedOptions[0].text;
-                const papCov = document.getElementById('brochure-cover-paper').selectedOptions[0].text;
-                
-                // Récupération FORCÉE des radios
-                const covTypeVal = document.querySelector('input[name="brochure-cover-type"]:checked').value;
-                const pellVal = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
-                
-                const covPrint = (covTypeVal === 'recto') ? "Recto Seul" : "Recto / Verso";
-                const pell = (pellVal === 'avec') ? "AVEC Pelliculage" : "SANS Pelliculage";
 
-                desc = `Format: ${format} - ${pages} Pages\nFinition: ${fin}\n----------------\nPapier Intérieur: ${papInt}\nPapier Couverture: ${papCov}\n>>> Impression Couv: ${covPrint}\n>>> Finition Couv: ${pell}`;
-            }
-            // (Ajouter les autres produits ici avec la même logique)
-            else {
-                desc = "Description standard produit..."; 
-            }
+            try {
+                if(type === 'flyer') {
+                    const mode = document.querySelector('input[name="flyer-type"]:checked').nextSibling.textContent;
+                    const modeVal = document.querySelector('input[name="flyer-type"]:checked').value;
+                    const paper = document.getElementById('flyer-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer[modeVal], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `Format Standard\nImpression: ${mode}\nPapier: ${getPaperName(paper)}`;
+                }
+                else if(type === 'carte') {
+                    const finish = document.querySelector('input[name="carte-finish"]:checked').value;
+                    const finishText = document.querySelector('input[name="carte-finish"]:checked').nextSibling.textContent;
+                    const paper = document.getElementById('carte-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.carte[finish], qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, Math.ceil(qty/10));
+                    config = `Finition: ${finishText}\nPapier: ${getPaperName(paper)}`;
+                }
+                else if(type === 'depliant') {
+                    const paper = document.getElementById('depliant-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.depliant, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `3 Volets (A4 Ouvert)\nPapier: ${getPaperName(paper)}`;
+                }
+                else if(type === 'entete') {
+                    const paper = document.getElementById('entete-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.entete, qty);
+                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
+                    config = `Format A4\nPapier: ${getPaperName(paper)}`;
+                }
+                else if(type === 'brochure') {
+                    const pages = parseInt(document.getElementById('brochure-pages').value);
+                    const format = document.getElementById('brochure-format').value.toUpperCase();
+                    const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
+                    const paperInt = document.getElementById('brochure-interior-paper').value;
+                    const paperCov = document.getElementById('brochure-cover-paper').value;
+                    const finition = document.getElementById('brochure-finition').value;
 
-            // Simulation Prix
-            const price = (qty * 0.5).toFixed(2);
-            const ref = "D-" + Math.floor(Math.random() * 1000000);
+                    let sheetsInt = Math.ceil((pages / (format === 'A4' ? 4 : 8)) * qty);
+                    let sheetsCov = Math.ceil((format === 'A4' ? 1 : 0.5) * qty);
+                    let totalSheets = sheetsInt + sheetsCov;
+                    let priceSheetInt = getPricePerSheetCouleur(totalSheets);
+                    let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets);
+                    
+                    let costInt = sheetsInt * priceSheetInt;
+                    let costCov = sheetsCov * priceSheetCov;
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
+                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
 
-            // Mise à jour UI
-            document.getElementById('total-price').textContent = price + " DT";
-            document.getElementById('quote-ref').textContent = ref;
-            document.getElementById('workflow-panel').style.opacity = "1";
-            document.getElementById('workflow-panel').style.pointerEvents = "auto";
+                    totalPrice = costInt + costCov + surcharge + costPell;
+                    
+                    const covPrint = (coverType === 'recto') ? "RECTO Seul" : "RECTO / VERSO";
+                    const pellText = (pell === 'avec') ? "AVEC Pelliculage" : "SANS Pelliculage";
 
-            // Sauvegarde
-            currentQuoteData = {
-                client: document.getElementById('client-name').value || "Client",
-                prod: prodName,
-                qty: qty,
-                price: price + " DT",
-                ref: ref,
-                desc: desc,
-                user: user.name
-            };
+                    config = `Format: ${format} - ${pages} Pages\nFinition: ${finition}\n\nPapier Intérieur: ${getPaperName(paperInt)}\nPapier Couverture: ${getPaperName(paperCov)}\n>>> Impression Couv: ${covPrint}\n>>> Finition Couv: ${pellText}`;
+                }
+                else if(type === 'livre') {
+                    const pages = parseInt(document.getElementById('livre-pages').value);
+                    const format = document.getElementById('livre-format').value.toUpperCase();
+                    const coverType = document.querySelector('input[name="livre-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
+                    const paperInt = document.getElementById('livre-interior-paper').value;
+                    const paperCov = document.getElementById('livre-cover-paper').value;
+
+                    let sheetsInt = Math.ceil((pages / (format === 'A4' ? 4 : 8)) * qty);
+                    let costInt = sheetsInt * PRIX_FIXES.feuille_nb;
+                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt);
+                    let unitCovPrice = coverType === 'recto' ? TARIFS.prix_couverture_livre[format.toLowerCase()].recto : TARIFS.prix_couverture_livre[format.toLowerCase()].rectoVerso;
+                    let costCov = qty * unitCovPrice;
+                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
+
+                    totalPrice = costInt + surcharge + costCov + costPell;
+                    
+                    const covPrint = (coverType === 'recto') ? "RECTO Seul" : "RECTO / VERSO";
+                    const pellText = (pell === 'avec') ? "AVEC Pelliculage" : "SANS Pelliculage";
+
+                    config = `Format: ${format} - ${pages} Pages\nReliure: Spirale Plastique\n\nPapier Intérieur: ${getPaperName(paperInt)}\nPapier Couverture: ${getPaperName(paperCov)}\n>>> Impression Couv: ${covPrint}\n>>> Finition Couv: ${pellText}`;
+                }
+                else if(type === 'affiches') {
+                    const format = document.getElementById('affiche-format').value;
+                    const paper = document.getElementById('affiche-paper').value;
+                    let res = calculatePriceWithSmoothing(TARIFS.flyer.recto, qty);
+                    let price = res.totalPrice;
+                    if(format === 'a3plus') price *= 1.2;
+                    totalPrice = price + calculatePaperSurcharge(paper, qty);
+                    config = `Grand Format ${format === 'a3' ? 'A3' : 'A3+'}\nPapier: ${getPaperName(paper)}`;
+                }
+
+                totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
+                const ref = "D-" + Date.now().toString().slice(-6);
+
+                // UI Update
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2) + " DT";
+                document.getElementById('quote-ref').textContent = ref;
+                document.getElementById('workflow-panel').style.opacity = "1";
+                document.getElementById('workflow-panel').style.pointerEvents = "auto";
+
+                // Data Store
+                currentQuoteData = {
+                    client: document.getElementById('client-name').value || "Client Comptoir",
+                    prod: prodName,
+                    qty: qty,
+                    price: totalPrice.toFixed(2) + " DT",
+                    ref: ref,
+                    desc: config,
+                    user: user.name
+                };
+
+            } catch(e) { console.error(e); alert("Erreur de calcul. Vérifiez les champs."); }
         }
 
         // --- 4. GESTION PDF (OVERLAY) ---
@@ -316,7 +525,7 @@
             document.getElementById('pdf-client').textContent = currentQuoteData.client;
             document.getElementById('pdf-commercial').textContent = currentQuoteData.user;
             document.getElementById('pdf-prod').textContent = currentQuoteData.prod.toUpperCase();
-            document.getElementById('pdf-desc').textContent = currentQuoteData.desc;
+            document.getElementById('pdf-desc').textContent = currentQuoteData.desc; // Le CSS white-space: pre-line gère les \n
             document.getElementById('pdf-qty').textContent = currentQuoteData.qty;
             document.getElementById('pdf-price').textContent = currentQuoteData.price;
             
@@ -328,7 +537,7 @@
             } else {
                 titleEl.textContent = "ORDRE DE FABRICATION";
                 titleEl.style.color = "#ea580c";
-                document.getElementById('pdf-atelier-content').textContent = currentQuoteData.desc;
+                document.getElementById('pdf-atelier-content').innerHTML = currentQuoteData.desc.replace(/\n/g, '<br>');
             }
 
             overlay.style.display = 'flex'; // Afficher l'overlay
@@ -336,10 +545,6 @@
 
         function downloadPdf() {
             const element = document.getElementById('pdf-template');
-            // Cacher temporairement les boutons pour le PDF
-            const buttons = element.querySelectorAll('button');
-            buttons.forEach(b => b.style.display = 'none');
-
             const opt = {
                 margin: 10,
                 filename: `Simpact_${currentMode}_${currentQuoteData.ref}.pdf`,
@@ -349,8 +554,6 @@
             };
 
             html2pdf().from(element).set(opt).save().then(() => {
-                // Remettre les boutons
-                buttons.forEach(b => b.style.display = 'inline-block');
                 closeOverlay();
             });
         }
