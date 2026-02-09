@@ -3,102 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simpact Portal - Connexion</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="users.js"></script> <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            color: white;
-        }
-        .login-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 3rem;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-        .logo { font-size: 3rem; margin-bottom: 1rem; }
-        h1 { margin: 0 0 0.5rem 0; font-weight: 700; }
-        p { color: #94a3b8; margin-bottom: 2rem; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-        button:hover { background: #3b82f6; transform: translateY(-2px); }
-        .error { color: #f87171; font-size: 0.9rem; margin-top: 10px; display: none; }
+    <title>Simpact - Portail Central</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="users.js"></script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; width: 100%; max-width: 1200px; padding: 2rem; }
+        .card { background: white; padding: 2rem; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-decoration: none; color: #1e293b; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px rgba(0,0,0,0.1); border-color: #2563eb; }
+        .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        h2 { margin: 0 0 0.5rem 0; color: #0f172a; font-size: 1.25rem; }
+        p { color: #64748b; font-size: 0.9rem; }
+        .badge-lock { position: absolute; top: 1rem; right: 1rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; }
+        
+        /* Login Modal */
+        #login-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center; }
+        .login-box { background:white; padding:2rem; border-radius:12px; width:300px; text-align:center; }
+        .login-box input { width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; }
+        .login-box button { width:100%; padding:10px; background:#2563eb; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo">💠</div>
-        <h1>Simpact Portal</h1>
-        <p>Connectez-vous à votre espace</p>
-        
-        <input type="text" id="login" placeholder="Identifiant">
-        <input type="password" id="pass" placeholder="Mot de passe">
-        <button onclick="attemptLogin()">Se connecter</button>
-        <div id="error-msg" class="error">Identifiants incorrects</div>
-        
-        <div style="margin-top: 20px; font-size: 0.8rem; color: #64748b;">
-            <a href="client.html" style="color: #94a3b8; text-decoration: none;">Accès Client Rapide (Sans login) →</a>
+    <div class="container">
+        <a href="client.html" class="card">
+            <span class="icon">👤</span>
+            <h2>Espace Client</h2>
+            <p>Devis Rapide</p>
+        </a>
+
+        <div onclick="openLogin('commercial')" class="card">
+            <span class="badge-lock">🔒</span>
+            <span class="icon">💼</span>
+            <h2>Commercial</h2>
+            <p>Devis & Validation</p>
+        </div>
+
+        <div onclick="openLogin('production')" class="card">
+            <span class="badge-lock">🔒</span>
+            <span class="icon">🏭</span>
+            <h2>Atelier / Prod</h2>
+            <p>Liste de fabrication</p>
+        </div>
+
+        <div onclick="openLogin('compta')" class="card">
+            <span class="badge-lock">🔒</span>
+            <span class="icon">💶</span>
+            <h2>Comptabilité</h2>
+            <p>Facturation & Paiement</p>
+        </div>
+
+        <div onclick="openLogin('admin')" class="card" style="background: #f1f5f9; border-style: dashed;">
+            <span class="badge-lock">🔒</span>
+            <span class="icon">⚙️</span>
+            <h2>Admin</h2>
+            <p>Configuration</p>
+        </div>
+    </div>
+
+    <div id="login-modal">
+        <div class="login-box">
+            <h3 id="login-title">Connexion</h3>
+            <input type="text" id="user-login" placeholder="Identifiant">
+            <input type="password" id="user-pass" placeholder="Mot de passe">
+            <button onclick="performLogin()">Se connecter</button>
+            <button onclick="document.getElementById('login-modal').style.display='none'" style="background:transparent; color:#666; margin-top:10px;">Annuler</button>
         </div>
     </div>
 
     <script>
-        // Vérifie si déjà connecté
-        const session = JSON.parse(localStorage.getItem('simpactUser'));
-        if(session) redirectUser(session);
+        let targetRole = '';
 
-        function attemptLogin() {
-            const l = document.getElementById('login').value;
-            const p = document.getElementById('pass').value;
-            const user = loginUser(l, p); // Fonction définie dans users.js
+        function openLogin(role) {
+            // Si déjà connecté avec le bon rôle, on y va direct
+            const currentUser = JSON.parse(localStorage.getItem('simpactUser'));
+            if(currentUser && (currentUser.role === role || currentUser.role === 'admin')) {
+                redirect(role);
+                return;
+            }
 
-            if (user) {
-                redirectUser(user);
+            targetRole = role;
+            document.getElementById('login-title').textContent = "Accès " + role.toUpperCase();
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        function performLogin() {
+            const l = document.getElementById('user-login').value;
+            const p = document.getElementById('user-pass').value;
+            const user = loginUser(l, p);
+
+            if(user) {
+                if(user.role === 'admin' || user.role === targetRole) {
+                    redirect(targetRole);
+                } else {
+                    alert("Ce compte n'a pas accès à la section " + targetRole);
+                }
             } else {
-                document.getElementById('error-msg').style.display = 'block';
+                alert("Identifiants incorrects");
             }
         }
 
-        function redirectUser(user) {
-            if (user.role === 'admin') window.location.href = 'admin_prix.html';
-            else if (user.role === 'commercial') window.location.href = 'commercial.html';
-            else window.location.href = 'client.html';
+        function redirect(role) {
+            if(role === 'commercial') window.location.href = 'commercial.html';
+            else if(role === 'production') window.location.href = 'production.html';
+            else if(role === 'compta') window.location.href = 'compta.html';
+            else if(role === 'admin') window.location.href = 'admin_prix.html';
         }
-
-        // Touche Entrée pour valider
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') attemptLogin();
-        });
     </script>
 </body>
 </html>
