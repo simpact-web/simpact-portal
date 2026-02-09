@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Comptabilité</title>
+    <script src="users.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #f1f5f9; color: #1e293b; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th { background: #e2e8f0; padding: 15px; text-align: left; font-size: 0.9rem; color: #475569; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .status-unpaid { background: #fee2e2; color: #991b1b; }
+        .status-paid { background: #dcfce7; color: #166534; }
+
+        .btn-pay { background: #2563eb; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💶 Suivi Facturation</h1>
+            <button onclick="logout()" style="background:#cbd5e1; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Quitter</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Ref</th>
+                    <th>Client</th>
+                    <th>Produit</th>
+                    <th>Prix HT</th>
+                    <th>Statut Paiement</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="compta-list">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        checkAuth(['compta', 'admin']);
+
+        function renderCompta() {
+            const orders = getOrders();
+            const list = document.getElementById('compta-list');
+            list.innerHTML = '';
+
+            orders.forEach(order => {
+                const isPaid = order.statusCompta === 'Payé';
+                const html = `
+                    <tr style="${isPaid ? 'opacity:0.6;' : ''}">
+                        <td>${order.date}</td>
+                        <td><strong>${order.ref}</strong></td>
+                        <td>${order.client}</td>
+                        <td>${order.prod} (${order.qty})</td>
+                        <td style="font-weight:bold; color:#2563eb;">${order.price} DT</td>
+                        <td><span class="status-badge ${isPaid ? 'status-paid' : 'status-unpaid'}">${order.statusCompta}</span></td>
+                        <td>
+                            ${!isPaid ? `<button class="btn-pay" onclick="setPaid('${order.ref}')">Marquer Payé</button>` : '✅'}
+                        </td>
+                    </tr>
+                `;
+                list.innerHTML += html;
+            });
+        }
+
+        function setPaid(ref) {
+            if(confirm("Confirmer le paiement ?")) {
+                updateOrderStatus(ref, 'Payé', 'compta');
+                renderCompta();
+            }
+        }
+
+        renderCompta();
+    </script>
+</body>
+</html>
