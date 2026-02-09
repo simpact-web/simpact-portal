@@ -12,7 +12,7 @@ const SIMPACT_USERS = [
     
     // --- COMMERCIAUX ---
     { login: "slim", pass: "slim2026", role: "commercial", name: "Slim Bouraoui" },
-    { login: "commercial", pass: "test", role: "commercial", name: "Commercial Test" },
+    { login: "emna", pass: "emna2026", role: "commercial", name: "Emna Ben Achour" },
 
     // --- CLIENTS ---
     { login: "client", pass: "client", role: "client", name: "Client Visiteur" }
