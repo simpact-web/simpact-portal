@@ -1,50 +1,55 @@
-// BASE DE DONNÉES UTILISATEURS (Simulée)
+// BASE DE DONNÉES UTILISATEURS
 const USERS = [
     { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Youssef (PDG)', redirect: 'admin.html' },
     { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
     { id: 'compta01', pass: 'facture', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
     { id: 'comm01', pass: 'vente', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
-    // CLIENTS
     { id: 'client01', pass: 'client123', role: 'client', name: 'Agence Pub', redirect: 'client.html' },
     { id: 'client02', pass: '1234', role: 'client', name: 'Restaurant Le Chef', redirect: 'client.html' }
 ];
 
 // FONCTION DE LOGIN
 function login(user, pass) {
-    const foundUser = USERS.find(u => u.id === user && u.pass === pass);
+    if(!user || !pass) return null;
+    
+    // Recherche insensible à la casse pour l'identifiant
+    const foundUser = USERS.find(u => u.id.toLowerCase() === user.toLowerCase() && u.pass === pass);
+    
     if (foundUser) {
-        // On enregistre la session
         localStorage.setItem('SIMPACT_USER', JSON.stringify(foundUser));
         return foundUser;
     }
     return null;
 }
 
-// FONCTION DE VÉRIFICATION (À mettre en haut de chaque page)
+// FONCTION DE VÉRIFICATION
 function checkAuth(allowedRoles) {
     const session = localStorage.getItem('SIMPACT_USER');
     if (!session) {
-        window.location.href = 'index.html'; // Renvoie au login si pas connecté
+        window.location.href = 'index.html';
         return null;
     }
     
-    const user = JSON.parse(session);
-    
-    // Si 'allowedRoles' est vide, on accepte tout le monde connecté
-    if (!allowedRoles) return user;
+    try {
+        const user = JSON.parse(session);
+        
+        if (!allowedRoles) return user;
 
-    // Si le rôle n'est pas autorisé
-    if (Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
-        alert("⛔ Accès interdit à cette zone !");
-        window.location.href = user.redirect; // Renvoie vers sa page légitime
-        return null;
-    } else if (typeof allowedRoles === 'string' && allowedRoles !== user.role) {
-        alert("⛔ Accès interdit !");
-        window.location.href = user.redirect;
+        if (Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
+            alert("⛔ Accès interdit à cette zone !");
+            window.location.href = user.redirect;
+            return null;
+        } else if (typeof allowedRoles === 'string' && allowedRoles !== user.role) {
+            alert("⛔ Accès interdit !");
+            window.location.href = user.redirect;
+            return null;
+        }
+        return user;
+    } catch(e) {
+        // En cas d'erreur de lecture, on déconnecte
+        logout();
         return null;
     }
-
-    return user;
 }
 
 // DÉCONNEXION
@@ -53,19 +58,26 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// GESTION DES COMMANDES (LocalStorage - Base de données locale navigateur)
+// GESTION DES COMMANDES (Sécurisée)
 function getOrders() {
-    const orders = localStorage.getItem('SIMPACT_ORDERS');
-    return orders ? JSON.parse(orders) : [];
+    try {
+        const orders = localStorage.getItem('SIMPACT_ORDERS');
+        return orders ? JSON.parse(orders) : [];
+    } catch(e) {
+        console.error("Erreur lecture commandes", e);
+        return [];
+    }
 }
 
 function saveOrder(orderData) {
-    const orders = getOrders();
-    // Ajout en haut de la liste
-    orders.unshift(orderData);
-    // Limite à 50 dernières commandes pour ne pas surcharger
-    if(orders.length > 50) orders.pop();
-    localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
+    try {
+        const orders = getOrders();
+        orders.unshift(orderData);
+        if(orders.length > 50) orders.pop();
+        localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
+    } catch(e) {
+        alert("Erreur de sauvegarde locale (Mémoire pleine ?)");
+    }
 }
 
 function updateOrderStatus(ref, newStatus, type) {
