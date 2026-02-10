@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpact - Connexion</title>
-    <script src="users.js"></script>
+    <script src="users.js?v=2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
@@ -23,36 +23,58 @@
         <h1>SIMPACT</h1>
         <p>Portail Professionnel</p>
         
-        <input type="text" id="login-id" placeholder="Identifiant">
-        <input type="password" id="login-pass" placeholder="Mot de passe">
-        <button onclick="attemptLogin()">Se connecter</button>
+        <form onsubmit="event.preventDefault(); attemptLogin();">
+            <input type="text" id="login-id" placeholder="Identifiant" autocomplete="username" required>
+            <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password" required>
+            <button type="submit">Se connecter</button>
+        </form>
+
         <div id="error-msg" class="error">Identifiant ou mot de passe incorrect</div>
+        <div id="debug-msg" style="color: #64748b; font-size: 0.8rem; margin-top: 10px; display:none;">Chargement...</div>
     </div>
 
     <script>
-        // Si déjà connecté, on redirige direct
-        const session = localStorage.getItem('SIMPACT_USER');
-        if(session) {
-            const user = JSON.parse(session);
-            window.location.href = user.redirect;
+        // Vérification immédiate de la session
+        try {
+            const session = localStorage.getItem('SIMPACT_USER');
+            if(session) {
+                const user = JSON.parse(session);
+                if(user && user.redirect) {
+                    window.location.href = user.redirect;
+                }
+            }
+        } catch(e) {
+            console.error("Erreur lecture session", e);
+            localStorage.removeItem('SIMPACT_USER'); // Nettoyage si corrompu
         }
 
         function attemptLogin() {
-            const id = document.getElementById('login-id').value;
-            const pass = document.getElementById('login-pass').value;
+            const id = document.getElementById('login-id').value.trim(); // .trim() enlève les espaces accidentels
+            const pass = document.getElementById('login-pass').value.trim();
+            const errorDiv = document.getElementById('error-msg');
+            
+            // Vérification que le fichier users.js est bien chargé
+            if (typeof login !== 'function') {
+                alert("ERREUR CRITIQUE : Le fichier users.js n'est pas chargé correctement. Vérifiez qu'il est bien sur GitHub au même endroit que index.html");
+                return;
+            }
+
+            console.log("Tentative de connexion pour :", id); // Pour le débogage (F12)
+
             const user = login(id, pass); // Fonction dans users.js
 
             if(user) {
+                console.log("Connexion réussie, redirection vers :", user.redirect);
                 window.location.href = user.redirect;
             } else {
-                document.getElementById('error-msg').style.display = 'block';
+                console.log("Échec connexion");
+                errorDiv.style.display = 'block';
+                // Petit effet visuel pour dire que ça a échoué si l'erreur est déjà affichée
+                errorDiv.style.animation = 'none';
+                errorDiv.offsetHeight; /* trigger reflow */
+                errorDiv.style.animation = 'shake 0.5s';
             }
         }
-        
-        // Touche Entrée pour valider
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') attemptLogin();
-        });
     </script>
 </body>
 </html>
