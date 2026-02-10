@@ -4,27 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js"></script>
+    <script src="users.js?v=2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* MÊME DESIGN QUE LE COMMERCIAL MAIS SIMPLIFIÉ */
-        :root { --primary: #8b5cf6; --bg: #f8fafc; --text: #1e293b; } /* Violet pour les clients */
+        /* DESIGN CLIENT (VIOLET) - STRICTEMENT CONSERVÉ */
+        :root { --primary: #8b5cf6; --bg: #f8fafc; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; }
-        .logout-btn { background: #fee2e2; color: #991b1b; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+        .logout-btn { background: #fee2e2; color: #991b1b; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
 
         h2 { color: var(--primary); margin-top: 0; }
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; }
-        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; box-sizing: border-box; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 1rem; }
         
-        .upload-zone { border: 2px dashed #cbd5e1; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #f1f5f9; }
-        .upload-zone:hover { border-color: var(--primary); background: #f3f0ff; }
+        /* GESTION DES OPTIONS CACHÉES (Recopié du Commercial mais adapté au style Violet) */
+        .option-group { display: none; background: #f3f0ff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd6fe; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease; }
+        .option-group.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn-order { background: var(--primary); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-order:hover { background: #7c3aed; }
+        /* RADIOS STYLE */
+        .radio-group { display: flex; gap: 10px; }
+        .radio-option { flex: 1; }
+        .radio-option input { display: none; }
+        .radio-option label { display: block; padding: 12px; border: 1px solid var(--border); text-align: center; border-radius: 6px; cursor: pointer; background: white; font-size: 0.9rem; transition: 0.2s; font-weight: 500; }
+        .radio-option input:checked + label { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .btn-order { background: var(--primary); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-order:hover { background: #7c3aed; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -37,12 +46,16 @@
         <h2>Nouvelle Commande</h2>
         
         <div class="form-group">
-            <label>Type de produit</label>
+            <label>Je souhaite commander :</label>
             <select id="prod-type">
-                <option>Flyers</option>
-                <option>Cartes de visite</option>
-                <option>Dépliants</option>
-                <option>Brochures</option>
+                <option value="">-- Sélectionner un produit --</option>
+                <option value="flyer">Flyers</option>
+                <option value="carte">Cartes de visite</option>
+                <option value="depliant">Dépliants 3 volets</option>
+                <option value="entete">Papier à en-tête</option>
+                <option value="brochure">Brochure couleur</option>
+                <option value="livre">Livre N&B</option>
+                <option value="affiches">Affiches Grand Format</option>
             </select>
         </div>
         
@@ -51,9 +64,105 @@
             <input type="number" id="qty" placeholder="Ex: 1000">
         </div>
 
+        <div id="flyer-options" class="option-group">
+            <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto / Verso</label></div></div></div>
+            <div class="form-group"><label>Papier</label>
+                <select id="flyer-paper">
+                    <option value="couche-90-mat">Couché 90gr Mat</option>
+                    <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                    <option value="couche-115-mat">Couché 115gr Mat</option>
+                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                    <option value="couche-170-mat">Couché 170gr Mat</option>
+                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                    <option value="couche-200-mat">Couché 200gr Mat</option>
+                    <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="carte-options" class="option-group">
+            <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé (Mat/Brillant)</label></div></div></div>
+            <div class="form-group"><label>Papier</label>
+                <select id="carte-paper">
+                    <option value="couche-300-mat">Couché 300gr Mat</option>
+                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                    <option value="couche-350-mat">Couché 350gr Mat</option>
+                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="depliant-options" class="option-group">
+            <div class="form-group"><label>Papier</label>
+                <select id="depliant-paper">
+                    <option value="couche-115-mat">Couché 115gr Mat</option>
+                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                    <option value="couche-170-mat">Couché 170gr Mat</option>
+                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="entete-options" class="option-group">
+            <div class="form-group"><label>Papier</label>
+                <select id="entete-paper">
+                    <option value="offset-80">Offset 80gr Standard</option>
+                    <option value="offset-100">Offset 100gr Premium</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="brochure-options" class="option-group">
+            <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
+            <div class="form-group"><label>Nombre de Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 12"></div>
+            <div class="form-group"><label>Papier Intérieur</label>
+                <select id="brochure-interior-paper">
+                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                    <option value="offset-80">Offset 80gr</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Papier Couverture</label>
+                <select id="brochure-cover-paper">
+                    <option value="couche-250-brillant">Couché 250gr Brillant</option>
+                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="livre-options" class="option-group">
+            <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
+            <div class="form-group"><label>Nombre de Pages</label><input type="number" id="livre-pages"></div>
+            <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
+            <div class="form-group"><label>Couverture</label>
+                <select id="livre-cover-paper">
+                    <option value="couche-300-mat">Couché 300gr Mat</option>
+                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Finition Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Pelliculage</label></div></div></div>
+        </div>
+
+        <div id="affiches-options" class="option-group">
+            <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div>
+            <div class="form-group"><label>Papier</label>
+                <select id="affiche-paper">
+                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                    <option value="couche-170-mat">Couché 170gr Mat</option>
+                    <option value="couche-200-brillant">Couché 200gr Brillant</option>
+                </select>
+            </div>
+        </div>
+
         <div class="form-group">
-            <label>Description / Instructions</label>
-            <textarea id="desc" rows="3" placeholder="Ex: Papier brillant, coins arrondis..."></textarea>
+            <label>Remarques / Instructions supplémentaires</label>
+            <textarea id="desc" rows="3" placeholder="Ex: Livraison impérative avant vendredi..."></textarea>
         </div>
 
         <div class="form-group">
@@ -74,45 +183,103 @@
         const user = checkAuth('client');
         if(user) document.getElementById('client-name').textContent = user.name;
 
-        // LIEN SCRIPT GOOGLE (Le même que commercial)
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
 
+        // GESTION DE L'AFFICHAGE DYNAMIQUE DES OPTIONS
+        document.getElementById('prod-type').addEventListener('change', function() {
+            // Cacher toutes les options
+            document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
+            // Afficher celle correspondante
+            if(this.value) {
+                const group = document.getElementById(this.value + '-options');
+                if(group) group.classList.add('active');
+            }
+        });
+
+        // FONCTION POUR RÉCUPÉRER LE NOM DU PAPIER LISIBLEMENT
+        function getPaperName(id) {
+            const el = document.getElementById(id);
+            if(el && el.selectedOptions[0]) return el.selectedOptions[0].text;
+            return id || '';
+        }
+
+        // GÉNÉRATION DE LA DESCRIPTION TECHNIQUE
+        function generateConfigString(type) {
+            let config = "";
+            try {
+                if(type === 'flyer') {
+                    const modeVal = document.querySelector('input[name="flyer-type"]:checked').value;
+                    config = `Impression: ${modeVal === 'recto' ? 'Recto' : 'R/V'}\nPapier: ${getPaperName('flyer-paper')}`;
+                }
+                else if(type === 'carte') {
+                    const finish = document.querySelector('input[name="carte-finish"]:checked').value;
+                    config = `Finition: ${finish === 'recto' ? 'Standard' : 'Pelliculé'}\nPapier: ${getPaperName('carte-paper')}`;
+                }
+                else if(type === 'depliant') {
+                    config = `3 Volets (A4 Ouvert)\nPapier: ${getPaperName('depliant-paper')}`;
+                }
+                else if(type === 'entete') {
+                    config = `Format A4\nPapier: ${getPaperName('entete-paper')}`;
+                }
+                else if(type === 'brochure') {
+                    const pages = document.getElementById('brochure-pages').value;
+                    const fmt = document.getElementById('brochure-format').value.toUpperCase();
+                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('brochure-interior-paper')}\nCouv: ${getPaperName('brochure-cover-paper')}`;
+                }
+                else if(type === 'livre') {
+                    const pages = document.getElementById('livre-pages').value;
+                    const fmt = document.getElementById('livre-format').value.toUpperCase();
+                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
+                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('livre-interior-paper')}\nCouv: ${getPaperName('livre-cover-paper')}\nPelliculage: ${pell === 'avec' ? 'OUI' : 'NON'}`;
+                }
+                else if(type === 'affiches') {
+                    const fmt = document.getElementById('affiche-format').value === 'a3' ? 'A3' : 'A3+';
+                    config = `Format: ${fmt}\nPapier: ${getPaperName('affiche-paper')}`;
+                }
+            } catch(e) { console.log("Info manquante dans config"); }
+            
+            return config;
+        }
+
         function submitClientOrder() {
-            const prod = document.getElementById('prod-type').value;
+            const prodType = document.getElementById('prod-type').value;
             const qty = document.getElementById('qty').value;
-            const desc = document.getElementById('desc').value;
+            const userDesc = document.getElementById('desc').value;
             const file = document.getElementById('file-upload').files[0];
             
-            if(!qty) return alert("Veuillez mettre une quantité.");
+            if(!prodType || !qty) return alert("Veuillez choisir un produit et une quantité.");
 
             const btn = document.querySelector('.btn-order');
             btn.textContent = "⏳ Envoi en cours..."; btn.disabled = true;
 
-            // Construction de la donnée
+            // Construction de la donnée complète
             const ref = "WEB-" + Date.now().toString().slice(-5);
+            let prodLabel = document.getElementById('prod-type').selectedOptions[0].text;
             
-            // NOTE : L'upload réel de fichier vers Drive demande une config complexe.
-            // Ici on simule l'envoi de la commande texte.
-            // Pour le fichier, le mieux dans une V1 est de demander un lien Wetransfer ou Drive si c'est lourd.
+            // On combine les choix techniques + la remarque du client
+            let technicalDetails = generateConfigString(prodType);
+            let fullDetails = technicalDetails + "\n\n[Note Client]: " + userDesc;
+            if(file) fullDetails += "\n[Fichier joint]: " + file.name;
             
             const formData = new FormData();
             formData.append("Date", new Date().toLocaleString());
             formData.append("Ref", ref);
-            formData.append("Client", user.name); // Nom du compte connecté
-            formData.append("Produit", prod);
+            formData.append("Client", user.name);
+            formData.append("Produit", prodLabel);
             formData.append("Quantité", qty);
-            formData.append("Prix HT", "A DEVISER"); // Le client ne fixe pas le prix
-            formData.append("Détails", desc + (file ? " [Fichier joint: " + file.name + "]" : ""));
+            formData.append("Prix HT", "A DEVISER"); // Le client ne voit pas le prix
+            formData.append("Détails", fullDetails);
             formData.append("Commercial", "CLIENT WEB");
 
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
             .then(r => {
-                alert("✅ Commande envoyée ! Un commercial va valider votre dossier.");
+                alert("✅ Commande envoyée ! Nous allons traiter votre demande.");
                 window.location.reload();
             })
             .catch(e => {
-                alert("Erreur réseau.");
+                alert("Erreur réseau. Vérifiez votre connexion.");
                 btn.disabled = false;
+                btn.textContent = "ENVOYER LA COMMANDE";
             });
         }
     </script>
