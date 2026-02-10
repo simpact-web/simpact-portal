@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Admin Prix</title>
+    <script src="users.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --accent: #f59e0b; --success: #10b981; --danger: #ef4444; --input-bg: #334155; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; margin: 0; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* HEADER */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.2s; color: white; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-save { background: var(--success); }
+        .btn-reset { background: var(--danger); }
+        .btn-logout { background: #334155; }
+
+        /* TABS */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: var(--card-bg); color: #94a3b8; padding: 10px 20px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS & TABLES */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #334155; }
+        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; margin-bottom: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+        td { padding: 10px; border-bottom: 1px solid #334155; }
+        
+        input { background: var(--input-bg); border: 1px solid #475569; color: white; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; font-family: monospace; }
+        input:focus { outline: none; border-color: var(--accent); }
+        
+        .delete-btn { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .delete-btn:hover { background: var(--danger); color: white; }
+        
+        .add-row-btn { background: #334155; color: white; width: 100%; padding: 10px; margin-top: 10px; border: 1px dashed #475569; border-radius: 6px; cursor: pointer; }
+        .add-row-btn:hover { background: #475569; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <script>checkAuth('admin');</script>
+
+    <div class="container">
+        <header>
+            <h1>🎛️ Admin Prix</h1>
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetOrders()">🗑️ Vider Commandes</button>
+                <button class="btn btn-save" onclick="saveAllPrices()">💾 SAUVEGARDER CONFIG</button>
+                <button class="btn btn-logout" onclick="logout()">Quitter</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('flyers')">Flyers</button>
+            <button class="tab-btn" onclick="switchTab('cartes')">Cartes</button>
+            <button class="tab-btn" onclick="switchTab('affiches')">🖼️ Affiches</button>
+            <button class="tab-btn" onclick="switchTab('depliants')">Dépliants</button>
+            <button class="tab-btn" onclick="switchTab('entetes')">En-têtes</button>
+            <button class="tab-btn" onclick="switchTab('livres')">Livres</button>
+            <button class="tab-btn" onclick="switchTab('brochures')">Brochures</button>
+            <button class="tab-btn" onclick="switchTab('fixes')">Paramètres</button>
+        </div>
+
+        <div id="flyers" class="tab-content active">
+            <div class="grid-2">
+                <div class="card"><h2>Flyers Recto</h2><table id="flyer-recto-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('flyer-recto')">+ Ajouter palier</button></div>
+                <div class="card"><h2>Flyers R/V</h2><table id="flyer-rectoverso-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('flyer-rectoverso')">+ Ajouter palier</button></div>
+            </div>
+        </div>
+
+        <div id="cartes" class="tab-content">
+            <div class="grid-2">
+                <div class="card"><h2>Cartes Standard</h2><table id="carte-recto-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('carte-recto')">+ Ajouter palier</button></div>
+                <div class="card"><h2>Cartes Pelliculées</h2><table id="carte-pellicule-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('carte-pellicule')">+ Ajouter palier</button></div>
+            </div>
+        </div>
+
+        <div id="affiches" class="tab-content">
+            <div class="card">
+                <h2>Affiches Grand Format (Base A3)</h2>
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:15px;">Le format A3+ sera calculé automatiquement (Prix A3 x 1.2)</p>
+                <table id="affiche-table"><thead><tr><th>Qté Max</th><th>Prix Unitaire A3 (DT)</th><th></th></tr></thead><tbody></tbody></table>
+                <button class="add-row-btn" onclick="addRow('affiche')">+ Ajouter palier</button>
+            </div>
+        </div>
+
+        <div id="depliants" class="tab-content">
+            <div class="card"><h2>Dépliants 3 Volets</h2><table id="depliant-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('depliant')">+ Ajouter palier</button></div>
+        </div>
+
+        <div id="entetes" class="tab-content">
+            <div class="card"><h2>Papier En-tête</h2><table id="entete-table"><thead><tr><th>Qté Max</th><th>Prix (DT)</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('entete')">+ Ajouter palier</button></div>
+        </div>
+        
+        <div id="livres" class="tab-content">
+            <div class="card">
+                <h2>Prix Couvertures Livres</h2>
+                <div class="grid-2">
+                    <div><label>A4 Recto</label><input type="number" id="livre-a4-recto" step="0.01"></div>
+                    <div><label>A4 R/V</label><input type="number" id="livre-a4-rectoverso" step="0.01"></div>
+                    <div><label>A5 Recto</label><input type="number" id="livre-a5-recto" step="0.01"></div>
+                    <div><label>A5 R/V</label><input type="number" id="livre-a5-rectoverso" step="0.01"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="brochures" class="tab-content">
+            <div class="card"><h2>Paliers Brochures (Prix par page)</h2><table id="brochure-paliers-table"><thead><tr><th>Min</th><th>Max</th><th>Prix/feuille</th><th></th></tr></thead><tbody></tbody></table><button class="add-row-btn" onclick="addRow('brochure-paliers')">+ Ajouter palier</button></div>
+        </div>
+
+        <div id="fixes" class="tab-content">
+            <div class="card">
+                <h2>Coûts Matières & Fixes</h2>
+                <div class="grid-2">
+                    <div><label>Coût Pelliculage (par unité)</label><input type="number" id="prix-pelliculage" step="0.01"></div>
+                    <div><label>Coût Feuille N&B (Livre)</label><input type="number" id="prix-feuille-nb" step="0.01"></div>
+                    <div><label>Supplément Offset 100g</label><input type="number" id="prix-offset-100" step="0.001"></div>
+                    <div><label>Coût par gramme papier couché</label><input type="number" id="prix-gramme-couche" step="0.0001"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let prixData = {};
+
+        // INITIALISATION
+        async function loadPrices() {
+            try {
+                // Essayer de charger la config, sinon utiliser une base vide
+                const r = await fetch('prix_config.json');
+                prixData = await r.json();
+            } catch (e) {
+                console.log("Config non trouvée, création base vide.");
+                prixData = { tarifs: { flyer: {}, carte: {}, depliant: [], entete: [], affiche: [] }, prix_couverture_livre: {}, prix_fixes: {}, paliers_brochure: {} };
+            }
+            
+            // Remplissage des tableaux
+            fillTable('flyer-recto', prixData.tarifs.flyer.recto);
+            fillTable('flyer-rectoverso', prixData.tarifs.flyer.rectoVerso);
+            fillTable('carte-recto', prixData.tarifs.carte.recto);
+            fillTable('carte-pellicule', prixData.tarifs.carte.pellicule);
+            fillTable('depliant', prixData.tarifs.depliant);
+            fillTable('entete', prixData.tarifs.entete);
+            
+            // Gestion spécifique Affiches (Si pas de données, on initie un tableau vide)
+            fillTable('affiche', prixData.tarifs.affiche || []);
+
+            fillBrochureTable(prixData.paliers_brochure.couleur_recto_verso);
+
+            // Inputs simples
+            setVal('livre-a4-recto', prixData.prix_couverture_livre.a4?.recto);
+            setVal('livre-a4-rectoverso', prixData.prix_couverture_livre.a4?.rectoVerso);
+            setVal('livre-a5-recto', prixData.prix_couverture_livre.a5?.recto);
+            setVal('livre-a5-rectoverso', prixData.prix_couverture_livre.a5?.rectoVerso);
+
+            setVal('prix-pelliculage', prixData.prix_fixes.pelliculage);
+            setVal('prix-feuille-nb', prixData.prix_fixes.feuille_nb);
+            setVal('prix-offset-100', prixData.prix_fixes.offset_100);
+            setVal('prix-gramme-couche', prixData.prix_fixes.gramme_couche);
+        }
+
+        // FONCTIONS UTILITAIRES
+        function switchTab(id) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(id).classList.add('active');
+        }
+
+        function setVal(id, val) { if(val !== undefined) document.getElementById(id).value = val; }
+
+        function fillTable(id, data) {
+            const tbody = document.querySelector(`#${id}-table tbody`);
+            tbody.innerHTML = '';
+            if(!data) return;
+            data.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><input type="number" value="${item.qty || item.min || 0}"></td>
+                    <td><input type="number" value="${item.price || item.max || 0}"></td>
+                    <td><button class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+                `;
+            });
+        }
+
+        function fillBrochureTable(data) {
+            const tbody = document.querySelector('#brochure-paliers-table tbody');
+            tbody.innerHTML = '';
+            if(!data) return;
+            data.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><input type="number" value="${item.min}"></td>
+                    <td><input type="number" value="${item.max}"></td>
+                    <td><input type="number" value="${item.price}"></td>
+                    <td><button class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>
+                `;
+            });
+        }
+
+        function addRow(type) {
+            const tbody = type === 'brochure-paliers' 
+                ? document.querySelector(`#${type}-table tbody`)
+                : document.querySelector(`#${type}-table tbody`);
+                
+            const row = tbody.insertRow();
+            if(type === 'brochure-paliers') {
+                row.innerHTML = `<td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><button class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>`;
+            } else {
+                row.innerHTML = `<td><input type="number" value="0"></td><td><input type="number" value="0"></td><td><button class="delete-btn" onclick="this.closest('tr').remove()">×</button></td>`;
+            }
+        }
+
+        function getTableData(id) {
+            return Array.from(document.querySelectorAll(`#${id}-table tbody tr`)).map(row => {
+                const inputs = row.querySelectorAll('input');
+                return { qty: parseFloat(inputs[0].value), price: parseFloat(inputs[1].value) };
+            });
+        }
+
+        function getBrochureData() {
+            return Array.from(document.querySelectorAll(`#brochure-paliers-table tbody tr`)).map(row => {
+                const inputs = row.querySelectorAll('input');
+                return { min: parseFloat(inputs[0].value), max: parseFloat(inputs[1].value), price: parseFloat(inputs[2].value) };
+            });
+        }
+
+        // SAUVEGARDE
+        function saveAllPrices() {
+            const config = {
+                tarifs: {
+                    flyer: { recto: getTableData('flyer-recto'), rectoVerso: getTableData('flyer-rectoverso') },
+                    carte: { recto: getTableData('carte-recto'), pellicule: getTableData('carte-pellicule') },
+                    depliant: getTableData('depliant'),
+                    entete: getTableData('entete'),
+                    affiche: getTableData('affiche') // Sauvegarde des affiches
+                },
+                prix_couverture_livre: {
+                    a4: { recto: parseFloat(document.getElementById('livre-a4-recto').value), rectoVerso: parseFloat(document.getElementById('livre-a4-rectoverso').value) },
+                    a5: { recto: parseFloat(document.getElementById('livre-a5-recto').value), rectoVerso: parseFloat(document.getElementById('livre-a5-rectoverso').value) }
+                },
+                paliers_brochure: { couleur_recto_verso: getBrochureData() },
+                prix_fixes: {
+                    pelliculage: parseFloat(document.getElementById('prix-pelliculage').value),
+                    feuille_nb: parseFloat(document.getElementById('prix-feuille-nb').value),
+                    offset_100: parseFloat(document.getElementById('prix-offset-100').value),
+                    gramme_couche: parseFloat(document.getElementById('prix-gramme-couche').value)
+                },
+                version: Date.now()
+            };
+
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'prix_config.json';
+            a.click();
+            alert("✅ Configuration téléchargée ! Remplacez le fichier 'prix_config.json' sur GitHub.");
+        }
+
+        function resetOrders() {
+            if(confirm("⚠️ Etes-vous sûr de vouloir effacer TOUTES les commandes locales ?")) {
+                localStorage.removeItem('SIMPACT_ORDERS');
+                alert("Commandes effacées.");
+            }
+        }
+
+        loadPrices();
+    </script>
+</body>
+</html>
