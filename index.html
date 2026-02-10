@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Connexion</title>
+    <script src="users.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
+        .login-box { background: #1e293b; padding: 3rem; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; text-align: center; }
+        h1 { margin: 0 0 10px 0; color: #2563eb; letter-spacing: -1px; }
+        p { color: #94a3b8; margin-bottom: 2rem; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #334155; border: 1px solid #475569; color: white; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        input:focus { outline: none; border-color: #2563eb; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #1d4ed8; }
+        .error { color: #ef4444; font-size: 0.9rem; margin-top: 15px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>SIMPACT</h1>
+        <p>Portail Professionnel</p>
+        
+        <input type="text" id="login-id" placeholder="Identifiant">
+        <input type="password" id="login-pass" placeholder="Mot de passe">
+        <button onclick="attemptLogin()">Se connecter</button>
+        <div id="error-msg" class="error">Identifiant ou mot de passe incorrect</div>
+    </div>
+
+    <script>
+        // Si déjà connecté, on redirige direct
+        const session = localStorage.getItem('SIMPACT_USER');
+        if(session) {
+            const user = JSON.parse(session);
+            window.location.href = user.redirect;
+        }
+
+        function attemptLogin() {
+            const id = document.getElementById('login-id').value;
+            const pass = document.getElementById('login-pass').value;
+            const user = login(id, pass); // Fonction dans users.js
+
+            if(user) {
+                window.location.href = user.redirect;
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+        
+        // Touche Entrée pour valider
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+    </script>
+</body>
+</html>
