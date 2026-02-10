@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=5"></script>
+    <script src="users.js?v=6"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         /* DESIGN CLIENT (VIOLET) */
@@ -247,7 +247,7 @@
         }
         loadPrices();
 
-        [cite_start]// Helpers Calcul [cite: 133-146]
+        // Helpers Calcul
         function getPaperName(id) { const el = document.getElementById(id); return el && el.selectedOptions[0] ? el.selectedOptions[0].text : id; }
         
         function calculatePaperSurcharge(paperType, numSheets) {
@@ -279,7 +279,7 @@
             return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
         }
 
-        [cite_start]// --- CALCUL CENTRAL (Adapté du Commercial pour l'affichage client) [cite: 153-186] ---
+        // --- CALCUL CENTRAL ---
         function calculateQuote() {
             const type = document.getElementById('prod-type').value;
             const qty = parseInt(document.getElementById('qty').value);
