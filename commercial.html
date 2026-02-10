@@ -287,6 +287,7 @@
                     flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
                     carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
                     depliant: data.tarifs.depliant, entete: data.tarifs.entete,
+                    affiche: data.tarifs.affiche || [], // <--- C'est la nouveauté !
                     prix_couverture_livre: data.prix_couverture_livre || { a4: { recto: 1.3, rectoVerso: 1.5 }, a5: { recto: 0.65, rectoVerso: 0.75 } }
                 };
             } catch(e) { console.log("Erreur chargement prix"); }
@@ -433,10 +434,17 @@
                 else if(type === 'affiches') {
                     const format = document.getElementById('affiche-format').value;
                     const paper = document.getElementById('affiche-paper').value;
-                    let res = calculatePriceWithSmoothing(TARIFS.flyer.recto, qty);
-                    let price = res.totalPrice;
-                    if(format === 'a3plus') price *= 1.2;
-                    totalPrice = price + calculatePaperSurcharge(paper, qty);
+                    
+                    // On calcule le PRIX UNITAIRE lissé selon la quantité
+                    // (Plus on en prend, moins c'est cher à l'unité)
+                    let resUnit = calculatePriceWithSmoothing(TARIFS.affiche, qty); 
+                    let unitPrice = resUnit.totalPrice; // Ici "totalPrice" est en fait le prix unitaire lissé du tableau
+                    
+                    if(format === 'a3plus') unitPrice *= 1.2; // +20% pour le A3+
+                    
+                    let basePrice = unitPrice * qty; // Prix x Quantité
+                    totalPrice = basePrice + calculatePaperSurcharge(paper, qty);
+                    
                     config = `Grand Format ${format === 'a3' ? 'A3' : 'A3+'}\nPapier: ${getPaperName(paper)}`;
                 }
 
