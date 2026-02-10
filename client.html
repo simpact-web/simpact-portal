@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=2"></script>
+    <script src="users.js?v=3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* DESIGN CLIENT (VIOLET) - STRICTEMENT CONSERVÉ */
@@ -20,7 +20,7 @@
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; }
         select, input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 1rem; }
         
-        /* GESTION DES OPTIONS CACHÉES (Recopié du Commercial mais adapté au style Violet) */
+        /* GESTION DES OPTIONS CACHÉES */
         .option-group { display: none; background: #f3f0ff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd6fe; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease; }
         .option-group.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -83,7 +83,7 @@
         </div>
 
         <div id="carte-options" class="option-group">
-            <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé (Mat/Brillant)</label></div></div></div>
+            <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
             <div class="form-group"><label>Papier</label>
                 <select id="carte-paper">
                     <option value="couche-300-mat">Couché 300gr Mat</option>
@@ -119,20 +119,37 @@
         <div id="brochure-options" class="option-group">
             <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
             <div class="form-group"><label>Nombre de Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 12"></div>
+            
             <div class="form-group"><label>Papier Intérieur</label>
                 <select id="brochure-interior-paper">
-                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-90-mat">Couché 90gr Mat</option>
                     <option value="couche-90-brillant">Couché 90gr Brillant</option>
+                    <option value="couche-115-mat">Couché 115gr Mat</option>
+                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
+                    <option value="couche-135-mat">Couché 135gr Mat</option>
+                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
+                    <option value="couche-170-mat">Couché 170gr Mat</option>
+                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
                     <option value="offset-80">Offset 80gr</option>
+                    <option value="offset-100">Offset 100gr</option>
                 </select>
             </div>
+            
             <div class="form-group"><label>Papier Couverture</label>
                 <select id="brochure-cover-paper">
+                    <option value="couche-250-mat">Couché 250gr Mat</option>
                     <option value="couche-250-brillant">Couché 250gr Brillant</option>
+                    <option value="couche-300-mat">Couché 300gr Mat</option>
                     <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                    <option value="couche-350-mat">Couché 350gr Mat</option>
+                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
                 </select>
             </div>
+
+            <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
+            <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="Piquée à cheval">Piquée à cheval (Agrafé)</option><option value="Dos carré collé">Dos carré collé</option><option value="Spirale">Spirale</option></select></div>
+            
+            <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
         </div>
 
         <div id="livre-options" class="option-group">
@@ -141,11 +158,17 @@
             <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
             <div class="form-group"><label>Couverture</label>
                 <select id="livre-cover-paper">
+                    <option value="couche-250-mat">Couché 250gr Mat</option>
+                    <option value="couche-250-brillant">Couché 250gr Brillant</option>
                     <option value="couche-300-mat">Couché 300gr Mat</option>
                     <option value="couche-300-brillant">Couché 300gr Brillant</option>
+                    <option value="couche-350-mat">Couché 350gr Mat</option>
+                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
                 </select>
             </div>
-            <div class="form-group"><label>Finition Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Pelliculage</label></div></div></div>
+            <div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
+            
+            <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
         </div>
 
         <div id="affiches-options" class="option-group">
@@ -155,6 +178,8 @@
                     <option value="couche-135-mat">Couché 135gr Mat</option>
                     <option value="couche-135-brillant">Couché 135gr Brillant</option>
                     <option value="couche-170-mat">Couché 170gr Mat</option>
+                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
+                    <option value="couche-200-mat">Couché 200gr Mat</option>
                     <option value="couche-200-brillant">Couché 200gr Brillant</option>
                 </select>
             </div>
@@ -224,13 +249,18 @@
                 else if(type === 'brochure') {
                     const pages = document.getElementById('brochure-pages').value;
                     const fmt = document.getElementById('brochure-format').value.toUpperCase();
-                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('brochure-interior-paper')}\nCouv: ${getPaperName('brochure-cover-paper')}`;
+                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
+                    const couvType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
+                    
+                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('brochure-interior-paper')}\nCouv: ${getPaperName('brochure-cover-paper')}\nImpression Couv: ${couvType === 'recto' ? 'Recto' : 'R/V'}\nPelliculage Couv: ${pell === 'avec' ? 'OUI' : 'NON'}`;
                 }
                 else if(type === 'livre') {
                     const pages = document.getElementById('livre-pages').value;
                     const fmt = document.getElementById('livre-format').value.toUpperCase();
                     const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
-                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('livre-interior-paper')}\nCouv: ${getPaperName('livre-cover-paper')}\nPelliculage: ${pell === 'avec' ? 'OUI' : 'NON'}`;
+                    const couvType = document.querySelector('input[name="livre-cover-type"]:checked').value;
+                    
+                    config = `Format: ${fmt} - ${pages} Pages\nIntérieur: ${getPaperName('livre-interior-paper')}\nCouv: ${getPaperName('livre-cover-paper')}\nImpression Couv: ${couvType === 'recto' ? 'Recto' : 'R/V'}\nPelliculage: ${pell === 'avec' ? 'OUI' : 'NON'}`;
                 }
                 else if(type === 'affiches') {
                     const fmt = document.getElementById('affiche-format').value === 'a3' ? 'A3' : 'A3+';
