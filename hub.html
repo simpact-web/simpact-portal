@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpact - Super Admin</title>
+    <script src="users.js?v=6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* DESIGN SYSTEM DARK (Cohérent avec Admin/Atelier) */
+        :root { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --accent: #3b82f6; --hover: #334155; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+        .user-badge { background: #334155; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; color: #94a3b8; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .logout-btn:hover { background: #dc2626; }
+
+        h1 { margin: 0; font-size: 1.8rem; }
+        h1 span { color: var(--accent); }
+
+        /* GRILLE DE NAVIGATION */
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        
+        .hub-card { 
+            background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid #334155; 
+            text-decoration: none; color: white; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; height: 120px;
+            position: relative; overflow: hidden;
+        }
+        .hub-card:hover { transform: translateY(-5px); border-color: var(--accent); background: var(--hover); }
+        
+        .card-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .card-desc { font-size: 0.9rem; color: #94a3b8; }
+        .card-icon { font-size: 2rem; opacity: 0.2; position: absolute; bottom: 10px; right: 15px; }
+
+        /* COULEURS SPÉCIFIQUES */
+        .c-comm { border-left: 5px solid #2563eb; }
+        .c-prod { border-left: 5px solid #f59e0b; }
+        .c-admin { border-left: 5px solid #ef4444; }
+        .c-compta { border-left: 5px solid #10b981; }
+        .c-client { border-left: 5px solid #8b5cf6; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Centre de Contrôle <span>Simpact</span></h1>
+                <p style="color:#64748b; margin:5px 0 0 0;">Accès Super Admin</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span class="user-badge">👤 Youssef</span>
+                <button class="logout-btn" onclick="logout()">Déconnexion</button>
+            </div>
+        </header>
+
+        <div class="hub-grid">
+            <a href="commercial.html" class="hub-card c-comm">
+                <div>
+                    <div class="card-title">💎 Commercial</div>
+                    <div class="card-desc">Saisir des commandes & Devis</div>
+                </div>
+                <div class="card-icon">💼</div>
+            </a>
+
+            <a href="production.html" class="hub-card c-prod">
+                <div>
+                    <div class="card-title">🏭 Atelier</div>
+                    <div class="card-desc">Suivi de production & Fiches</div>
+                </div>
+                <div class="card-icon">⚙️</div>
+            </a>
+
+            <a href="compta.html" class="hub-card c-compta">
+                <div>
+                    <div class="card-title">💰 Comptabilité</div>
+                    <div class="card-desc">Facturation & Chiffre d'Affaires</div>
+                </div>
+                <div class="card-icon">📊</div>
+            </a>
+
+            <a href="admin.html" class="hub-card c-admin">
+                <div>
+                    <div class="card-title">🎛️ Administration</div>
+                    <div class="card-desc">Gestion des Prix & Papiers</div>
+                </div>
+                <div class="card-icon">🔧</div>
+            </a>
+
+            <a href="client.html" class="hub-card c-client">
+                <div>
+                    <div class="card-title">🌍 Vue Client</div>
+                    <div class="card-desc">Tester l'interface publique</div>
+                </div>
+                <div class="card-icon">👋</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Vérification que c'est bien le superadmin qui est là
+        checkAuth('superadmin');
+    </script>
+</body>
+</html>
