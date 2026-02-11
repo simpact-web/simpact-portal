@@ -1,6 +1,10 @@
 // BASE DE DONNÉES UTILISATEURS
 const USERS = [
-    { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Youssef (PDG)', redirect: 'admin.html' },
+    // COMPTE SUPER ADMIN
+    { id: 'youssef', pass: 'ni3Shaey', role: 'superadmin', name: 'Youssef (PDG)', redirect: 'hub.html' },
+    
+    // AUTRES COMPTES
+    { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Admin Simpact', redirect: 'admin.html' },
     { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
     { id: 'compta01', pass: 'facture', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
     { id: 'comm01', pass: 'vente', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
@@ -11,10 +15,7 @@ const USERS = [
 // FONCTION DE LOGIN
 function login(user, pass) {
     if(!user || !pass) return null;
-    
-    // Recherche insensible à la casse pour l'identifiant
     const foundUser = USERS.find(u => u.id.toLowerCase() === user.toLowerCase() && u.pass === pass);
-    
     if (foundUser) {
         localStorage.setItem('SIMPACT_USER', JSON.stringify(foundUser));
         return foundUser;
@@ -22,7 +23,7 @@ function login(user, pass) {
     return null;
 }
 
-// FONCTION DE VÉRIFICATION
+// FONCTION DE VÉRIFICATION (INTELLIGENTE)
 function checkAuth(allowedRoles) {
     const session = localStorage.getItem('SIMPACT_USER');
     if (!session) {
@@ -33,6 +34,11 @@ function checkAuth(allowedRoles) {
     try {
         const user = JSON.parse(session);
         
+        // --- LA CLEF DU SUPER ADMIN ---
+        // Si l'utilisateur est 'superadmin', il a accès à TOUT, tout le temps.
+        if (user.role === 'superadmin') return user; 
+        // -----------------------------
+
         if (!allowedRoles) return user;
 
         if (Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
@@ -46,7 +52,6 @@ function checkAuth(allowedRoles) {
         }
         return user;
     } catch(e) {
-        // En cas d'erreur de lecture, on déconnecte
         logout();
         return null;
     }
@@ -76,7 +81,7 @@ function saveOrder(orderData) {
         if(orders.length > 50) orders.pop();
         localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
     } catch(e) {
-        alert("Erreur de sauvegarde locale (Mémoire pleine ?)");
+        alert("Erreur de sauvegarde locale");
     }
 }
 
