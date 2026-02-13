@@ -48,6 +48,34 @@
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #94a3b8; }
+        
+        /* MODAL GESTION UTILISATEURS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); padding: 2rem; border-radius: 16px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; border: 2px solid #475569; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #475569; }
+        .modal-title { font-size: 1.5rem; color: var(--accent); margin: 0; }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 2rem; cursor: pointer; line-height: 1; }
+        .close-btn:hover { color: white; }
+        .users-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .users-table th { background: #0f172a; padding: 12px; text-align: left; color: #94a3b8; border-bottom: 2px solid #475569; }
+        .users-table td { padding: 12px; border-bottom: 1px solid #475569; }
+        .role-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        .role-superadmin { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .role-admin { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .role-production { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .role-commercial { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
+        .role-compta { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .role-client { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+        .action-btns { display: flex; gap: 5px; }
+        .btn-edit-user { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .btn-delete-user { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .btn-delete-user:hover { background: #ef4444; color: white; }
+        .user-form { background: #0f172a; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-group-full { grid-column: 1/-1; }
+        .form-group label { color: #cbd5e1; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid #475569; color: white; border-radius: 6px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
     </style>
 </head>
 <body>
@@ -58,6 +86,7 @@
             <h1>🎛️ Admin Prix</h1>
             <div class="btn-group">
                 <button class="btn" onclick="window.location.href='stock.html'" style="background: #8b5cf6;">📦 Gestion Stock</button>
+                <button class="btn" onclick="openUsersModal()" style="background: #3b82f6;">👥 Gestion Utilisateurs</button>
                 <button class="btn btn-reset" onclick="resetOrders()">🗑️ Vider Commandes</button>
                 <button class="btn btn-save" onclick="saveAllPrices()">💾 SAUVEGARDER CONFIG</button>
                 <button class="btn btn-logout" onclick="logout()">Quitter</button>
@@ -131,6 +160,88 @@
                     <div><label>Supplément Offset 100g</label><input type="number" id="prix-offset-100" step="0.001"></div>
                     <div><label>Coût par gramme papier couché</label><input type="number" id="prix-gramme-couche" step="0.0001"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GESTION UTILISATEURS -->
+    <div id="modal-users" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">👥 Gestion des Utilisateurs</h2>
+                <button class="close-btn" onclick="closeUsersModal()">&times;</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Identifiant</th>
+                            <th>Nom</th>
+                            <th>Rôle</th>
+                            <th>Page par défaut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+
+            <div class="user-form">
+                <h3 style="color: var(--accent); margin-top: 0;">➕ Ajouter / Modifier un Utilisateur</h3>
+                <form id="user-form" onsubmit="saveUserForm(event)">
+                    <input type="hidden" id="user-original-id">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Identifiant de connexion *</label>
+                            <input type="text" id="user-id" placeholder="Ex: comm02" required>
+                            <small style="color: #64748b; font-size: 0.85rem;">Utilisé pour se connecter</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mot de passe *</label>
+                            <input type="text" id="user-pass" placeholder="Ex: motdepasse123" required>
+                            <small style="color: #64748b; font-size: 0.85rem;">Visible pour l'admin</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nom d'affichage *</label>
+                            <input type="text" id="user-name" placeholder="Ex: Commercial 2" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rôle *</label>
+                            <select id="user-role" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="superadmin">🔴 Super Admin (accès total)</option>
+                                <option value="admin">🟠 Admin (prix, stock, utilisateurs)</option>
+                                <option value="production">🔵 Production (atelier, stock)</option>
+                                <option value="commercial">🟣 Commercial (commandes)</option>
+                                <option value="compta">🟢 Comptabilité (finances)</option>
+                                <option value="client">⚪ Client (commandes uniquement)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label>Page de redirection *</label>
+                            <select id="user-redirect" required>
+                                <option value="admin.html">Admin (prix, config)</option>
+                                <option value="stock.html">Stock (gestion papier)</option>
+                                <option value="production.html">Production (atelier)</option>
+                                <option value="commercial.html">Commercial (commandes)</option>
+                                <option value="compta.html">Comptabilité</option>
+                                <option value="client.html">Client</option>
+                            </select>
+                            <small style="color: #64748b; font-size: 0.85rem;">Page affichée après connexion</small>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-save" style="flex: 1;">💾 Enregistrer l'utilisateur</button>
+                        <button type="button" class="btn btn-logout" onclick="resetUserForm()">🔄 Réinitialiser</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -281,6 +392,144 @@
         }
 
         loadPrices();
+
+        // ============================================
+        // GESTION DES UTILISATEURS
+        // ============================================
+
+        function openUsersModal() {
+            loadUsersTable();
+            document.getElementById('modal-users').style.display = 'flex';
+        }
+
+        function closeUsersModal() {
+            document.getElementById('modal-users').style.display = 'none';
+            resetUserForm();
+        }
+
+        function loadUsersTable() {
+            const users = getAllUsers();
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = tbody.insertRow();
+                
+                const roleClass = `role-${user.role}`;
+                const roleName = {
+                    'superadmin': '🔴 Super Admin',
+                    'admin': '🟠 Admin',
+                    'production': '🔵 Production',
+                    'commercial': '🟣 Commercial',
+                    'compta': '🟢 Comptabilité',
+                    'client': '⚪ Client'
+                }[user.role] || user.role;
+
+                row.innerHTML = `
+                    <td style="font-family: monospace; font-weight: bold;">${user.id}</td>
+                    <td>${user.name}</td>
+                    <td><span class="role-badge ${roleClass}">${roleName}</span></td>
+                    <td style="font-size: 0.9rem; color: #94a3b8;">${user.redirect}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-edit-user" onclick='editUser(${JSON.stringify(user)})'>✏️ Modifier</button>
+                            ${user.id !== 'youssef' ? `<button class="btn-delete-user" onclick="deleteUserConfirm('${user.id}', '${user.name}')">🗑️</button>` : '<span style="color: #64748b; font-size: 0.8rem;">Protégé</span>'}
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        function editUser(user) {
+            document.getElementById('user-original-id').value = user.id;
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-pass').value = user.pass;
+            document.getElementById('user-name').value = user.name;
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-redirect').value = user.redirect;
+
+            // Désactiver la modification de l'ID pour le super admin
+            if(user.id === 'youssef') {
+                document.getElementById('user-id').disabled = true;
+                document.getElementById('user-role').disabled = true;
+            } else {
+                document.getElementById('user-id').disabled = false;
+                document.getElementById('user-role').disabled = false;
+            }
+
+            // Scroll vers le formulaire
+            document.querySelector('.user-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteUserConfirm(userId, userName) {
+            if(confirm(`⚠️ Êtes-vous sûr de vouloir supprimer l'utilisateur "${userName}" (${userId}) ?\n\nCette action est irréversible.`)) {
+                if(deleteUser(userId)) {
+                    alert('✅ Utilisateur supprimé avec succès');
+                    loadUsersTable();
+                }
+            }
+        }
+
+        function saveUserForm(event) {
+            event.preventDefault();
+
+            const originalId = document.getElementById('user-original-id').value;
+            const userId = document.getElementById('user-id').value.trim();
+            const userPass = document.getElementById('user-pass').value;
+            const userName = document.getElementById('user-name').value.trim();
+            const userRole = document.getElementById('user-role').value;
+            const userRedirect = document.getElementById('user-redirect').value;
+
+            // Validation
+            if(!userId || !userPass || !userName || !userRole || !userRedirect) {
+                alert('⚠️ Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            // Vérifier si l'ID existe déjà (sauf si modification du même utilisateur)
+            const users = getAllUsers();
+            const existingUser = users.find(u => u.id === userId);
+            if(existingUser && originalId !== userId) {
+                alert(`⚠️ L'identifiant "${userId}" existe déjà. Veuillez en choisir un autre.`);
+                return;
+            }
+
+            // Si modification et changement d'ID, supprimer l'ancien
+            if(originalId && originalId !== userId) {
+                deleteUser(originalId);
+            }
+
+            // Créer/Modifier l'utilisateur
+            const userData = {
+                id: userId,
+                pass: userPass,
+                role: userRole,
+                name: userName,
+                redirect: userRedirect
+            };
+
+            saveUser(userData);
+            
+            alert(`✅ Utilisateur "${userName}" ${originalId ? 'modifié' : 'créé'} avec succès !`);
+            
+            resetUserForm();
+            loadUsersTable();
+        }
+
+        function resetUserForm() {
+            document.getElementById('user-form').reset();
+            document.getElementById('user-original-id').value = '';
+            document.getElementById('user-id').disabled = false;
+            document.getElementById('user-role').disabled = false;
+        }
+
+        // Fermer le modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-users');
+            if(event.target === modal) {
+                closeUsersModal();
+            }
+        }
     </script>
 </body>
 </html>

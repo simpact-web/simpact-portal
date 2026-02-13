@@ -6,7 +6,21 @@
     <title>Simpact - Gestion Stock Papier</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        // FONCTIONS ESSENTIELLES D'AUTHENTIFICATION (extrait de users.js)
+        // FONCTIONS ESSENTIELLES D'AUTHENTIFICATION
+        let USERS = [
+            { id: 'youssef', pass: 'ni3Shaey', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
+            { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Youssef (PDG)', redirect: 'admin.html' },
+            { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' }
+        ];
+
+        function getAllUsers() {
+            const savedUsers = localStorage.getItem('SIMPACT_USERS');
+            if(savedUsers) {
+                USERS = JSON.parse(savedUsers);
+            }
+            return USERS;
+        }
+
         function checkAuth(allowedRoles) {
             const session = localStorage.getItem('SIMPACT_USER');
             if (!session) {
@@ -15,6 +29,9 @@
             }
             
             const user = JSON.parse(session);
+            
+            // Le superadmin a accès à TOUT
+            if(user.role === 'superadmin') return user;
             
             if (!allowedRoles) return user;
 
@@ -35,6 +52,9 @@
             localStorage.removeItem('SIMPACT_USER');
             window.location.href = 'index.html';
         }
+
+        // Charger les utilisateurs au démarrage
+        getAllUsers();
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>

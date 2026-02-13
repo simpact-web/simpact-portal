@@ -1,5 +1,6 @@
 // BASE DE DONNÉES UTILISATEURS (Simulée)
-const USERS = [
+let USERS = [
+    { id: 'youssef', pass: 'ni3Shaey', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
     { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Youssef (PDG)', redirect: 'admin.html' },
     { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
     { id: 'compta01', pass: 'facture', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
@@ -11,6 +12,12 @@ const USERS = [
 
 // FONCTION DE LOGIN
 function login(user, pass) {
+    // Charger les utilisateurs depuis localStorage si disponible
+    const savedUsers = localStorage.getItem('SIMPACT_USERS');
+    if(savedUsers) {
+        USERS = JSON.parse(savedUsers);
+    }
+    
     const foundUser = USERS.find(u => u.id === user && u.pass === pass);
     if (foundUser) {
         // On enregistre la session
@@ -29,6 +36,9 @@ function checkAuth(allowedRoles) {
     }
     
     const user = JSON.parse(session);
+    
+    // Le superadmin a accès à TOUT
+    if(user.role === 'superadmin') return user;
     
     // Si 'allowedRoles' est vide, on accepte tout le monde connecté
     if (!allowedRoles) return user;
@@ -76,6 +86,68 @@ function updateOrderStatus(ref, newStatus, type) {
         if(type === 'compta') order.statusCompta = newStatus;
         localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
     }
+}
+
+// ============================================
+// GESTION DES UTILISATEURS (SUPER ADMIN)
+// ============================================
+
+/**
+ * Récupère la liste complète des utilisateurs
+ * @returns {Array} Liste des utilisateurs
+ */
+function getAllUsers() {
+    const savedUsers = localStorage.getItem('SIMPACT_USERS');
+    if(savedUsers) {
+        USERS = JSON.parse(savedUsers);
+    }
+    return USERS;
+}
+
+/**
+ * Sauvegarde les utilisateurs dans LocalStorage
+ * @param {Array} users - Liste des utilisateurs
+ */
+function saveUsers(users) {
+    USERS = users;
+    localStorage.setItem('SIMPACT_USERS', JSON.stringify(users));
+}
+
+/**
+ * Ajoute ou modifie un utilisateur
+ * @param {Object} userData - Données de l'utilisateur
+ * @returns {Boolean} Succès de l'opération
+ */
+function saveUser(userData) {
+    let users = getAllUsers();
+    const existingIndex = users.findIndex(u => u.id === userData.id);
+    
+    if(existingIndex >= 0) {
+        users[existingIndex] = userData;
+    } else {
+        users.push(userData);
+    }
+    
+    saveUsers(users);
+    return true;
+}
+
+/**
+ * Supprime un utilisateur
+ * @param {String} userId - ID de l'utilisateur à supprimer
+ * @returns {Boolean} Succès de l'opération
+ */
+function deleteUser(userId) {
+    // Empêcher la suppression du super admin
+    if(userId === 'youssef') {
+        alert('⛔ Impossible de supprimer le super admin !');
+        return false;
+    }
+    
+    let users = getAllUsers();
+    users = users.filter(u => u.id !== userId);
+    saveUsers(users);
+    return true;
 }
 
 // ============================================
