@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=7"></script>
+    <script src="users.js?v=8"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         /* DESIGN CLIENT (VIOLET) */
@@ -50,7 +50,7 @@
 
         /* ZONE PAO */
         .pao-section { border: 2px dashed #8b5cf6; padding: 20px; border-radius: 12px; background: #f5f3ff; margin-bottom: 20px; }
-        .pao-info { font-size: 0.9rem; color: #64748b; margin-top: 5px; }
+        .pao-info { font-size: 0.9rem; color: #64748b; margin-top: 5px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -96,11 +96,11 @@
             </div>
 
             <div class="form-group" style="margin-top:20px;">
-                <label>🎨 Service Création Graphique</label>
+                <label>🎨 Service Création Graphique (PAO)</label>
                 <select id="pao-service" onchange="resetPrice()">
                     <option value="none">J'ai mon fichier PDF prêt (Gratuit)</option>
-                    <option value="conception">✨ Conception Créative (De A à Z)</option>
-                    <option value="layout">📄 Mise en page (J'ai les textes/images)</option>
+                    <option value="conception">✨ Conception (Création complète)</option>
+                    <option value="layout">📄 Mise en page (Assemblage textes/images)</option>
                     <option value="correction">🔍 Correction simple</option>
                 </select>
                 <p id="pao-desc" class="pao-info">Aucun frais supplémentaire.</p>
@@ -127,24 +127,25 @@
         if(user) document.getElementById('client-name').textContent = user.name;
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
 
-        // --- CONFIGURATION PAO (issue du fichier Excel) ---
-        // Heures de travail estimées par produit
-        const PAO_HOURS = {
-            'flyer': 4,     // Base "Feuillet"
-            'carte': 1,     // "Carte visite"
-            'depliant': 8,  // "Dépliant"
-            'entete': 4,    // Base "Feuillet"
-            'brochure': 8,  // "Brochure"
-            'livre': 12,    // "Livre"
-            'affiches': 7   // "Affiche"
+        // --- DONNÉES PAO (Issues du fichier Excel) ---
+        // h = Heures forfaitaires, h_page = Heures par page
+        const PAO_DATA = {
+            'flyer':    { conc: 4,  corr: 2,    layout: 2 },    // Layout = Correction pour Flyer
+            'carte':    { conc: 1,  corr: 0.5,  layout: 0.5 },  // Layout = Correction pour Carte
+            'depliant': { conc: 8,  corr: 3,    layout: 3 },
+            'entete':   { conc: 4,  corr: 2,    layout: 2 },
+            'affiches': { conc: 7,  corr: 1,    layout: 1 },
+            'brochure': { conc: 8,  corr: 0.17, layout: 0.34, perPage: true }, // Format A4
+            'livre':    { conc: 12, corr: 0.17, layout: 0.25, perPage: true }  // Format A4
         };
 
-        // Tarifs horaires (DT/h)
-        const PAO_RATES = {
-            'conception': 55, // 55 d/h
-            'layout': 40,     // 40 d/h (Mise en page)
-            'correction': 40  // 40 d/h (Correction - estimé à 50% du temps)
+        // Ajustements pour Format A5 (< A4)
+        const PAO_A5_FACTOR = {
+            'brochure': { corr: 0.119, layout: 0.238 },
+            'livre':    { corr: 0.119, layout: 0.175 }
         };
+
+        const PAO_RATES = { 'conception': 55, 'layout': 40, 'correction': 40 };
 
         let TARIFS = {};
         const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
@@ -167,7 +168,6 @@
 
         // Helpers Calcul
         function getPaperName(id) { const el = document.getElementById(id); return el && el.selectedOptions[0] ? el.selectedOptions[0].text : id; }
-        
         function calculatePaperSurcharge(paperType, numSheets) {
             if(!paperType || numSheets === 0) return 0;
             if(paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
@@ -180,7 +180,6 @@
             }
             return 0;
         }
-
         function getPricePerSheetCouleur(sheets) {
             if(sheets < 25) return 3; if(sheets < 50) return 2.5; if(sheets < 100) return 2;
             if(sheets < 200) return 1.9; if(sheets < 300) return 1.8; if(sheets < 400) return 1.7;
@@ -197,7 +196,7 @@
             return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
         }
 
-        // --- CALCUL CENTRAL AVEC PAO ---
+        // --- CALCUL CENTRAL AVEC PAO INTÉGRÉ ---
         function calculateQuote() {
             const type = document.getElementById('prod-type').value;
             const qty = parseInt(document.getElementById('qty').value);
@@ -207,7 +206,7 @@
 
             let totalPrice = 0;
             try {
-                // 1. Calcul Impression (Standard)
+                // 1. PRIX IMPRESSION
                 if(type === 'flyer') {
                     const mode = document.querySelector('input[name="flyer-type"]:checked').value;
                     const paper = document.getElementById('flyer-paper').value;
@@ -277,24 +276,52 @@
 
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
 
-                // 2. Ajout du coût PAO
+                // 2. PRIX PAO (Création Graphique)
                 let paoCost = 0;
-                if(paoOption !== 'none' && PAO_HOURS[type]) {
-                    const hours = PAO_HOURS[type];
-                    let rate = PAO_RATES[paoOption] || 0;
+                let paoDetails = "Aucun frais supplémentaire.";
+                
+                if(paoOption !== 'none' && PAO_DATA[type]) {
+                    let hours = 0;
+                    let rate = PAO_RATES[paoOption];
+                    const data = PAO_DATA[type];
+
+                    // Clé pour chercher les heures (conc, corr, layout)
+                    let key = (paoOption === 'conception') ? 'conc' : (paoOption === 'layout' ? 'layout' : 'corr');
                     
-                    // Logic spéciale correction (50% du temps estimé)
-                    let timeMultiplier = paoOption === 'correction' ? 0.5 : 1.0;
-                    
-                    paoCost = hours * rate * timeMultiplier;
-                    
-                    // Mise à jour du texte d'info
-                    document.getElementById('pao-desc').textContent = 
-                        `Inclus : ${hours * timeMultiplier}h de travail graphique (+${paoCost.toFixed(2)} DT)`;
-                } else {
-                    document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire.";
+                    if(data.perPage) {
+                        // Logique Brochure/Livre (Par Page)
+                        let pages = 0;
+                        let format = '';
+                        if(type === 'brochure') {
+                            pages = parseInt(document.getElementById('brochure-pages').value) || 0;
+                            format = document.getElementById('brochure-format').value;
+                        } else {
+                            pages = parseInt(document.getElementById('livre-pages').value) || 0;
+                            format = document.getElementById('livre-format').value;
+                        }
+
+                        // Si Conception, c'est Forfaitaire (Pas par page)
+                        if(paoOption === 'conception') {
+                            hours = data.conc;
+                        } else {
+                            // Si Correction/Layout, c'est par page
+                            // Check si format A5 pour appliquer tarif réduit
+                            let unitHours = data[key];
+                            if(format === 'a5' && PAO_A5_FACTOR[type]) {
+                                unitHours = PAO_A5_FACTOR[type][key];
+                            }
+                            hours = unitHours * pages;
+                        }
+                    } else {
+                        // Logique Simple (Flyer, etc.)
+                        hours = data[key];
+                    }
+
+                    paoCost = hours * rate;
+                    paoDetails = `Service PAO inclus : ${hours.toFixed(2)}h (+${paoCost.toFixed(2)} DT)`;
                 }
 
+                document.getElementById('pao-desc').textContent = paoDetails;
                 totalPrice += paoCost;
 
                 currentCalculatedPrice = totalPrice.toFixed(2);
@@ -308,13 +335,12 @@
             document.getElementById('total-price').textContent = "-- DT";
             document.querySelector('.btn-order').disabled = true;
             currentCalculatedPrice = 0;
-            // Reset text PAO si changement manuel
             if(document.getElementById('pao-service').value === 'none') {
                 document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire.";
             }
         }
 
-        // GENERATION TEXTE CONFIG
+        // GENERATION CONFIG
         function generateConfigString(type) {
             try {
                 let baseConfig = "";
@@ -332,11 +358,9 @@
                     baseConfig = `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`;
                 }
                 
-                // Ajout info PAO
                 const paoSelect = document.getElementById('pao-service');
-                const paoText = paoSelect.options[paoSelect.selectedIndex].text;
                 if(paoSelect.value !== 'none') {
-                    return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoText}`;
+                    return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoSelect.options[paoSelect.selectedIndex].text}`;
                 }
                 return baseConfig;
 
@@ -373,7 +397,6 @@
             .catch(e => { alert("Erreur."); btn.disabled = false; });
         }
 
-        // Affichage dynamique des sections
         document.getElementById('prod-type').addEventListener('change', function() {
             document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
             if(this.value) {
