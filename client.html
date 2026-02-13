@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=6"></script>
+    <script src="users.js?v=7"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         /* DESIGN CLIENT (VIOLET) */
@@ -48,7 +48,9 @@
         .btn-order:hover { background: #059669; transform: translateY(-2px); }
         .btn-order:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
 
-        .canva-link { display: inline-block; background:linear-gradient(45deg, #00c4cc, #7d2ae8); color:white; padding:10px 20px; text-decoration:none; border-radius:50px; font-weight:bold; margin-top: 10px; }
+        /* ZONE PAO */
+        .pao-section { border: 2px dashed #8b5cf6; padding: 20px; border-radius: 12px; background: #f5f3ff; margin-bottom: 20px; }
+        .pao-info { font-size: 0.9rem; color: #64748b; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -79,137 +81,35 @@
             <input type="number" id="qty" placeholder="Ex: 1000" oninput="resetPrice()">
         </div>
 
-        <div id="flyer-options" class="option-group">
-            <div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto / Verso</label></div></div></div>
-            <div class="form-group"><label>Papier</label>
-                <select id="flyer-paper">
-                    <option value="couche-90-mat">Couché 90gr Mat</option>
-                    <option value="couche-90-brillant">Couché 90gr Brillant</option>
-                    <option value="couche-115-mat">Couché 115gr Mat</option>
-                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                    <option value="couche-135-mat">Couché 135gr Mat</option>
-                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                    <option value="couche-170-mat">Couché 170gr Mat</option>
-                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                    <option value="couche-200-mat">Couché 200gr Mat</option>
-                    <option value="couche-200-brillant">Couché 200gr Brillant</option>
-                </select>
-            </div>
-        </div>
+        <div id="flyer-options" class="option-group"><div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto / Verso</label></div></div></div><div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-90-mat">Couché 90gr Mat</option><option value="couche-90-brillant">Couché 90gr Brillant</option><option value="couche-115-mat">Couché 115gr Mat</option><option value="couche-115-brillant">Couché 115gr Brillant</option><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option><option value="couche-200-mat">Couché 200gr Mat</option><option value="couche-200-brillant">Couché 200gr Brillant</option></select></div></div>
+        <div id="carte-options" class="option-group"><div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div><div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-300-mat">Couché 300gr Mat</option><option value="couche-300-brillant">Couché 300gr Brillant</option><option value="couche-350-mat">Couché 350gr Mat</option><option value="couche-350-brillant">Couché 350gr Brillant</option></select></div></div>
+        <div id="depliant-options" class="option-group"><div class="form-group"><label>Papier</label><select id="depliant-paper"><option value="couche-115-mat">Couché 115gr Mat</option><option value="couche-115-brillant">Couché 115gr Brillant</option><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option></select></div></div>
+        <div id="entete-options" class="option-group"><div class="form-group"><label>Papier</label><select id="entete-paper"><option value="offset-80">Offset 80gr Standard</option><option value="offset-100">Offset 100gr Premium</option></select></div></div>
+        <div id="brochure-options" class="option-group"><div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div><div class="form-group"><label>Nombre de Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 12"></div><div class="form-group"><label>Papier Intérieur</label><select id="brochure-interior-paper"><option value="couche-90-mat">Couché 90gr Mat</option><option value="couche-90-brillant">Couché 90gr Brillant</option><option value="couche-115-mat">Couché 115gr Mat</option><option value="couche-115-brillant">Couché 115gr Brillant</option><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div><div class="form-group"><label>Papier Couverture</label><select id="brochure-cover-paper"><option value="couche-250-mat">Couché 250gr Mat</option><option value="couche-250-brillant">Couché 250gr Brillant</option><option value="couche-300-mat">Couché 300gr Mat</option><option value="couche-300-brillant">Couché 300gr Brillant</option><option value="couche-350-mat">Couché 350gr Mat</option><option value="couche-350-brillant">Couché 350gr Brillant</option></select></div><div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div><div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="Piquée à cheval">Piquée à cheval (Agrafé)</option><option value="Dos carré collé">Dos carré collé</option><option value="Spirale">Spirale</option></select></div><div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div></div>
+        <div id="livre-options" class="option-group"><div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div><div class="form-group"><label>Nombre de Pages</label><input type="number" id="livre-pages"></div><div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div><div class="form-group"><label>Couverture</label><select id="livre-cover-paper"><option value="couche-250-mat">Couché 250gr Mat</option><option value="couche-250-brillant">Couché 250gr Brillant</option><option value="couche-300-mat">Couché 300gr Mat</option><option value="couche-300-brillant">Couché 300gr Brillant</option><option value="couche-350-mat">Couché 350gr Mat</option><option value="couche-350-brillant">Couché 350gr Brillant</option></select></div><div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div><div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div></div>
+        <div id="affiches-options" class="option-group"><div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div><div class="form-group"><label>Papier</label><select id="affiche-paper"><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option><option value="couche-200-mat">Couché 200gr Mat</option><option value="couche-200-brillant">Couché 200gr Brillant</option></select></div></div>
 
-        <div id="carte-options" class="option-group">
-            <div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div>
-            <div class="form-group"><label>Papier</label>
-                <select id="carte-paper">
-                    <option value="couche-300-mat">Couché 300gr Mat</option>
-                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                    <option value="couche-350-mat">Couché 350gr Mat</option>
-                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="depliant-options" class="option-group">
-            <div class="form-group"><label>Papier</label>
-                <select id="depliant-paper">
-                    <option value="couche-115-mat">Couché 115gr Mat</option>
-                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                    <option value="couche-135-mat">Couché 135gr Mat</option>
-                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                    <option value="couche-170-mat">Couché 170gr Mat</option>
-                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="entete-options" class="option-group">
-            <div class="form-group"><label>Papier</label>
-                <select id="entete-paper">
-                    <option value="offset-80">Offset 80gr Standard</option>
-                    <option value="offset-100">Offset 100gr Premium</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="brochure-options" class="option-group">
-            <div class="form-group"><label>Format</label><select id="brochure-format"><option value="a4">A4 (21x29.7 cm)</option><option value="a5">A5 (14.8x21 cm)</option></select></div>
-            <div class="form-group"><label>Nombre de Pages (Multiple de 4)</label><input type="number" id="brochure-pages" placeholder="Ex: 12"></div>
-            
-            <div class="form-group"><label>Papier Intérieur</label>
-                <select id="brochure-interior-paper">
-                    <option value="couche-90-mat">Couché 90gr Mat</option>
-                    <option value="couche-90-brillant">Couché 90gr Brillant</option>
-                    <option value="couche-115-mat">Couché 115gr Mat</option>
-                    <option value="couche-115-brillant">Couché 115gr Brillant</option>
-                    <option value="couche-135-mat">Couché 135gr Mat</option>
-                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                    <option value="couche-170-mat">Couché 170gr Mat</option>
-                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                    <option value="offset-80">Offset 80gr</option>
-                    <option value="offset-100">Offset 100gr</option>
-                </select>
-            </div>
-            
-            <div class="form-group"><label>Papier Couverture</label>
-                <select id="brochure-cover-paper">
-                    <option value="couche-250-mat">Couché 250gr Mat</option>
-                    <option value="couche-250-brillant">Couché 250gr Brillant</option>
-                    <option value="couche-300-mat">Couché 300gr Mat</option>
-                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                    <option value="couche-350-mat">Couché 350gr Mat</option>
-                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
-                </select>
+        <div class="pao-section">
+            <div class="form-group">
+                <label>📁 Fichier d'impression (PDF)</label>
+                <input type="file" id="file-upload" accept=".pdf,.ai,.zip">
             </div>
 
-            <div class="form-group"><label>Type Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-cover-type" value="recto" id="bcr" checked><label for="bcr">Recto</label></div><div class="radio-option"><input type="radio" name="brochure-cover-type" value="rectoVerso" id="bcrv"><label for="bcrv">R/V</label></div></div></div>
-            <div class="form-group"><label>Finition</label><select id="brochure-finition"><option value="Piquée à cheval">Piquée à cheval (Agrafé)</option><option value="Dos carré collé">Dos carré collé</option><option value="Spirale">Spirale</option></select></div>
-            <div class="form-group"><label>Pelliculage Couv.</label><div class="radio-group"><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="sans" id="bps" checked><label for="bps">Non</label></div><div class="radio-option"><input type="radio" name="brochure-pelliculage" value="avec" id="bpa"><label for="bpa">Oui</label></div></div></div>
-        </div>
-
-        <div id="livre-options" class="option-group">
-            <div class="form-group"><label>Format</label><select id="livre-format"><option value="a4">A4</option><option value="a5">A5</option></select></div>
-            <div class="form-group"><label>Nombre de Pages</label><input type="number" id="livre-pages"></div>
-            <div class="form-group"><label>Intérieur</label><select id="livre-interior-paper"><option value="offset-80">Offset 80gr</option><option value="offset-100">Offset 100gr</option></select></div>
-            <div class="form-group"><label>Couverture</label>
-                <select id="livre-cover-paper">
-                    <option value="couche-250-mat">Couché 250gr Mat</option>
-                    <option value="couche-250-brillant">Couché 250gr Brillant</option>
-                    <option value="couche-300-mat">Couché 300gr Mat</option>
-                    <option value="couche-300-brillant">Couché 300gr Brillant</option>
-                    <option value="couche-350-mat">Couché 350gr Mat</option>
-                    <option value="couche-350-brillant">Couché 350gr Brillant</option>
+            <div class="form-group" style="margin-top:20px;">
+                <label>🎨 Service Création Graphique</label>
+                <select id="pao-service" onchange="resetPrice()">
+                    <option value="none">J'ai mon fichier PDF prêt (Gratuit)</option>
+                    <option value="conception">✨ Conception Créative (De A à Z)</option>
+                    <option value="layout">📄 Mise en page (J'ai les textes/images)</option>
+                    <option value="correction">🔍 Correction simple</option>
                 </select>
-            </div>
-            <div class="form-group"><label>Couv. Couleur</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-cover-type" value="recto" id="lcr" checked><label for="lcr">Recto</label></div><div class="radio-option"><input type="radio" name="livre-cover-type" value="rectoVerso" id="lcrv"><label for="lcrv">R/V</label></div></div></div>
-            <div class="form-group"><label>Pelliculage</label><div class="radio-group"><div class="radio-option"><input type="radio" name="livre-pelliculage" value="sans" id="lps" checked><label for="lps">Non</label></div><div class="radio-option"><input type="radio" name="livre-pelliculage" value="avec" id="lpa"><label for="lpa">Oui</label></div></div></div>
-        </div>
-
-        <div id="affiches-options" class="option-group">
-            <div class="form-group"><label>Format</label><select id="affiche-format"><option value="a3">A3 (30x42 cm)</option><option value="a3plus">A3+ (32x48 cm)</option></select></div>
-            <div class="form-group"><label>Papier</label>
-                <select id="affiche-paper">
-                    <option value="couche-135-mat">Couché 135gr Mat</option>
-                    <option value="couche-135-brillant">Couché 135gr Brillant</option>
-                    <option value="couche-170-mat">Couché 170gr Mat</option>
-                    <option value="couche-170-brillant">Couché 170gr Brillant</option>
-                    <option value="couche-200-mat">Couché 200gr Mat</option>
-                    <option value="couche-200-brillant">Couché 200gr Brillant</option>
-                </select>
+                <p id="pao-desc" class="pao-info">Aucun frais supplémentaire.</p>
             </div>
         </div>
 
         <div class="form-group">
             <label>Remarques / Instructions</label>
             <textarea id="desc" rows="3" placeholder="Ex: Découpe spéciale..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Fichier d'impression (PDF)</label>
-            <input type="file" id="file-upload" accept=".pdf,.ai,.zip">
-            <div style="text-align:center; margin-top:10px;">
-                <span style="font-size:0.9rem; color:#64748b;">Pas de fichier ?</span><br>
-                <a href="https://www.canva.com/" target="_blank" class="canva-link">🎨 Ouvrir Canva</a>
-            </div>
         </div>
 
         <button class="btn-calc" onclick="calculateQuote()">💰 ESTIMER MON PRIX</button>
@@ -227,7 +127,25 @@
         if(user) document.getElementById('client-name').textContent = user.name;
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
 
-        // --- MOTEUR DE PRIX (Importé du Commercial) ---
+        // --- CONFIGURATION PAO (issue du fichier Excel) ---
+        // Heures de travail estimées par produit
+        const PAO_HOURS = {
+            'flyer': 4,     // Base "Feuillet"
+            'carte': 1,     // "Carte visite"
+            'depliant': 8,  // "Dépliant"
+            'entete': 4,    // Base "Feuillet"
+            'brochure': 8,  // "Brochure"
+            'livre': 12,    // "Livre"
+            'affiches': 7   // "Affiche"
+        };
+
+        // Tarifs horaires (DT/h)
+        const PAO_RATES = {
+            'conception': 55, // 55 d/h
+            'layout': 40,     // 40 d/h (Mise en page)
+            'correction': 40  // 40 d/h (Correction - estimé à 50% du temps)
+        };
+
         let TARIFS = {};
         const PRIX_FIXES = { pelliculage: 0.1, feuille_nb: 0.2, offset_100: 0.014, gramme_couche: 0.0007, min_price: 28 };
         let currentCalculatedPrice = 0;
@@ -279,14 +197,17 @@
             return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
         }
 
-        // --- CALCUL CENTRAL ---
+        // --- CALCUL CENTRAL AVEC PAO ---
         function calculateQuote() {
             const type = document.getElementById('prod-type').value;
             const qty = parseInt(document.getElementById('qty').value);
+            const paoOption = document.getElementById('pao-service').value;
+
             if(!type || !qty) return alert("Remplissez les champs !");
 
             let totalPrice = 0;
             try {
+                // 1. Calcul Impression (Standard)
                 if(type === 'flyer') {
                     const mode = document.querySelector('input[name="flyer-type"]:checked').value;
                     const paper = document.getElementById('flyer-paper').value;
@@ -355,9 +276,30 @@
                 }
 
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
+
+                // 2. Ajout du coût PAO
+                let paoCost = 0;
+                if(paoOption !== 'none' && PAO_HOURS[type]) {
+                    const hours = PAO_HOURS[type];
+                    let rate = PAO_RATES[paoOption] || 0;
+                    
+                    // Logic spéciale correction (50% du temps estimé)
+                    let timeMultiplier = paoOption === 'correction' ? 0.5 : 1.0;
+                    
+                    paoCost = hours * rate * timeMultiplier;
+                    
+                    // Mise à jour du texte d'info
+                    document.getElementById('pao-desc').textContent = 
+                        `Inclus : ${hours * timeMultiplier}h de travail graphique (+${paoCost.toFixed(2)} DT)`;
+                } else {
+                    document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire.";
+                }
+
+                totalPrice += paoCost;
+
                 currentCalculatedPrice = totalPrice.toFixed(2);
                 document.getElementById('total-price').textContent = currentCalculatedPrice + " DT";
-                document.querySelector('.btn-order').disabled = false; // Active le bouton commande
+                document.querySelector('.btn-order').disabled = false;
 
             } catch(e) { console.error(e); alert("Erreur de calcul. Vérifiez les champs."); }
         }
@@ -366,26 +308,39 @@
             document.getElementById('total-price').textContent = "-- DT";
             document.querySelector('.btn-order').disabled = true;
             currentCalculatedPrice = 0;
+            // Reset text PAO si changement manuel
+            if(document.getElementById('pao-service').value === 'none') {
+                document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire.";
+            }
         }
 
         // GENERATION TEXTE CONFIG
         function generateConfigString(type) {
             try {
-                if(type === 'flyer') return `Papier: ${getPaperName('flyer-paper')}, Impression: ${document.querySelector('input[name="flyer-type"]:checked').nextElementSibling.textContent}`;
-                if(type === 'carte') return `Papier: ${getPaperName('carte-paper')}, Finition: ${document.querySelector('input[name="carte-finish"]:checked').nextElementSibling.textContent}`;
-                if(type === 'depliant') return `Papier: ${getPaperName('depliant-paper')}`;
-                if(type === 'entete') return `Papier: ${getPaperName('entete-paper')}`;
-                if(type === 'affiches') return `Format: ${getPaperName('affiche-format')}, Papier: ${getPaperName('affiche-paper')}`;
-                if(type === 'brochure') {
+                let baseConfig = "";
+                if(type === 'flyer') baseConfig = `Papier: ${getPaperName('flyer-paper')}, Impression: ${document.querySelector('input[name="flyer-type"]:checked').nextElementSibling.textContent}`;
+                else if(type === 'carte') baseConfig = `Papier: ${getPaperName('carte-paper')}, Finition: ${document.querySelector('input[name="carte-finish"]:checked').nextElementSibling.textContent}`;
+                else if(type === 'depliant') baseConfig = `Papier: ${getPaperName('depliant-paper')}`;
+                else if(type === 'entete') baseConfig = `Papier: ${getPaperName('entete-paper')}`;
+                else if(type === 'affiches') baseConfig = `Format: ${getPaperName('affiche-format')}, Papier: ${getPaperName('affiche-paper')}`;
+                else if(type === 'brochure') {
                     const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON';
-                    return `${document.getElementById('brochure-pages').value} pages, Int: ${getPaperName('brochure-interior-paper')}, Couv: ${getPaperName('brochure-cover-paper')}, Pelliculage: ${pell}`;
+                    baseConfig = `${document.getElementById('brochure-pages').value} pages, Int: ${getPaperName('brochure-interior-paper')}, Couv: ${getPaperName('brochure-cover-paper')}, Pelliculage: ${pell}`;
                 }
-                if(type === 'livre') {
+                else if(type === 'livre') {
                     const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON';
-                    return `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`;
+                    baseConfig = `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`;
                 }
+                
+                // Ajout info PAO
+                const paoSelect = document.getElementById('pao-service');
+                const paoText = paoSelect.options[paoSelect.selectedIndex].text;
+                if(paoSelect.value !== 'none') {
+                    return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoText}`;
+                }
+                return baseConfig;
+
             } catch(e) { return "Config standard"; }
-            return "";
         }
 
         function submitClientOrder() {
