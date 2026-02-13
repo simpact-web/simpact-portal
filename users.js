@@ -1,11 +1,11 @@
 // BASE DE DONNÉES UTILISATEURS (Simulée)
 let USERS = [
     { id: 'youssef', pass: 'ni3Shaey', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
-    { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
-    { id: 'compta01', pass: 'facture', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
-    { id: 'comm01', pass: 'vente', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
+    { id: 'prod', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
+    { id: 'compta', pass: 'compta123', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
+    { id: 'com', pass: 'com123', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
     // CLIENTS
-    { id: 'client01', pass: 'client123', role: 'client', name: 'Agence Pub', redirect: 'client.html' },
+    { id: 'client', pass: 'client123', role: 'client', name: 'Agence Pub', redirect: 'client.html' },
     { id: 'client02', pass: '1234', role: 'client', name: 'Restaurant Le Chef', redirect: 'client.html' }
 ];
 
