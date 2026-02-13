@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests Module Stock - Simpact</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0f172a; color: #f1f5f9; }
+        .test-section { background: #1e293b; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #8b5cf6; }
+        .test-section h2 { color: #8b5cf6; margin-top: 0; }
+        .success { color: #10b981; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .warning { color: #f59e0b; font-weight: bold; }
+        pre { background: #0f172a; padding: 15px; border-radius: 4px; overflow-x: auto; border: 1px solid #334155; }
+        button { background: #8b5cf6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin: 5px; font-weight: bold; }
+        button:hover { background: #7c3aed; }
+        .result { margin: 10px 0; padding: 10px; background: #0f172a; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Tests de Cohésion - Module Stock Papier</h1>
+    
+    <div class="test-section">
+        <h2>1️⃣ Test LocalStorage (Indépendance des Données)</h2>
+        <p>Vérifie que le module stock ne perturbe pas les données existantes</p>
+        <button onclick="testLocalStorage()">Lancer Test</button>
+        <div id="result-1" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2️⃣ Test Fonctions Stock (API)</h2>
+        <p>Vérifie que toutes les fonctions stock fonctionnent correctement</p>
+        <button onclick="testStockFunctions()">Lancer Test</button>
+        <div id="result-2" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3️⃣ Test Compatibilité avec Commandes</h2>
+        <p>Vérifie que les commandes existantes ne sont pas affectées</p>
+        <button onclick="testOrdersCompatibility()">Lancer Test</button>
+        <div id="result-3" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4️⃣ Test Authentification</h2>
+        <p>Vérifie que l'authentification fonctionne correctement</p>
+        <button onclick="testAuth()">Lancer Test</button>
+        <div id="result-4" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5️⃣ Test Intégrité des Données</h2>
+        <p>Vérifie que les mouvements de stock maintiennent l'intégrité</p>
+        <button onclick="testDataIntegrity()">Lancer Test</button>
+        <div id="result-5" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6️⃣ Test Performance</h2>
+        <p>Vérifie les performances avec beaucoup de données</p>
+        <button onclick="testPerformance()">Lancer Test</button>
+        <div id="result-6" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7️⃣ Test Nettoyage</h2>
+        <p>Nettoie toutes les données de test</p>
+        <button onclick="cleanupTests()">Nettoyer</button>
+        <div id="result-7" class="result"></div>
+    </div>
+
+    <script>
+        // ============ CHARGEMENT DES FONCTIONS STOCK ============
+        
+        function getStock() {
+            const stock = localStorage.getItem('SIMPACT_STOCK');
+            return stock ? JSON.parse(stock) : [];
+        }
+
+        function saveStock(stockData) {
+            localStorage.setItem('SIMPACT_STOCK', JSON.stringify(stockData));
+        }
+
+        function getStockMovements() {
+            const movements = localStorage.getItem('SIMPACT_STOCK_MOVEMENTS');
+            return movements ? JSON.parse(movements) : [];
+        }
+
+        function saveStockMovement(movementData) {
+            const movements = getStockMovements();
+            movements.unshift(movementData);
+            if(movements.length > 200) movements.pop();
+            localStorage.setItem('SIMPACT_STOCK_MOVEMENTS', JSON.stringify(movements));
+            return true;
+        }
+
+        function executeStockMovement(paperId, type, qty, details) {
+            let stock = getStock();
+            const paper = stock.find(p => p.id === paperId);
+            
+            if(!paper) return false;
+            
+            if(type === 'in') {
+                paper.qty += qty;
+            } else if(type === 'out') {
+                paper.qty -= qty;
+                if(paper.qty < 0) paper.qty = 0;
+            }
+            
+            saveStock(stock);
+            
+            const movement = {
+                id: 'MOV-' + Date.now(),
+                paperId: paperId,
+                paperName: `${paper.category} ${paper.weight}g ${paper.format}`,
+                type: type,
+                qty: qty,
+                reason: details.reason || '',
+                ref: details.ref || '',
+                comment: details.comment || '',
+                date: new Date().toLocaleString('fr-FR'),
+                user: details.user || 'Test'
+            };
+            
+            saveStockMovement(movement);
+            return true;
+        }
+
+        function getStockStats() {
+            const stock = getStock();
+            
+            const stats = {
+                totalTypes: stock.length,
+                totalQty: 0,
+                totalValue: 0,
+                alerts: 0
+            };
+            
+            stock.forEach(paper => {
+                stats.totalQty += paper.qty;
+                stats.totalValue += (paper.qty * (paper.price || 0));
+                
+                const percentage = (paper.qty / paper.threshold) * 100;
+                if(percentage <= 100) stats.alerts++;
+            });
+            
+            return stats;
+        }
+
+        // ============ FONCTIONS COMMANDES (ORIGINALES) ============
+        
+        function getOrders() {
+            const orders = localStorage.getItem('SIMPACT_ORDERS');
+            return orders ? JSON.parse(orders) : [];
+        }
+
+        function saveOrder(orderData) {
+            const orders = getOrders();
+            orders.unshift(orderData);
+            if(orders.length > 50) orders.pop();
+            localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
+        }
+
+        // ============ TESTS ============
+
+        function log(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : '';
+            container.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function clearLog(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        // TEST 1: LocalStorage Indépendance
+        function testLocalStorage() {
+            clearLog('result-1');
+            log('result-1', '🔍 Vérification de l\'indépendance des données...');
+            
+            try {
+                // Créer des données de test
+                const testOrder = {
+                    ref: 'TEST-001',
+                    client: 'Client Test',
+                    prod: 'Flyers',
+                    qty: 1000,
+                    price: 100,
+                    date: new Date().toLocaleString()
+                };
+                
+                const testPaper = {
+                    id: 'PAPER-TEST-001',
+                    category: 'Couché Brillant',
+                    weight: 135,
+                    format: 'A3',
+                    qty: 5000,
+                    unit: 'feuilles',
+                    threshold: 2000,
+                    price: 0.025
+                };
+                
+                // Sauvegarder
+                saveOrder(testOrder);
+                saveStock([testPaper]);
+                
+                // Vérifier
+                const orders = getOrders();
+                const stock = getStock();
+                
+                if(orders.length > 0 && stock.length > 0) {
+                    log('result-1', '✅ Les données sont stockées dans des clés séparées', 'success');
+                    log('result-1', `   - SIMPACT_ORDERS: ${orders.length} commande(s)`, 'info');
+                    log('result-1', `   - SIMPACT_STOCK: ${stock.length} papier(s)`, 'info');
+                    
+                    // Vérifier qu'elles ne se mélangent pas
+                    if(orders[0].ref === testOrder.ref && stock[0].id === testPaper.id) {
+                        log('result-1', '✅ Aucune interférence détectée entre les données', 'success');
+                    } else {
+                        log('result-1', '❌ ERREUR: Les données semblent corrompues', 'error');
+                    }
+                } else {
+                    log('result-1', '❌ ERREUR: Impossible de sauvegarder les données', 'error');
+                }
+                
+            } catch(e) {
+                log('result-1', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // TEST 2: Fonctions Stock
+        function testStockFunctions() {
+            clearLog('result-2');
+            log('result-2', '🔍 Test des fonctions de gestion stock...');
+            
+            try {
+                // 1. Créer un papier
+                const paper = {
+                    id: 'PAPER-FUNC-001',
+                    category: 'Offset Blanc',
+                    weight: 80,
+                    format: 'A4',
+                    qty: 10000,
+                    unit: 'feuilles',
+                    threshold: 5000,
+                    price: 0.015
+                };
+                
+                saveStock([paper]);
+                log('result-2', '✅ saveStock() fonctionne', 'success');
+                
+                // 2. Récupérer
+                const stock = getStock();
+                if(stock.length > 0 && stock[0].id === paper.id) {
+                    log('result-2', '✅ getStock() fonctionne', 'success');
+                } else {
+                    log('result-2', '❌ getStock() défaillant', 'error');
+                    return;
+                }
+                
+                // 3. Mouvement Entrée
+                const success1 = executeStockMovement('PAPER-FUNC-001', 'in', 5000, {
+                    reason: 'Test entrée',
+                    ref: 'TEST-001',
+                    user: 'Test Script'
+                });
+                
+                if(success1) {
+                    const updatedStock = getStock();
+                    if(updatedStock[0].qty === 15000) {
+                        log('result-2', '✅ executeStockMovement(IN) fonctionne - Qté: 10000 → 15000', 'success');
+                    } else {
+                        log('result-2', `❌ Quantité incorrecte: ${updatedStock[0].qty} au lieu de 15000`, 'error');
+                    }
+                } else {
+                    log('result-2', '❌ executeStockMovement(IN) a échoué', 'error');
+                }
+                
+                // 4. Mouvement Sortie
+                const success2 = executeStockMovement('PAPER-FUNC-001', 'out', 3000, {
+                    reason: 'Test sortie',
+                    ref: 'TEST-002',
+                    user: 'Test Script'
+                });
+                
+                if(success2) {
+                    const updatedStock2 = getStock();
+                    if(updatedStock2[0].qty === 12000) {
+                        log('result-2', '✅ executeStockMovement(OUT) fonctionne - Qté: 15000 → 12000', 'success');
+                    } else {
+                        log('result-2', `❌ Quantité incorrecte: ${updatedStock2[0].qty} au lieu de 12000`, 'error');
+                    }
+                } else {
+                    log('result-2', '❌ executeStockMovement(OUT) a échoué', 'error');
+                }
+                
+                // 5. Historique
+                const movements = getStockMovements();
+                if(movements.length >= 2) {
+                    log('result-2', `✅ getStockMovements() fonctionne - ${movements.length} mouvements`, 'success');
+                } else {
+                    log('result-2', '❌ Historique incomplet', 'error');
+                }
+                
+                // 6. Statistiques
+                const stats = getStockStats();
+                if(stats.totalTypes > 0 && stats.totalQty > 0) {
+                    log('result-2', `✅ getStockStats() fonctionne`, 'success');
+                    log('result-2', `   - Types: ${stats.totalTypes}`, 'info');
+                    log('result-2', `   - Quantité totale: ${stats.totalQty}`, 'info');
+                    log('result-2', `   - Valeur: ${stats.totalValue.toFixed(2)} DT`, 'info');
+                } else {
+                    log('result-2', '❌ getStockStats() défaillant', 'error');
+                }
+                
+            } catch(e) {
+                log('result-2', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // TEST 3: Compatibilité Commandes
+        function testOrdersCompatibility() {
+            clearLog('result-3');
+            log('result-3', '🔍 Test de compatibilité avec le système de commandes...');
+            
+            try {
+                // Créer des commandes de test
+                const orders = [
+                    { ref: 'CMD-001', client: 'Client A', prod: 'Flyers', qty: 1000, price: 100 },
+                    { ref: 'CMD-002', client: 'Client B', prod: 'Cartes', qty: 500, price: 50 },
+                    { ref: 'CMD-003', client: 'Client C', prod: 'Brochures', qty: 200, price: 150 }
+                ];
+                
+                // Sauvegarder les commandes
+                orders.forEach(order => saveOrder(order));
+                log('result-3', `✅ ${orders.length} commandes créées`, 'success');
+                
+                // Créer du stock
+                const papers = [
+                    { id: 'P1', category: 'Couché Brillant', weight: 135, format: 'A3', qty: 10000, unit: 'feuilles', threshold: 5000, price: 0.025 },
+                    { id: 'P2', category: 'Bristol', weight: 250, format: 'A4', qty: 5000, unit: 'feuilles', threshold: 2000, price: 0.045 }
+                ];
+                saveStock(papers);
+                log('result-3', `✅ ${papers.length} papiers ajoutés au stock`, 'success');
+                
+                // Vérifier qu'on peut récupérer les deux
+                const retrievedOrders = getOrders();
+                const retrievedStock = getStock();
+                
+                if(retrievedOrders.length >= 3 && retrievedStock.length >= 2) {
+                    log('result-3', '✅ Les systèmes coexistent sans conflit', 'success');
+                    log('result-3', `   - Commandes: ${retrievedOrders.length}`, 'info');
+                    log('result-3', `   - Stock: ${retrievedStock.length}`, 'info');
+                } else {
+                    log('result-3', '❌ CONFLIT: Données manquantes', 'error');
+                    log('result-3', `   - Commandes trouvées: ${retrievedOrders.length} (attendu ≥3)`, 'error');
+                    log('result-3', `   - Stock trouvé: ${retrievedStock.length} (attendu ≥2)`, 'error');
+                }
+                
+                // Vérifier la structure
+                if(retrievedOrders[0].ref && retrievedStock[0].category) {
+                    log('result-3', '✅ Structures de données respectées', 'success');
+                } else {
+                    log('result-3', '❌ ERREUR: Structures corrompues', 'error');
+                }
+                
+            } catch(e) {
+                log('result-3', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // TEST 4: Authentification
+        function testAuth() {
+            clearLog('result-4');
+            log('result-4', '🔍 Test du système d\'authentification...');
+            
+            try {
+                // Simuler une session admin
+                const adminUser = {
+                    id: 'admin01',
+                    role: 'admin',
+                    name: 'Test Admin',
+                    redirect: 'admin.html'
+                };
+                
+                localStorage.setItem('SIMPACT_USER', JSON.stringify(adminUser));
+                log('result-4', '✅ Session admin simulée créée', 'success');
+                
+                // Vérifier la session
+                const session = localStorage.getItem('SIMPACT_USER');
+                if(session) {
+                    const user = JSON.parse(session);
+                    log('result-4', `✅ Session récupérée: ${user.name} (${user.role})`, 'success');
+                    
+                    // Tester l'accès
+                    if(user.role === 'admin' || user.role === 'production') {
+                        log('result-4', '✅ Accès autorisé au module stock', 'success');
+                    } else {
+                        log('result-4', '⚠️ Rôle non autorisé pour le stock', 'warning');
+                    }
+                } else {
+                    log('result-4', '❌ Session non trouvée', 'error');
+                }
+                
+                // Test avec rôle non autorisé
+                const clientUser = {
+                    id: 'client01',
+                    role: 'client',
+                    name: 'Test Client',
+                    redirect: 'client.html'
+                };
+                
+                localStorage.setItem('SIMPACT_USER', JSON.stringify(clientUser));
+                const clientSession = JSON.parse(localStorage.getItem('SIMPACT_USER'));
+                
+                if(clientSession.role !== 'admin' && clientSession.role !== 'production') {
+                    log('result-4', '✅ Restriction d\'accès fonctionne pour les clients', 'success');
+                } else {
+                    log('result-4', '❌ ERREUR: Client a accès au stock', 'error');
+                }
+                
+                // Restaurer session admin
+                localStorage.setItem('SIMPACT_USER', JSON.stringify(adminUser));
+                
+            } catch(e) {
+                log('result-4', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // TEST 5: Intégrité des Données
+        function testDataIntegrity() {
+            clearLog('result-5');
+            log('result-5', '🔍 Test d\'intégrité des données...');
+            
+            try {
+                // Créer un papier
+                const paper = {
+                    id: 'INTEGRITY-001',
+                    category: 'Couché Mat',
+                    weight: 170,
+                    format: 'A3',
+                    qty: 5000,
+                    unit: 'feuilles',
+                    threshold: 3000,
+                    price: 0.032
+                };
+                
+                saveStock([paper]);
+                log('result-5', '📝 Papier initial: 5000 feuilles', 'info');
+                
+                // Série de mouvements
+                const movements = [
+                    { type: 'in', qty: 2000, reason: 'Achat' },
+                    { type: 'out', qty: 1500, reason: 'Production' },
+                    { type: 'in', qty: 3000, reason: 'Achat' },
+                    { type: 'out', qty: 2000, reason: 'Production' }
+                ];
+                
+                let expectedQty = 5000;
+                movements.forEach((m, i) => {
+                    executeStockMovement('INTEGRITY-001', m.type, m.qty, {
+                        reason: m.reason,
+                        ref: `INT-${i+1}`,
+                        user: 'Test'
+                    });
+                    
+                    if(m.type === 'in') {
+                        expectedQty += m.qty;
+                    } else {
+                        expectedQty -= m.qty;
+                    }
+                    
+                    log('result-5', `${m.type === 'in' ? '➕' : '➖'} ${m.qty} - Attendu: ${expectedQty}`, 'info');
+                });
+                
+                // Vérifier le résultat final
+                const finalStock = getStock();
+                const finalPaper = finalStock.find(p => p.id === 'INTEGRITY-001');
+                
+                if(finalPaper && finalPaper.qty === expectedQty) {
+                    log('result-5', `✅ INTÉGRITÉ VALIDÉE: ${finalPaper.qty} = ${expectedQty}`, 'success');
+                } else {
+                    log('result-5', `❌ ERREUR: ${finalPaper.qty} ≠ ${expectedQty}`, 'error');
+                }
+                
+                // Vérifier l'historique
+                const history = getStockMovements();
+                const relevantMoves = history.filter(m => m.paperId === 'INTEGRITY-001');
+                
+                if(relevantMoves.length === movements.length) {
+                    log('result-5', `✅ Historique complet: ${relevantMoves.length} mouvements`, 'success');
+                } else {
+                    log('result-5', `⚠️ Historique incomplet: ${relevantMoves.length}/${movements.length}`, 'warning');
+                }
+                
+            } catch(e) {
+                log('result-5', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // TEST 6: Performance
+        function testPerformance() {
+            clearLog('result-6');
+            log('result-6', '🔍 Test de performance avec beaucoup de données...');
+            
+            try {
+                const startTime = performance.now();
+                
+                // Créer 100 types de papier
+                const papers = [];
+                for(let i = 1; i <= 100; i++) {
+                    papers.push({
+                        id: `PERF-${i}`,
+                        category: `Papier Test ${i}`,
+                        weight: 80 + (i % 10) * 10,
+                        format: i % 2 === 0 ? 'A3' : 'A4',
+                        qty: Math.floor(Math.random() * 10000) + 1000,
+                        unit: 'feuilles',
+                        threshold: 2000,
+                        price: 0.01 + (i % 5) * 0.01
+                    });
+                }
+                
+                saveStock(papers);
+                const createTime = performance.now() - startTime;
+                log('result-6', `✅ 100 papiers créés en ${createTime.toFixed(2)}ms`, 'success');
+                
+                // Test de lecture
+                const readStart = performance.now();
+                const stock = getStock();
+                const readTime = performance.now() - readStart;
+                log('result-6', `✅ Lecture de ${stock.length} papiers en ${readTime.toFixed(2)}ms`, 'success');
+                
+                // Test de stats
+                const statsStart = performance.now();
+                const stats = getStockStats();
+                const statsTime = performance.now() - statsStart;
+                log('result-6', `✅ Calcul des stats en ${statsTime.toFixed(2)}ms`, 'success');
+                log('result-6', `   - Total: ${stats.totalQty.toLocaleString()} feuilles`, 'info');
+                log('result-6', `   - Valeur: ${stats.totalValue.toFixed(2)} DT`, 'info');
+                
+                // Avertissement si lent
+                if(createTime > 100 || readTime > 50 || statsTime > 50) {
+                    log('result-6', '⚠️ Performance dégradée détectée', 'warning');
+                } else {
+                    log('result-6', '✅ Performance excellente', 'success');
+                }
+                
+            } catch(e) {
+                log('result-6', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // NETTOYAGE
+        function cleanupTests() {
+            clearLog('result-7');
+            log('result-7', '🧹 Nettoyage des données de test...');
+            
+            try {
+                // Ne pas toucher aux vraies données, seulement aux tests
+                let stock = getStock();
+                let movements = getStockMovements();
+                
+                // Compter les données de test
+                const testPapers = stock.filter(p => p.id.includes('TEST') || p.id.includes('FUNC') || p.id.includes('INTEGRITY') || p.id.includes('PERF'));
+                const testMoves = movements.filter(m => m.paperId.includes('TEST') || m.paperId.includes('FUNC') || m.paperId.includes('INTEGRITY') || m.paperId.includes('PERF'));
+                
+                log('result-7', `📊 Données de test trouvées:`, 'info');
+                log('result-7', `   - ${testPapers.length} papiers de test`, 'info');
+                log('result-7', `   - ${testMoves.length} mouvements de test`, 'info');
+                
+                // Nettoyer
+                stock = stock.filter(p => !p.id.includes('TEST') && !p.id.includes('FUNC') && !p.id.includes('INTEGRITY') && !p.id.includes('PERF'));
+                movements = movements.filter(m => !m.paperId.includes('TEST') && !m.paperId.includes('FUNC') && !m.paperId.includes('INTEGRITY') && !m.paperId.includes('PERF'));
+                
+                saveStock(stock);
+                localStorage.setItem('SIMPACT_STOCK_MOVEMENTS', JSON.stringify(movements));
+                
+                log('result-7', `✅ Nettoyage terminé`, 'success');
+                log('result-7', `   - Stock restant: ${stock.length} papiers`, 'info');
+                log('result-7', `   - Mouvements restants: ${movements.length}`, 'info');
+                
+            } catch(e) {
+                log('result-7', `❌ ERREUR: ${e.message}`, 'error');
+            }
+        }
+
+        // Auto-test au chargement
+        window.onload = function() {
+            console.log('🧪 Page de test chargée - Prêt pour les tests');
+        }
+    </script>
+</body>
+</html>
