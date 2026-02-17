@@ -4,74 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpact - Connexion</title>
-    <script src="users.js?v=2"></script>
+    <script src="users.js?v=9"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* DESIGN DU LOGIN INTACT */
         body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
         .login-box { background: #1e293b; padding: 3rem; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; text-align: center; }
         h1 { margin: 0 0 10px 0; color: #2563eb; letter-spacing: -1px; }
         p { color: #94a3b8; margin-bottom: 2rem; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; background: #334155; border: 1px solid #475569; color: white; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
         input:focus { outline: none; border-color: #2563eb; }
-        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #1d4ed8; }
+        .btn-submit { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-submit:hover { background: #1d4ed8; }
         .error { color: #ef4444; font-size: 0.9rem; margin-top: 15px; display: none; }
+        
+        /* DESIGN DES BOUTONS SUPER ADMIN (Intégrés au thème) */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .module-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .module-btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+        .btn-comm { background: #2563eb; }
+        .btn-prod { background: #f59e0b; }
+        .btn-compta { background: #10b981; }
+        .btn-admin { background: #ef4444; }
+        .btn-client { background: #8b5cf6; }
+        .btn-logout { background: transparent; border: 1px solid #ef4444; color: #ef4444; margin-top: 10px; box-shadow: none; }
+        .btn-logout:hover { background: #ef4444; color: white; transform: none; }
     </style>
 </head>
 <body>
     <div class="login-box">
         <h1>SIMPACT</h1>
-        <p>Portail Professionnel</p>
+        <p id="subtitle">Portail Professionnel</p>
         
-        <form onsubmit="event.preventDefault(); attemptLogin();">
+        <form id="login-form" onsubmit="event.preventDefault(); attemptLogin();">
             <input type="text" id="login-id" placeholder="Identifiant" autocomplete="username" required>
             <input type="password" id="login-pass" placeholder="Mot de passe" autocomplete="current-password" required>
-            <button type="submit">Se connecter</button>
+            <button type="submit" class="btn-submit">Se connecter</button>
         </form>
 
         <div id="error-msg" class="error">Identifiant ou mot de passe incorrect</div>
-        <div id="debug-msg" style="color: #64748b; font-size: 0.8rem; margin-top: 10px; display:none;">Chargement...</div>
+
+        <div id="superadmin-menu" style="display: none; animation: fadeIn 0.3s ease;">
+            <p style="color: #10b981; font-weight: bold; margin-bottom: 20px;">👋 Bienvenue Youssef</p>
+            
+            <button class="module-btn btn-comm" onclick="window.location.href='commercial.html'">💼 Pôle Commercial</button>
+            <button class="module-btn btn-prod" onclick="window.location.href='production.html'">🏭 Atelier Production</button>
+            <button class="module-btn btn-compta" onclick="window.location.href='compta.html'">💰 Comptabilité</button>
+            <button class="module-btn btn-admin" onclick="window.location.href='admin.html'">🎛️ Administration Prix</button>
+            <button class="module-btn btn-client" onclick="window.location.href='client.html'">🌍 Espace Client</button>
+            
+            <button class="module-btn btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
     </div>
 
     <script>
-        // Vérification immédiate de la session
+        // Fonction pour afficher le menu du patron sans changer de page
+        function showSuperAdminMenu() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('subtitle').style.display = 'none';
+            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('superadmin-menu').style.display = 'block';
+        }
+
+        // Vérification immédiate : si vous êtes DÉJÀ connecté et rafraîchissez la page
         try {
             const session = localStorage.getItem('SIMPACT_USER');
             if(session) {
                 const user = JSON.parse(session);
-                if(user && user.redirect) {
-                    window.location.href = user.redirect;
+                if(user) {
+                    if(user.role === 'superadmin') {
+                        showSuperAdminMenu(); // On garde le menu affiché
+                    } else if(user.redirect) {
+                        window.location.href = user.redirect; // L'employé est renvoyé à sa place
+                    }
                 }
             }
         } catch(e) {
-            console.error("Erreur lecture session", e);
-            localStorage.removeItem('SIMPACT_USER'); // Nettoyage si corrompu
+            console.error("Erreur de lecture session", e);
+            localStorage.removeItem('SIMPACT_USER');
         }
 
+        // Action au clic sur "Se connecter"
         function attemptLogin() {
-            const id = document.getElementById('login-id').value.trim(); // .trim() enlève les espaces accidentels
+            const id = document.getElementById('login-id').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
             const errorDiv = document.getElementById('error-msg');
             
-            // Vérification que le fichier users.js est bien chargé
             if (typeof login !== 'function') {
-                alert("ERREUR CRITIQUE : Le fichier users.js n'est pas chargé correctement. Vérifiez qu'il est bien sur GitHub au même endroit que index.html");
+                alert("Erreur: Le fichier users.js n'est pas trouvé.");
                 return;
             }
 
-            console.log("Tentative de connexion pour :", id); // Pour le débogage (F12)
-
-            const user = login(id, pass); // Fonction dans users.js
+            const user = login(id, pass); // Fait appel au fichier users.js
 
             if(user) {
-                console.log("Connexion réussie, redirection vers :", user.redirect);
-                window.location.href = user.redirect;
+                if(user.role === 'superadmin') {
+                    // C'est vous : on déploie le menu de pilotage
+                    showSuperAdminMenu();
+                } else {
+                    // C'est un employé : redirection classique
+                    window.location.href = user.redirect;
+                }
             } else {
-                console.log("Échec connexion");
+                // Erreur de frappe
                 errorDiv.style.display = 'block';
-                // Petit effet visuel pour dire que ça a échoué si l'erreur est déjà affichée
                 errorDiv.style.animation = 'none';
-                errorDiv.offsetHeight; /* trigger reflow */
+                errorDiv.offsetHeight; /* Relance la petite animation d'erreur */
                 errorDiv.style.animation = 'shake 0.5s';
             }
         }
