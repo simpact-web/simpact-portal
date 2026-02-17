@@ -1,6 +1,6 @@
 // BASE DE DONNÉES UTILISATEURS (Simulée)
 let USERS = [
-    { id: 'youssef', pass: 'ni3Shaey', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
+    { id: 'youssef', pass: 'youssef123', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
     { id: 'prod', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
     { id: 'compta', pass: 'compta123', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
     { id: 'com', pass: 'com123', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
