@@ -1,6 +1,6 @@
 // --- CONFIGURATION CLOUD ---
-// 🔴 COLLEZ VOTRE LIEN SCRIPT GOOGLE ICI :
-const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec"; 
+// Votre lien Google Script officiel :
+const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbx7IEuFfAaE6AMJ_rm9jHOa5A41OsyvzxJrWc_9vxgMBrQHYjIUNTkgtGISiyA5ceiQ/exec"; 
 
 const USERS = [
     { id: 'youssef', pass: 'youssef123', role: 'superadmin', name: 'Youssef (PDG)', redirect: 'hub.html' },
@@ -41,14 +41,14 @@ function getOrders() {
 }
 
 function saveOrder(orderData) {
-    // 1. Sauvegarde Locale Rapide
+    // 1. Sauvegarde Locale
     let orders = getOrders();
-    orders = orders.filter(o => o.ref !== orderData.ref); // Évite les doublons
+    orders = orders.filter(o => o.ref !== orderData.ref); 
     orders.unshift(orderData);
     if(orders.length > 100) orders.pop();
     localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
 
-    // 2. Envoi au Drive avec les NOMS EXACTS de votre tableau
+    // 2. Envoi au Drive
     if(CLOUD_API_URL && CLOUD_API_URL.startsWith("http")) {
         const formData = new FormData();
         formData.append("Date", orderData.date);
@@ -57,13 +57,11 @@ function saveOrder(orderData) {
         formData.append("Produit", orderData.prod);
         formData.append("Quantité", orderData.qty);
         formData.append("Prix HT", orderData.price);
-        formData.append("Détails", orderData.desc); // <- Répare les caractéristiques
+        formData.append("Détails", orderData.desc);
         formData.append("Commercial", orderData.user);
-        
-        // Donnée invisible pour que le Commercial puisse télécharger
         formData.append("JSON_FULL", JSON.stringify(orderData));
 
-        fetch(CLOUD_API_URL, { method: 'POST', body: formData }).catch(e => console.log("Erreur silencieuse"));
+        fetch(CLOUD_API_URL, { method: 'POST', body: formData, mode: 'no-cors' }).catch(e => console.log("Erreur silencieuse"));
     }
 }
 
@@ -73,7 +71,7 @@ function updateOrderStatus(ref, newStatus, type) {
     if(order) {
         if(type === 'prod') order.statusProd = newStatus;
         if(type === 'compta') order.statusCompta = newStatus;
-        saveOrder(order); // Relance la sauvegarde
+        saveOrder(order); 
     }
 }
 
