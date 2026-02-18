@@ -1,6 +1,6 @@
 // --- CONFIGURATION CLOUD ---
-// 🔴 COLLEZ VOTRE NOUVEAU LIEN SCRIPT GOOGLE ICI (ENTRE LES GUILLEMETS) :
-const CLOUD_API_URL = "VOTRE_LIEN_ICI"; 
+// 🔴 COLLEZ VOTRE LIEN SCRIPT GOOGLE ICI (ENTRE LES GUILLEMETS) :
+const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec"; 
 
 // BASE DE DONNÉES UTILISATEURS
 const USERS = [
@@ -40,18 +40,19 @@ function checkAuth(allowedRoles) {
 function logout() { localStorage.removeItem('SIMPACT_USER'); window.location.href = 'index.html'; }
 
 function getOrders() {
-    try {
-        const local = localStorage.getItem('SIMPACT_ORDERS');
-        return local ? JSON.parse(local) : [];
-    } catch(e) { return []; }
+    try { return JSON.parse(localStorage.getItem('SIMPACT_ORDERS')) || []; } 
+    catch(e) { return []; }
 }
 
+// ⚙️ MOTEUR D'ENVOI CENTRALISÉ ET SÉCURISÉ
 function saveOrder(orderData) {
-    const orders = getOrders();
+    // 1. Sauvegarde locale (Garantie de ne rien perdre sur ce PC)
+    let orders = getOrders();
     orders.unshift(orderData);
     if(orders.length > 100) orders.pop();
     localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
 
+    // 2. Envoi au Google Sheet (Format strict en minuscules)
     if(CLOUD_API_URL && CLOUD_API_URL.startsWith("http")) {
         const formData = new FormData();
         formData.append("ref", orderData.ref);
@@ -65,7 +66,9 @@ function saveOrder(orderData) {
         formData.append("statusCompta", orderData.statusCompta);
         formData.append("jsonFull", JSON.stringify(orderData));
 
-        fetch(CLOUD_API_URL, { method: 'POST', body: formData }).catch(e => console.error(e));
+        // Le "mode: no-cors" est vital pour empêcher le navigateur de bloquer le Drive
+        fetch(CLOUD_API_URL, { method: 'POST', body: formData, mode: 'no-cors' })
+        .catch(e => console.error("Erreur Drive", e));
     }
 }
 
@@ -76,28 +79,28 @@ function updateOrderStatus(ref, newStatus, type) {
         if(type === 'prod') order.statusProd = newStatus;
         if(type === 'compta') order.statusCompta = newStatus;
         localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
-        saveOrder(order); 
+        saveOrder(order); // Renvoie la mise à jour au Drive
     }
 }
 
-// SYNCHRONISATION MAGIQUE EN ARRIÈRE-PLAN
+// 🔄 SYNCHRONISATION BLINDÉE
 async function syncWithCloud() {
     if(!CLOUD_API_URL || !CLOUD_API_URL.startsWith("http")) return;
     try {
         const response = await fetch(CLOUD_API_URL);
         const cloudData = await response.json();
         
-        if(Array.isArray(cloudData)) {
+        // Sécurité : On ne remplace les données que si le Drive n'est pas "vide à cause d'une erreur"
+        if(Array.isArray(cloudData) && cloudData.length > 0) {
             localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(cloudData));
             
-            // Mise à jour de l'écran en temps réel selon la page ouverte
+            // Rafraîchissement des écrans en direct
             if(typeof renderOrders === 'function') renderOrders();
             if(typeof loadStats === 'function') loadStats();
-            if(typeof loadWebOrders === 'function') loadWebOrders(); // Ouvre la boîte de réception
+            if(typeof loadWebOrders === 'function') loadWebOrders();
         }
     } catch(e) {}
 }
 
-// Vérifie le Google Drive toutes les 8 secondes
-setInterval(syncWithCloud, 8000);
+setInterval(syncWithCloud, 6000); // Scanne le Drive toutes les 6 secondes
 syncWithCloud();
