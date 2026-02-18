@@ -1,5 +1,5 @@
 // --- CONFIGURATION CLOUD ---
-// Votre lien Google Script officiel :
+// 🔴 VOTRE LIEN ICI :
 const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbx7IEuFfAaE6AMJ_rm9jHOa5A41OsyvzxJrWc_9vxgMBrQHYjIUNTkgtGISiyA5ceiQ/exec"; 
 
 const USERS = [
@@ -41,14 +41,12 @@ function getOrders() {
 }
 
 function saveOrder(orderData) {
-    // 1. Sauvegarde Locale
     let orders = getOrders();
     orders = orders.filter(o => o.ref !== orderData.ref); 
     orders.unshift(orderData);
     if(orders.length > 100) orders.pop();
     localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
 
-    // 2. Envoi au Drive
     if(CLOUD_API_URL && CLOUD_API_URL.startsWith("http")) {
         const formData = new FormData();
         formData.append("Date", orderData.date);
@@ -59,9 +57,10 @@ function saveOrder(orderData) {
         formData.append("Prix HT", orderData.price);
         formData.append("Détails", orderData.desc);
         formData.append("Commercial", orderData.user);
-        formData.append("JSON_FULL", JSON.stringify(orderData));
+        formData.append("Statut_Prod", orderData.statusProd);
+        formData.append("Statut_Compta", orderData.statusCompta);
 
-        fetch(CLOUD_API_URL, { method: 'POST', body: formData, mode: 'no-cors' }).catch(e => console.log("Erreur silencieuse"));
+        fetch(CLOUD_API_URL, { method: 'POST', body: formData, mode: 'no-cors' }).catch(e => console.log(""));
     }
 }
 
@@ -71,7 +70,7 @@ function updateOrderStatus(ref, newStatus, type) {
     if(order) {
         if(type === 'prod') order.statusProd = newStatus;
         if(type === 'compta') order.statusCompta = newStatus;
-        saveOrder(order); 
+        saveOrder(order); // Cette fonction va maintenant ECRASE la ligne dans Google Sheet au lieu d'en créer une.
     }
 }
 
@@ -81,7 +80,9 @@ async function syncWithCloud() {
         const response = await fetch(CLOUD_API_URL);
         const cloudData = await response.json();
         
-        if(Array.isArray(cloudData) && cloudData.length > 0) {
+        // CORRECTION DU BUG ZOMBIE : 
+        // Si le Drive est vide, on force le site à se vider aussi. Le Drive est LE SEUL maitre.
+        if(Array.isArray(cloudData)) {
             localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(cloudData));
             if(typeof renderOrders === 'function') renderOrders();
             if(typeof loadStats === 'function') loadStats();
@@ -90,5 +91,5 @@ async function syncWithCloud() {
     } catch(e) {}
 }
 
-setInterval(syncWithCloud, 6000);
+setInterval(syncWithCloud, 5000);
 syncWithCloud();
