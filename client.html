@@ -4,51 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=9"></script>
+    <script src="users.js?v=10"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* DESIGN CLIENT (VIOLET) */
         :root { --primary: #8b5cf6; --primary-dark: #7c3aed; --bg: #f8fafc; --text: #1e293b; --border: #cbd5e1; --success: #10b981; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; }
         .logout-btn { background: #fee2e2; color: #991b1b; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
         h2 { color: var(--primary); margin-top: 0; }
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; }
         select, input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 1rem; }
-        
-        /* ZONES DYNAMIQUES */
         .option-group { display: none; background: #f3f0ff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd6fe; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease; }
         .option-group.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* RADIOS */
         .radio-group { display: flex; gap: 10px; }
         .radio-option { flex: 1; }
         .radio-option input { display: none; }
         .radio-option label { display: block; padding: 12px; border: 1px solid var(--border); text-align: center; border-radius: 6px; cursor: pointer; background: white; font-size: 0.9rem; transition: 0.2s; font-weight: 500; }
         .radio-option input:checked + label { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* ZONE PRIX */
-        .price-box { 
-            background: #1e293b; color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 30px 0;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
-        }
+        .price-box { background: #1e293b; color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 30px 0; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
         .price-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
         .price-value { font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700; color: #a78bfa; }
-        
         .btn-calc { background: white; color: var(--primary); border: 2px solid var(--primary); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
         .btn-calc:hover { background: #f3f0ff; }
-
         .btn-order { background: var(--success); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
         .btn-order:hover { background: #059669; transform: translateY(-2px); }
         .btn-order:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
-
-        /* ZONE PAO */
         .pao-section { border: 2px dashed #8b5cf6; padding: 20px; border-radius: 12px; background: #f5f3ff; margin-bottom: 20px; }
         .pao-info { font-size: 0.9rem; color: #64748b; margin-top: 5px; font-style: italic; }
     </style>
@@ -75,11 +58,7 @@
                 <option value="affiches">Affiches Grand Format</option>
             </select>
         </div>
-        
-        <div class="form-group">
-            <label>Quantité</label>
-            <input type="number" id="qty" placeholder="Ex: 1000" oninput="resetPrice()">
-        </div>
+        <div class="form-group"><label>Quantité</label><input type="number" id="qty" placeholder="Ex: 1000" oninput="resetPrice()"></div>
 
         <div id="flyer-options" class="option-group"><div class="form-group"><label>Impression</label><div class="radio-group"><div class="radio-option"><input type="radio" name="flyer-type" value="recto" id="fr" checked><label for="fr">Recto</label></div><div class="radio-option"><input type="radio" name="flyer-type" value="rectoVerso" id="frv"><label for="frv">Recto / Verso</label></div></div></div><div class="form-group"><label>Papier</label><select id="flyer-paper"><option value="couche-90-mat">Couché 90gr Mat</option><option value="couche-90-brillant">Couché 90gr Brillant</option><option value="couche-115-mat">Couché 115gr Mat</option><option value="couche-115-brillant">Couché 115gr Brillant</option><option value="couche-135-mat">Couché 135gr Mat</option><option value="couche-135-brillant">Couché 135gr Brillant</option><option value="couche-170-mat">Couché 170gr Mat</option><option value="couche-170-brillant">Couché 170gr Brillant</option><option value="couche-200-mat">Couché 200gr Mat</option><option value="couche-200-brillant">Couché 200gr Brillant</option></select></div></div>
         <div id="carte-options" class="option-group"><div class="form-group"><label>Finition</label><div class="radio-group"><div class="radio-option"><input type="radio" name="carte-finish" value="recto" id="cr" checked><label for="cr">Standard</label></div><div class="radio-option"><input type="radio" name="carte-finish" value="pellicule" id="cp"><label for="cp">Pelliculé</label></div></div></div><div class="form-group"><label>Papier</label><select id="carte-paper"><option value="couche-300-mat">Couché 300gr Mat</option><option value="couche-300-brillant">Couché 300gr Brillant</option><option value="couche-350-mat">Couché 350gr Mat</option><option value="couche-350-brillant">Couché 350gr Brillant</option></select></div></div>
@@ -94,7 +73,6 @@
                 <label>📁 Fichier d'impression (PDF)</label>
                 <input type="file" id="file-upload" accept=".pdf,.ai,.zip">
             </div>
-
             <div class="form-group" style="margin-top:20px;">
                 <label>🎨 Service Création Graphique (PAO)</label>
                 <select id="pao-service" onchange="resetPrice()">
@@ -113,34 +91,17 @@
         </div>
 
         <button class="btn-calc" onclick="calculateQuote()">💰 ESTIMER MON PRIX</button>
-        
-        <div class="price-box">
-            <span class="price-label">Total HT Estimé</span>
-            <span class="price-value" id="total-price">-- DT</span>
-        </div>
-
+        <div class="price-box"><span class="price-label">Total HT Estimé</span><span class="price-value" id="total-price">-- DT</span></div>
         <button class="btn-order" onclick="submitClientOrder()" disabled>✅ VALIDER LA COMMANDE</button>
     </div>
 
     <script>
         const user = checkAuth('client');
         if(user) document.getElementById('client-name').textContent = user.name;
-        const GOOGLE_SCRIPT_URL = CLOUD_API_URL;
-        
-        // --- DONNÉES PAO (Issues du fichier Excel) ---
-        const PAO_DATA = {
-            'flyer':    { conc: 4,  corr: 2,    layout: 2 },
-            'carte':    { conc: 1,  corr: 0.5,  layout: 0.5 },
-            'depliant': { conc: 8,  corr: 3,    layout: 3 },
-            'entete':   { conc: 4,  corr: 2,    layout: 2 },
-            'affiches': { conc: 7,  corr: 1,    layout: 1 },
-            'brochure': { conc: 8,  corr: 0.17, layout: 0.34, perPage: true },
-            'livre':    { conc: 12, corr: 0.17, layout: 0.25, perPage: true }
-        };
-        const PAO_A5_FACTOR = {
-            'brochure': { corr: 0.119, layout: 0.238 },
-            'livre':    { corr: 0.119, layout: 0.175 }
-        };
+
+        // DONNÉES PAO
+        const PAO_DATA = { 'flyer': { conc: 4, corr: 2, layout: 2 }, 'carte': { conc: 1, corr: 0.5, layout: 0.5 }, 'depliant': { conc: 8, corr: 3, layout: 3 }, 'entete': { conc: 4, corr: 2, layout: 2 }, 'affiches': { conc: 7, corr: 1, layout: 1 }, 'brochure': { conc: 8, corr: 0.17, layout: 0.34, perPage: true }, 'livre': { conc: 12, corr: 0.17, layout: 0.25, perPage: true } };
+        const PAO_A5_FACTOR = { 'brochure': { corr: 0.119, layout: 0.238 }, 'livre': { corr: 0.119, layout: 0.175 } };
         const PAO_RATES = { 'conception': 55, 'layout': 40, 'correction': 40 };
 
         let TARIFS = {};
@@ -151,171 +112,50 @@
             try {
                 const r = await fetch('prix_config.json');
                 const data = await r.json();
-                TARIFS = {
-                    flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso },
-                    carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule },
-                    depliant: data.tarifs.depliant, entete: data.tarifs.entete,
-                    affiche: data.tarifs.affiche || [],
-                    prix_couverture_livre: data.prix_couverture_livre || { a4: { recto: 1.3, rectoVerso: 1.5 }, a5: { recto: 0.65, rectoVerso: 0.75 } }
-                };
-            } catch(e) { console.log("Erreur chargement prix", e); }
+                TARIFS = { flyer: { recto: data.tarifs.flyer.recto, rectoVerso: data.tarifs.flyer.rectoVerso }, carte: { recto: data.tarifs.carte.recto, pellicule: data.tarifs.carte.pellicule }, depliant: data.tarifs.depliant, entete: data.tarifs.entete, affiche: data.tarifs.affiche || [], prix_couverture_livre: data.prix_couverture_livre || { a4: { recto: 1.3, rectoVerso: 1.5 }, a5: { recto: 0.65, rectoVerso: 0.75 } } };
+            } catch(e) {}
         }
         loadPrices();
 
-        // Helpers Calcul
         function getPaperName(id) { const el = document.getElementById(id); return el && el.selectedOptions[0] ? el.selectedOptions[0].text : id; }
-        function calculatePaperSurcharge(paperType, numSheets) {
-            if(!paperType || numSheets === 0) return 0;
-            if(paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100;
-            if(paperType.startsWith('couche-')) {
-                const parts = paperType.split('-');
-                if (parts.length >= 2) {
-                    const grammage = parseInt(parts[1]);
-                    if (grammage > 90) return numSheets * (grammage - 90) * PRIX_FIXES.gramme_couche;
-                }
-            }
-            return 0;
-        }
-        function getPricePerSheetCouleur(sheets) {
-            if(sheets < 25) return 3; if(sheets < 50) return 2.5; if(sheets < 100) return 2;
-            if(sheets < 200) return 1.9; if(sheets < 300) return 1.8; if(sheets < 400) return 1.7;
-            if(sheets < 500) return 1.6; return 1.5;
-        }
+        function calculatePaperSurcharge(paperType, numSheets) { if(!paperType || numSheets === 0) return 0; if(paperType === 'offset-100') return numSheets * PRIX_FIXES.offset_100; if(paperType.startsWith('couche-')) { const parts = paperType.split('-'); if (parts.length >= 2) { const grammage = parseInt(parts[1]); if (grammage > 90) return numSheets * (grammage - 90) * PRIX_FIXES.gramme_couche; } } return 0; }
+        function getPricePerSheetCouleur(sheets) { if(sheets < 25) return 3; if(sheets < 50) return 2.5; if(sheets < 100) return 2; if(sheets < 200) return 1.9; if(sheets < 300) return 1.8; if(sheets < 400) return 1.7; if(sheets < 500) return 1.6; return 1.5; }
         function getPricePerSheetRecto(sheets) { return getPricePerSheetCouleur(sheets) - 0.2; }
-        function calculatePriceWithSmoothing(tarifArray, quantity) {
-            if(!tarifArray || !tarifArray.length) return { totalPrice: 0 };
-            let lower = tarifArray[0], upper = tarifArray[0];
-            for(let t of tarifArray) { if(t.qty <= quantity) lower = t; if(t.qty >= quantity && upper === tarifArray[0]) upper = t; }
-            if(lower.qty === upper.qty) return { totalPrice: lower.price };
-            const ratio = (quantity - lower.qty) / (upper.qty - lower.qty);
-            return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
-        }
+        function calculatePriceWithSmoothing(tarifArray, quantity) { if(!tarifArray || !tarifArray.length) return { totalPrice: 0 }; let lower = tarifArray[0], upper = tarifArray[0]; for(let t of tarifArray) { if(t.qty <= quantity) lower = t; if(t.qty >= quantity && upper === tarifArray[0]) upper = t; } if(lower.qty === upper.qty) return { totalPrice: lower.price }; const ratio = (quantity - lower.qty) / (upper.qty - lower.qty); return { totalPrice: lower.price + (upper.price - lower.price) * ratio }; }
 
-        // --- CALCUL CENTRAL ---
         function calculateQuote() {
             const type = document.getElementById('prod-type').value;
             const qty = parseInt(document.getElementById('qty').value);
             const paoOption = document.getElementById('pao-service').value;
-
             if(!type || !qty) return alert("Remplissez les champs !");
 
             let totalPrice = 0;
             try {
-                if(type === 'flyer') {
-                    const mode = document.querySelector('input[name="flyer-type"]:checked').value;
-                    const paper = document.getElementById('flyer-paper').value;
-                    let res = calculatePriceWithSmoothing(TARIFS.flyer[mode], qty);
-                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
-                }
-                else if(type === 'carte') {
-                    const finish = document.querySelector('input[name="carte-finish"]:checked').value;
-                    const paper = document.getElementById('carte-paper').value;
-                    let res = calculatePriceWithSmoothing(TARIFS.carte[finish], qty);
-                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, Math.ceil(qty/10));
-                }
-                else if(type === 'depliant') {
-                    const paper = document.getElementById('depliant-paper').value;
-                    let res = calculatePriceWithSmoothing(TARIFS.depliant, qty);
-                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
-                }
-                else if(type === 'entete') {
-                    const paper = document.getElementById('entete-paper').value;
-                    let res = calculatePriceWithSmoothing(TARIFS.entete, qty);
-                    totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty);
-                }
-                else if(type === 'brochure') {
-                    const pages = parseInt(document.getElementById('brochure-pages').value);
-                    const format = document.getElementById('brochure-format').value;
-                    const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
-                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
-                    const paperInt = document.getElementById('brochure-interior-paper').value;
-                    const paperCov = document.getElementById('brochure-cover-paper').value;
-                    
-                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
-                    let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty);
-                    let totalSheets = sheetsInt + sheetsCov;
-                    let priceSheetInt = getPricePerSheetCouleur(totalSheets);
-                    let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets);
-                    
-                    let costInt = sheetsInt * priceSheetInt;
-                    let costCov = sheetsCov * priceSheetCov;
-                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov);
-                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
-                    totalPrice = costInt + costCov + surcharge + costPell;
-                }
-                else if(type === 'livre') {
-                    const pages = parseInt(document.getElementById('livre-pages').value);
-                    const format = document.getElementById('livre-format').value;
-                    const coverType = document.querySelector('input[name="livre-cover-type"]:checked').value;
-                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
-                    const paperInt = document.getElementById('livre-interior-paper').value;
-                    const paperCov = document.getElementById('livre-cover-paper').value;
-
-                    let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty);
-                    let costInt = sheetsInt * PRIX_FIXES.feuille_nb;
-                    let surcharge = calculatePaperSurcharge(paperInt, sheetsInt);
-                    let unitCovPrice = coverType === 'recto' ? TARIFS.prix_couverture_livre[format].recto : TARIFS.prix_couverture_livre[format].rectoVerso;
-                    let costCov = qty * unitCovPrice;
-                    let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0;
-                    totalPrice = costInt + surcharge + costCov + costPell;
-                }
-                else if(type === 'affiches') {
-                    const format = document.getElementById('affiche-format').value;
-                    const paper = document.getElementById('affiche-paper').value;
-                    let resUnit = calculatePriceWithSmoothing(TARIFS.affiche, qty); 
-                    let unitPrice = resUnit.totalPrice;
-                    if(format === 'a3plus') unitPrice *= 1.2;
-                    totalPrice = (unitPrice * qty) + calculatePaperSurcharge(paper, qty);
-                }
+                if(type === 'flyer') { const mode = document.querySelector('input[name="flyer-type"]:checked').value; const paper = document.getElementById('flyer-paper').value; let res = calculatePriceWithSmoothing(TARIFS.flyer[mode], qty); totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty); }
+                else if(type === 'carte') { const finish = document.querySelector('input[name="carte-finish"]:checked').value; const paper = document.getElementById('carte-paper').value; let res = calculatePriceWithSmoothing(TARIFS.carte[finish], qty); totalPrice = res.totalPrice + calculatePaperSurcharge(paper, Math.ceil(qty/10)); }
+                else if(type === 'depliant') { const paper = document.getElementById('depliant-paper').value; let res = calculatePriceWithSmoothing(TARIFS.depliant, qty); totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty); }
+                else if(type === 'entete') { const paper = document.getElementById('entete-paper').value; let res = calculatePriceWithSmoothing(TARIFS.entete, qty); totalPrice = res.totalPrice + calculatePaperSurcharge(paper, qty); }
+                else if(type === 'brochure') { const pages = parseInt(document.getElementById('brochure-pages').value); const format = document.getElementById('brochure-format').value; const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value; const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value; const paperInt = document.getElementById('brochure-interior-paper').value; const paperCov = document.getElementById('brochure-cover-paper').value; let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty); let sheetsCov = Math.ceil((format === 'a4' ? 1 : 0.5) * qty); let totalSheets = sheetsInt + sheetsCov; let priceSheetInt = getPricePerSheetCouleur(totalSheets); let priceSheetCov = (coverType === 'recto') ? getPricePerSheetRecto(totalSheets) : getPricePerSheetCouleur(totalSheets); let costInt = sheetsInt * priceSheetInt; let costCov = sheetsCov * priceSheetCov; let surcharge = calculatePaperSurcharge(paperInt, sheetsInt) + calculatePaperSurcharge(paperCov, sheetsCov); let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0; totalPrice = costInt + costCov + surcharge + costPell; }
+                else if(type === 'livre') { const pages = parseInt(document.getElementById('livre-pages').value); const format = document.getElementById('livre-format').value; const coverType = document.querySelector('input[name="livre-cover-type"]:checked').value; const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value; const paperInt = document.getElementById('livre-interior-paper').value; const paperCov = document.getElementById('livre-cover-paper').value; let sheetsInt = Math.ceil((pages / (format === 'a4' ? 4 : 8)) * qty); let costInt = sheetsInt * PRIX_FIXES.feuille_nb; let surcharge = calculatePaperSurcharge(paperInt, sheetsInt); let unitCovPrice = coverType === 'recto' ? TARIFS.prix_couverture_livre[format].recto : TARIFS.prix_couverture_livre[format].rectoVerso; let costCov = qty * unitCovPrice; let costPell = pell === 'avec' ? qty * PRIX_FIXES.pelliculage : 0; totalPrice = costInt + surcharge + costCov + costPell; }
+                else if(type === 'affiches') { const format = document.getElementById('affiche-format').value; const paper = document.getElementById('affiche-paper').value; let resUnit = calculatePriceWithSmoothing(TARIFS.affiche, qty); let unitPrice = resUnit.totalPrice; if(format === 'a3plus') unitPrice *= 1.2; totalPrice = (unitPrice * qty) + calculatePaperSurcharge(paper, qty); }
 
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
 
-                let paoCost = 0;
-                let paoDetails = "Aucun frais supplémentaire.";
-                
+                let paoCost = 0; let paoDetails = "Aucun frais supplémentaire.";
                 if(paoOption !== 'none' && PAO_DATA[type]) {
-                    let hours = 0;
-                    let rate = PAO_RATES[paoOption];
-                    const data = PAO_DATA[type];
-                    let key = (paoOption === 'conception') ? 'conc' : (paoOption === 'layout' ? 'layout' : 'corr');
-                    
-                    if(data.perPage) {
-                        let pages = type === 'brochure' ? (parseInt(document.getElementById('brochure-pages').value) || 0) : (parseInt(document.getElementById('livre-pages').value) || 0);
-                        let format = type === 'brochure' ? document.getElementById('brochure-format').value : document.getElementById('livre-format').value;
-
-                        if(paoOption === 'conception') {
-                            hours = data.conc;
-                        } else {
-                            let unitHours = data[key];
-                            if(format === 'a5' && PAO_A5_FACTOR[type]) unitHours = PAO_A5_FACTOR[type][key];
-                            hours = unitHours * pages;
-                        }
-                    } else {
-                        hours = data[key];
-                    }
-
-                    paoCost = hours * rate;
-                    paoDetails = `Service PAO inclus : ${hours.toFixed(2)}h (+${paoCost.toFixed(2)} DT)`;
+                    let hours = 0; let rate = PAO_RATES[paoOption]; const data = PAO_DATA[type]; let key = (paoOption === 'conception') ? 'conc' : (paoOption === 'layout' ? 'layout' : 'corr');
+                    if(data.perPage) { let pages = type === 'brochure' ? (parseInt(document.getElementById('brochure-pages').value) || 0) : (parseInt(document.getElementById('livre-pages').value) || 0); let format = type === 'brochure' ? document.getElementById('brochure-format').value : document.getElementById('livre-format').value; if(paoOption === 'conception') { hours = data.conc; } else { let unitHours = data[key]; if(format === 'a5' && PAO_A5_FACTOR[type]) unitHours = PAO_A5_FACTOR[type][key]; hours = unitHours * pages; } } else { hours = data[key]; }
+                    paoCost = hours * rate; paoDetails = `Service PAO inclus : ${hours.toFixed(2)}h (+${paoCost.toFixed(2)} DT)`;
                 }
-
                 document.getElementById('pao-desc').textContent = paoDetails;
                 totalPrice += paoCost;
-
                 currentCalculatedPrice = totalPrice.toFixed(2);
                 document.getElementById('total-price').textContent = currentCalculatedPrice + " DT";
                 document.querySelector('.btn-order').disabled = false;
-
-            } catch(e) { console.error(e); alert("Erreur de calcul. Vérifiez les champs."); }
+            } catch(e) { alert("Erreur de calcul."); }
         }
 
-        function resetPrice() {
-            document.getElementById('total-price').textContent = "-- DT";
-            document.querySelector('.btn-order').disabled = true;
-            currentCalculatedPrice = 0;
-            if(document.getElementById('pao-service').value === 'none') {
-                document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire.";
-            }
-        }
+        function resetPrice() { document.getElementById('total-price').textContent = "-- DT"; document.querySelector('.btn-order').disabled = true; currentCalculatedPrice = 0; if(document.getElementById('pao-service').value === 'none') { document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire."; } }
 
         function generateConfigString(type) {
             try {
@@ -325,78 +165,48 @@
                 else if(type === 'depliant') baseConfig = `Papier: ${getPaperName('depliant-paper')}`;
                 else if(type === 'entete') baseConfig = `Papier: ${getPaperName('entete-paper')}`;
                 else if(type === 'affiches') baseConfig = `Format: ${getPaperName('affiche-format')}, Papier: ${getPaperName('affiche-paper')}`;
-                else if(type === 'brochure') {
-                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON';
-                    baseConfig = `${document.getElementById('brochure-pages').value} pages, Int: ${getPaperName('brochure-interior-paper')}, Couv: ${getPaperName('brochure-cover-paper')}, Pelliculage: ${pell}`;
-                }
-                else if(type === 'livre') {
-                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON';
-                    baseConfig = `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`;
-                }
-                
+                else if(type === 'brochure') { const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON'; baseConfig = `${document.getElementById('brochure-pages').value} pages, Int: ${getPaperName('brochure-interior-paper')}, Couv: ${getPaperName('brochure-cover-paper')}, Pelliculage: ${pell}`; }
+                else if(type === 'livre') { const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON'; baseConfig = `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`; }
                 const paoSelect = document.getElementById('pao-service');
-                if(paoSelect.value !== 'none') {
-                    return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoSelect.options[paoSelect.selectedIndex].text}`;
-                }
+                if(paoSelect.value !== 'none') { return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoSelect.options[paoSelect.selectedIndex].text}`; }
                 return baseConfig;
-
             } catch(e) { return "Config standard"; }
         }
 
+        // 🚀 C'EST ICI LE SECRET : On utilise la fonction 'saveOrder' de 'users.js'
         function submitClientOrder() {
-            if(!currentCalculatedPrice) return alert("Veuillez estimer le prix d'abord.");
-            
+            if(!currentCalculatedPrice) return alert("Veuillez estimer le prix.");
             const prodType = document.getElementById('prod-type').value;
             const qty = document.getElementById('qty').value;
             const userDesc = document.getElementById('desc').value;
-            const file = document.getElementById('file-upload').files[0];
-
             const btn = document.querySelector('.btn-order');
             btn.textContent = "⏳ Envoi..."; btn.disabled = true;
 
-            const ref = "WEB-" + Date.now().toString().slice(-5);
-            const prodLabel = document.getElementById('prod-type').selectedOptions[0].text;
-            const details = generateConfigString(prodType) + "\nNote: " + userDesc + (file ? "\n[Fichier]: " + file.name : "");
-
-            // --- NOUVEAUTÉ : ON FORCE LE STATUT "À VALIDER" ---
             const orderObj = {
-                ref: ref,
+                ref: "WEB-" + Date.now().toString().slice(-5),
                 client: user.name,
-                prod: prodLabel,
+                prod: document.getElementById('prod-type').selectedOptions[0].text,
                 qty: qty,
                 price: currentCalculatedPrice,
-                desc: details,
+                desc: generateConfigString(prodType) + "\nNote: " + userDesc,
                 user: "CLIENT WEB",
-                statusProd: "À Valider (Web)", // L'Atelier ignore ce statut
+                statusProd: "À Valider (Web)", 
                 statusCompta: "Non payé",
                 date: new Date().toLocaleDateString()
             };
 
-            const formData = new FormData();
-            formData.append("Date", new Date().toLocaleString());
-            formData.append("Ref", ref);
-            formData.append("Client", user.name);
-            formData.append("Produit", prodLabel);
-            formData.append("Quantité", qty);
-            formData.append("Prix HT", currentCalculatedPrice);
-            formData.append("Détails", details);
-            formData.append("Commercial", "CLIENT WEB");
-            // Sécurisation Cloud
-            formData.append("statusProd", orderObj.statusProd);
-            formData.append("statusCompta", orderObj.statusCompta);
-            formData.append("jsonFull", JSON.stringify(orderObj)); 
+            // Appel direct de la fonction centralisée ! 
+            saveOrder(orderObj);
 
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
-            .then(r => { alert("✅ Commande envoyée ! En attente de validation commerciale."); window.location.reload(); })
-            .catch(e => { alert("Erreur réseau."); btn.disabled = false; btn.textContent = "✅ VALIDER LA COMMANDE";});
+            setTimeout(() => {
+                alert("✅ Commande envoyée ! En attente de validation commerciale.");
+                window.location.reload();
+            }, 800);
         }
 
         document.getElementById('prod-type').addEventListener('change', function() {
             document.querySelectorAll('.option-group').forEach(el => el.classList.remove('active'));
-            if(this.value) {
-                const group = document.getElementById(this.value + '-options');
-                if(group) group.classList.add('active');
-            }
+            if(this.value) { const group = document.getElementById(this.value + '-options'); if(group) group.classList.add('active'); }
         });
     </script>
 </body>
