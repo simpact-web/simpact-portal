@@ -299,8 +299,7 @@
         const user = checkAuth('commercial');
         if(user) document.getElementById('user-name-display').textContent = user.name;
         
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
-
+        const GOOGLE_SCRIPT_URL = CLOUD_API_URL;
         let currentQuoteData = null;
         let currentMode = '';
         let TARIFS = {};
