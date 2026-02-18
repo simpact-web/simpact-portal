@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=10"></script>
+    <script src="users.js?v=11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #8b5cf6; --primary-dark: #7c3aed; --bg: #f8fafc; --text: #1e293b; --border: #cbd5e1; --success: #10b981; }
@@ -157,23 +157,62 @@
 
         function resetPrice() { document.getElementById('total-price').textContent = "-- DT"; document.querySelector('.btn-order').disabled = true; currentCalculatedPrice = 0; if(document.getElementById('pao-service').value === 'none') { document.getElementById('pao-desc').textContent = "Aucun frais supplémentaire."; } }
 
+        // MOTEUR RESTAURÉ AVEC LA BELLE MISE EN FORME
         function generateConfigString(type) {
             try {
-                let baseConfig = "";
-                if(type === 'flyer') baseConfig = `Papier: ${getPaperName('flyer-paper')}, Impression: ${document.querySelector('input[name="flyer-type"]:checked').nextElementSibling.textContent}`;
-                else if(type === 'carte') baseConfig = `Papier: ${getPaperName('carte-paper')}, Finition: ${document.querySelector('input[name="carte-finish"]:checked').nextElementSibling.textContent}`;
-                else if(type === 'depliant') baseConfig = `Papier: ${getPaperName('depliant-paper')}`;
-                else if(type === 'entete') baseConfig = `Papier: ${getPaperName('entete-paper')}`;
-                else if(type === 'affiches') baseConfig = `Format: ${getPaperName('affiche-format')}, Papier: ${getPaperName('affiche-paper')}`;
-                else if(type === 'brochure') { const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON'; baseConfig = `${document.getElementById('brochure-pages').value} pages, Int: ${getPaperName('brochure-interior-paper')}, Couv: ${getPaperName('brochure-cover-paper')}, Pelliculage: ${pell}`; }
-                else if(type === 'livre') { const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value === 'avec' ? 'OUI' : 'NON'; baseConfig = `${document.getElementById('livre-pages').value} pages, Int: ${getPaperName('livre-interior-paper')}, Couv: ${getPaperName('livre-cover-paper')}, Pelliculage: ${pell}`; }
+                let config = "";
+                if(type === 'flyer') {
+                    const modeVal = document.querySelector('input[name="flyer-type"]:checked').value;
+                    const modeTxt = modeVal === 'recto' ? 'Recto' : 'R/V';
+                    config = `Format Standard\nImpression: ${modeTxt}\nPapier: ${getPaperName('flyer-paper')}`;
+                }
+                else if(type === 'carte') {
+                    const finish = document.querySelector('input[name="carte-finish"]:checked').value;
+                    const finishTxt = finish === 'recto' ? 'Standard' : 'Pelliculé';
+                    config = `Finition: ${finishTxt}\nPapier: ${getPaperName('carte-paper')}`;
+                }
+                else if(type === 'depliant') {
+                    config = `3 Volets (A4 Ouvert)\nPapier: ${getPaperName('depliant-paper')}`;
+                }
+                else if(type === 'entete') {
+                    config = `Format A4\nPapier: ${getPaperName('entete-paper')}`;
+                }
+                else if(type === 'affiches') {
+                    const format = document.getElementById('affiche-format').value;
+                    config = `Grand Format ${format === 'a3' ? 'A3' : 'A3+'}\nPapier: ${getPaperName('affiche-paper')}`;
+                }
+                else if(type === 'brochure') {
+                    const pages = document.getElementById('brochure-pages').value;
+                    const format = document.getElementById('brochure-format').value.toUpperCase();
+                    const coverType = document.querySelector('input[name="brochure-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="brochure-pelliculage"]:checked').value;
+                    const finition = document.getElementById('brochure-finition').value;
+                    
+                    const covPrint = (coverType === 'recto') ? "RECTO Seul" : "RECTO / VERSO";
+                    const pellText = (pell === 'avec') ? "AVEC Pelliculage" : "SANS Pelliculage";
+                    
+                    config = `Format: ${format} - ${pages} Pages\nFinition: ${finition}\n\nPapier Intérieur: ${getPaperName('brochure-interior-paper')}\nPapier Couverture: ${getPaperName('brochure-cover-paper')}\n>>> Impression Couv: ${covPrint}\n>>> Finition Couv: ${pellText}`;
+                }
+                else if(type === 'livre') {
+                    const pages = document.getElementById('livre-pages').value;
+                    const format = document.getElementById('livre-format').value.toUpperCase();
+                    const coverType = document.querySelector('input[name="livre-cover-type"]:checked').value;
+                    const pell = document.querySelector('input[name="livre-pelliculage"]:checked').value;
+                    
+                    const covPrint = (coverType === 'recto') ? "RECTO Seul" : "RECTO / VERSO";
+                    const pellText = (pell === 'avec') ? "AVEC Pelliculage" : "SANS Pelliculage";
+                    
+                    config = `Format: ${format} - ${pages} Pages\nReliure: Spirale Plastique\n\nPapier Intérieur: ${getPaperName('livre-interior-paper')}\nPapier Couverture: ${getPaperName('livre-cover-paper')}\n>>> Impression Couv: ${covPrint}\n>>> Finition Couv: ${pellText}`;
+                }
+
                 const paoSelect = document.getElementById('pao-service');
-                if(paoSelect.value !== 'none') { return baseConfig + `\n\n[OPTION GRAPHIQUE]: ${paoSelect.options[paoSelect.selectedIndex].text}`; }
-                return baseConfig;
+                if(paoSelect.value !== 'none') {
+                    return config + `\n\n[OPTION GRAPHIQUE]: ${paoSelect.options[paoSelect.selectedIndex].text}`;
+                }
+                return config;
             } catch(e) { return "Config standard"; }
         }
 
-        // 🚀 C'EST ICI LE SECRET : On utilise la fonction 'saveOrder' de 'users.js'
         function submitClientOrder() {
             if(!currentCalculatedPrice) return alert("Veuillez estimer le prix.");
             const prodType = document.getElementById('prod-type').value;
@@ -188,14 +227,13 @@
                 prod: document.getElementById('prod-type').selectedOptions[0].text,
                 qty: qty,
                 price: currentCalculatedPrice,
-                desc: generateConfigString(prodType) + "\nNote: " + userDesc,
+                desc: generateConfigString(prodType) + "\nNote Client: " + userDesc,
                 user: "CLIENT WEB",
                 statusProd: "À Valider (Web)", 
                 statusCompta: "Non payé",
                 date: new Date().toLocaleDateString()
             };
 
-            // Appel direct de la fonction centralisée ! 
             saveOrder(orderObj);
 
             setTimeout(() => {
