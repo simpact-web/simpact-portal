@@ -1,80 +1,72 @@
-// BASE DE DONNÉES UTILISATEURS (Simulée)
-let USERS = [
-    { id: 'youssef', pass: 'youssef123', role: 'superadmin', name: 'Youssef (SUPER ADMIN)', redirect: 'admin.html' },
-    { id: 'prod', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
-    { id: 'compta', pass: 'compta123', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
-    { id: 'com', pass: 'com123', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
-    // CLIENTS
-    { id: 'client', pass: 'client123', role: 'client', name: 'Agence Pub', redirect: 'client.html' },
+// --- CONFIGURATION CLOUD ---
+// 🔴 COLLEZ VOTRE NOUVEAU LIEN SCRIPT GOOGLE ICI (ENTRE LES GUILLEMETS) :
+const CLOUD_API_URL = "VOTRE_LIEN_ICI"; 
+
+// BASE DE DONNÉES UTILISATEURS
+const USERS = [
+    { id: 'youssef', pass: 'youssef123', role: 'superadmin', name: 'Youssef (PDG)', redirect: 'hub.html' },
+    { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Admin Simpact', redirect: 'admin.html' },
+    { id: 'prod01', pass: 'atelier', role: 'production', name: 'Chef Atelier', redirect: 'production.html' },
+    { id: 'compta01', pass: 'facture', role: 'compta', name: 'Service Compta', redirect: 'compta.html' },
+    { id: 'comm01', pass: 'vente', role: 'commercial', name: 'Commercial 1', redirect: 'commercial.html' },
+    { id: 'client01', pass: 'client123', role: 'client', name: 'Agence Pub', redirect: 'client.html' },
     { id: 'client02', pass: '1234', role: 'client', name: 'Restaurant Le Chef', redirect: 'client.html' }
 ];
 
-// FONCTION DE LOGIN
 function login(user, pass) {
-    // Charger les utilisateurs depuis localStorage si disponible
-    const savedUsers = localStorage.getItem('SIMPACT_USERS');
-    if(savedUsers) {
-        USERS = JSON.parse(savedUsers);
-    }
-    
-    const foundUser = USERS.find(u => u.id === user && u.pass === pass);
+    if(!user || !pass) return null;
+    const foundUser = USERS.find(u => u.id.toLowerCase() === user.toLowerCase() && u.pass === pass);
     if (foundUser) {
-        // On enregistre la session
         localStorage.setItem('SIMPACT_USER', JSON.stringify(foundUser));
         return foundUser;
     }
     return null;
 }
 
-// FONCTION DE VÉRIFICATION (À mettre en haut de chaque page)
 function checkAuth(allowedRoles) {
     const session = localStorage.getItem('SIMPACT_USER');
-    if (!session) {
-        window.location.href = 'index.html'; // Renvoie au login si pas connecté
-        return null;
-    }
-    
-    const user = JSON.parse(session);
-    
-    // Le superadmin a accès à TOUT
-    if(user.role === 'superadmin') return user;
-    
-    // Si 'allowedRoles' est vide, on accepte tout le monde connecté
-    if (!allowedRoles) return user;
-
-    // Si le rôle n'est pas autorisé
-    if (Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
-        alert("⛔ Accès interdit à cette zone !");
-        window.location.href = user.redirect; // Renvoie vers sa page légitime
-        return null;
-    } else if (typeof allowedRoles === 'string' && allowedRoles !== user.role) {
-        alert("⛔ Accès interdit !");
-        window.location.href = user.redirect;
-        return null;
-    }
-
-    return user;
+    if (!session) { window.location.href = 'index.html'; return null; }
+    try {
+        const user = JSON.parse(session);
+        if (user.role === 'superadmin') return user; 
+        if (!allowedRoles) return user;
+        if (Array.isArray(allowedRoles) && !allowedRoles.includes(user.role)) {
+            alert("⛔ Accès interdit !"); window.location.href = user.redirect; return null;
+        }
+        return user;
+    } catch(e) { logout(); return null; }
 }
 
-// DÉCONNEXION
-function logout() {
-    localStorage.removeItem('SIMPACT_USER');
-    window.location.href = 'index.html';
-}
+function logout() { localStorage.removeItem('SIMPACT_USER'); window.location.href = 'index.html'; }
 
-// GESTION DES COMMANDES (LocalStorage - Base de données locale navigateur)
 function getOrders() {
-    const orders = localStorage.getItem('SIMPACT_ORDERS');
-    return orders ? JSON.parse(orders) : [];
+    try {
+        const local = localStorage.getItem('SIMPACT_ORDERS');
+        return local ? JSON.parse(local) : [];
+    } catch(e) { return []; }
 }
 
 function saveOrder(orderData) {
     const orders = getOrders();
-    // Ajout en haut de la liste
     orders.unshift(orderData);
-    // Limite à 50 dernières commandes pour ne pas surcharger
-    if(orders.length > 50) orders.pop();
+    if(orders.length > 100) orders.pop();
     localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
+
+    if(CLOUD_API_URL && CLOUD_API_URL.startsWith("http")) {
+        const formData = new FormData();
+        formData.append("ref", orderData.ref);
+        formData.append("client", orderData.client);
+        formData.append("prod", orderData.prod);
+        formData.append("qty", orderData.qty);
+        formData.append("price", orderData.price);
+        formData.append("desc", orderData.desc);
+        formData.append("user", orderData.user);
+        formData.append("statusProd", orderData.statusProd);
+        formData.append("statusCompta", orderData.statusCompta);
+        formData.append("jsonFull", JSON.stringify(orderData));
+
+        fetch(CLOUD_API_URL, { method: 'POST', body: formData }).catch(e => console.error(e));
+    }
 }
 
 function updateOrderStatus(ref, newStatus, type) {
@@ -84,368 +76,28 @@ function updateOrderStatus(ref, newStatus, type) {
         if(type === 'prod') order.statusProd = newStatus;
         if(type === 'compta') order.statusCompta = newStatus;
         localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
+        saveOrder(order); 
     }
 }
 
-// ============================================
-// GESTION DES UTILISATEURS (SUPER ADMIN)
-// ============================================
-
-/**
- * Récupère la liste complète des utilisateurs
- * @returns {Array} Liste des utilisateurs
- */
-function getAllUsers() {
-    const savedUsers = localStorage.getItem('SIMPACT_USERS');
-    if(savedUsers) {
-        USERS = JSON.parse(savedUsers);
-    }
-    return USERS;
-}
-
-/**
- * Sauvegarde les utilisateurs dans LocalStorage
- * @param {Array} users - Liste des utilisateurs
- */
-function saveUsers(users) {
-    USERS = users;
-    localStorage.setItem('SIMPACT_USERS', JSON.stringify(users));
-}
-
-/**
- * Ajoute ou modifie un utilisateur
- * @param {Object} userData - Données de l'utilisateur
- * @returns {Boolean} Succès de l'opération
- */
-function saveUser(userData) {
-    let users = getAllUsers();
-    const existingIndex = users.findIndex(u => u.id === userData.id);
-    
-    if(existingIndex >= 0) {
-        users[existingIndex] = userData;
-    } else {
-        users.push(userData);
-    }
-    
-    saveUsers(users);
-    return true;
-}
-
-/**
- * Supprime un utilisateur
- * @param {String} userId - ID de l'utilisateur à supprimer
- * @returns {Boolean} Succès de l'opération
- */
-function deleteUser(userId) {
-    // Empêcher la suppression du super admin
-    if(userId === 'youssef') {
-        alert('⛔ Impossible de supprimer le super admin !');
-        return false;
-    }
-    
-    let users = getAllUsers();
-    users = users.filter(u => u.id !== userId);
-    saveUsers(users);
-    return true;
-}
-
-// ============================================
-// GESTION DU STOCK PAPIER
-// ============================================
-
-/**
- * Récupère la liste complète du stock papier
- * @returns {Array} Liste des papiers en stock
- */
-function getStock() {
-    const stock = localStorage.getItem('SIMPACT_STOCK');
-    return stock ? JSON.parse(stock) : [];
-}
-
-/**
- * Sauvegarde le stock papier complet
- * @param {Array} stockData - Données du stock à sauvegarder
- */
-function saveStock(stockData) {
-    localStorage.setItem('SIMPACT_STOCK', JSON.stringify(stockData));
-}
-
-/**
- * Ajoute ou met à jour un type de papier dans le stock
- * @param {Object} paperData - Données du papier
- * @returns {Boolean} Succès de l'opération
- */
-function savePaper(paperData) {
-    let stock = getStock();
-    const existingIndex = stock.findIndex(p => p.id === paperData.id);
-    
-    if(existingIndex >= 0) {
-        stock[existingIndex] = paperData;
-    } else {
-        stock.push(paperData);
-    }
-    
-    saveStock(stock);
-    return true;
-}
-
-/**
- * Supprime un type de papier du stock
- * @param {String} paperId - ID du papier à supprimer
- * @returns {Boolean} Succès de l'opération
- */
-function deletePaper(paperId) {
-    let stock = getStock();
-    stock = stock.filter(p => p.id !== paperId);
-    saveStock(stock);
-    return true;
-}
-
-/**
- * Récupère un papier spécifique par son ID
- * @param {String} paperId - ID du papier
- * @returns {Object|null} Données du papier ou null
- */
-function getPaperById(paperId) {
-    const stock = getStock();
-    return stock.find(p => p.id === paperId) || null;
-}
-
-/**
- * Met à jour la quantité d'un papier
- * @param {String} paperId - ID du papier
- * @param {Number} newQty - Nouvelle quantité
- * @returns {Boolean} Succès de l'opération
- */
-function updatePaperQty(paperId, newQty) {
-    let stock = getStock();
-    const paper = stock.find(p => p.id === paperId);
-    
-    if(paper) {
-        paper.qty = newQty;
-        saveStock(stock);
-        return true;
-    }
-    
-    return false;
-}
-
-/**
- * Récupère l'historique des mouvements de stock
- * @returns {Array} Liste des mouvements
- */
-function getStockMovements() {
-    const movements = localStorage.getItem('SIMPACT_STOCK_MOVEMENTS');
-    return movements ? JSON.parse(movements) : [];
-}
-
-/**
- * Enregistre un mouvement de stock (entrée ou sortie)
- * @param {Object} movementData - Données du mouvement
- * @returns {Boolean} Succès de l'opération
- */
-function saveStockMovement(movementData) {
-    const movements = getStockMovements();
-    movements.unshift(movementData); // Ajoute en début de liste
-    
-    // Limite à 200 mouvements pour ne pas surcharger
-    if(movements.length > 200) movements.pop();
-    
-    localStorage.setItem('SIMPACT_STOCK_MOVEMENTS', JSON.stringify(movements));
-    return true;
-}
-
-/**
- * Effectue un mouvement de stock (entrée ou sortie) et met à jour la quantité
- * @param {String} paperId - ID du papier
- * @param {String} type - Type de mouvement ('in' ou 'out')
- * @param {Number} qty - Quantité du mouvement
- * @param {Object} details - Détails du mouvement (raison, référence, etc.)
- * @returns {Boolean} Succès de l'opération
- */
-function executeStockMovement(paperId, type, qty, details) {
-    let stock = getStock();
-    const paper = stock.find(p => p.id === paperId);
-    
-    if(!paper) return false;
-    
-    // Mise à jour de la quantité
-    if(type === 'in') {
-        paper.qty += qty;
-    } else if(type === 'out') {
-        paper.qty -= qty;
-        if(paper.qty < 0) paper.qty = 0; // Évite les quantités négatives
-    }
-    
-    saveStock(stock);
-    
-    // Enregistrement du mouvement
-    const movement = {
-        id: 'MOV-' + Date.now(),
-        paperId: paperId,
-        paperName: `${paper.category} ${paper.weight}g ${paper.format}`,
-        type: type,
-        qty: qty,
-        reason: details.reason || '',
-        ref: details.ref || '',
-        comment: details.comment || '',
-        date: new Date().toLocaleString('fr-FR'),
-        user: details.user || 'Système'
-    };
-    
-    saveStockMovement(movement);
-    
-    return true;
-}
-
-/**
- * Calcule les statistiques globales du stock
- * @returns {Object} Statistiques (types, total, valeur, alertes)
- */
-function getStockStats() {
-    const stock = getStock();
-    
-    const stats = {
-        totalTypes: stock.length,
-        totalQty: 0,
-        totalValue: 0,
-        alerts: 0,
-        byCategory: {}
-    };
-    
-    stock.forEach(paper => {
-        // Total quantité
-        stats.totalQty += paper.qty;
+// SYNCHRONISATION MAGIQUE EN ARRIÈRE-PLAN
+async function syncWithCloud() {
+    if(!CLOUD_API_URL || !CLOUD_API_URL.startsWith("http")) return;
+    try {
+        const response = await fetch(CLOUD_API_URL);
+        const cloudData = await response.json();
         
-        // Total valeur
-        stats.totalValue += (paper.qty * (paper.price || 0));
-        
-        // Alertes (stock bas)
-        const percentage = (paper.qty / paper.threshold) * 100;
-        if(percentage <= 100) stats.alerts++;
-        
-        // Par catégorie
-        if(!stats.byCategory[paper.category]) {
-            stats.byCategory[paper.category] = { qty: 0, value: 0, count: 0 };
+        if(Array.isArray(cloudData)) {
+            localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(cloudData));
+            
+            // Mise à jour de l'écran en temps réel selon la page ouverte
+            if(typeof renderOrders === 'function') renderOrders();
+            if(typeof loadStats === 'function') loadStats();
+            if(typeof loadWebOrders === 'function') loadWebOrders(); // Ouvre la boîte de réception
         }
-        stats.byCategory[paper.category].qty += paper.qty;
-        stats.byCategory[paper.category].value += (paper.qty * (paper.price || 0));
-        stats.byCategory[paper.category].count += 1;
-    });
-    
-    return stats;
+    } catch(e) {}
 }
 
-/**
- * Recherche des papiers selon des critères
- * @param {Object} criteria - Critères de recherche (category, weight, format, etc.)
- * @returns {Array} Liste des papiers correspondants
- */
-function searchStock(criteria) {
-    const stock = getStock();
-    
-    return stock.filter(paper => {
-        let match = true;
-        
-        if(criteria.category) {
-            match = match && paper.category.toLowerCase().includes(criteria.category.toLowerCase());
-        }
-        
-        if(criteria.weight) {
-            match = match && paper.weight === parseInt(criteria.weight);
-        }
-        
-        if(criteria.format) {
-            match = match && paper.format.toLowerCase().includes(criteria.format.toLowerCase());
-        }
-        
-        if(criteria.supplier) {
-            match = match && paper.supplier && paper.supplier.toLowerCase().includes(criteria.supplier.toLowerCase());
-        }
-        
-        if(criteria.lowStock === true) {
-            const percentage = (paper.qty / paper.threshold) * 100;
-            match = match && percentage <= 100;
-        }
-        
-        return match;
-    });
-}
-
-/**
- * Initialise des papiers de démo (pour tests)
- * À utiliser uniquement en développement
- */
-function initDemoStock() {
-    const demoStock = [
-        {
-            id: 'PAPER-DEMO-001',
-            category: 'Couché Brillant',
-            weight: 135,
-            format: 'A3',
-            qty: 15000,
-            unit: 'feuilles',
-            threshold: 5000,
-            price: 0.025,
-            supplier: 'Papeterie du Nord',
-            notes: 'Pour flyers et brochures premium',
-            createdAt: new Date().toISOString()
-        },
-        {
-            id: 'PAPER-DEMO-002',
-            category: 'Couché Mat',
-            weight: 170,
-            format: 'SRA3',
-            qty: 8000,
-            unit: 'feuilles',
-            threshold: 3000,
-            price: 0.032,
-            supplier: 'Papeterie du Nord',
-            notes: 'Catalogues et dépliants',
-            createdAt: new Date().toISOString()
-        },
-        {
-            id: 'PAPER-DEMO-003',
-            category: 'Offset Blanc',
-            weight: 80,
-            format: 'A4',
-            qty: 2500,
-            unit: 'feuilles',
-            threshold: 5000,
-            price: 0.015,
-            supplier: 'Distributeur Central',
-            notes: 'Stock bas - Réappro urgent',
-            createdAt: new Date().toISOString()
-        },
-        {
-            id: 'PAPER-DEMO-004',
-            category: 'Bristol',
-            weight: 250,
-            format: 'A4',
-            qty: 4000,
-            unit: 'feuilles',
-            threshold: 2000,
-            price: 0.045,
-            supplier: 'Papeterie du Nord',
-            notes: 'Cartes de visite premium',
-            createdAt: new Date().toISOString()
-        },
-        {
-            id: 'PAPER-DEMO-005',
-            category: 'Carton Plat',
-            weight: 300,
-            format: '70x100',
-            qty: 500,
-            unit: 'feuilles',
-            threshold: 1000,
-            price: 0.180,
-            supplier: 'Import Direct',
-            notes: 'Affiches et PLV',
-            createdAt: new Date().toISOString()
-        }
-    ];
-    
-    saveStock(demoStock);
-    console.log('✅ Stock de démo initialisé avec ' + demoStock.length + ' types de papier');
-    return true;
-}
+// Vérifie le Google Drive toutes les 8 secondes
+setInterval(syncWithCloud, 8000);
+syncWithCloud();
