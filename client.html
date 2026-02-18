@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - Simpact</title>
-    <script src="users.js?v=8"></script>
+    <script src="users.js?v=9"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         /* DESIGN CLIENT (VIOLET) */
@@ -128,23 +128,19 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec";
 
         // --- DONNÉES PAO (Issues du fichier Excel) ---
-        // h = Heures forfaitaires, h_page = Heures par page
         const PAO_DATA = {
-            'flyer':    { conc: 4,  corr: 2,    layout: 2 },    // Layout = Correction pour Flyer
-            'carte':    { conc: 1,  corr: 0.5,  layout: 0.5 },  // Layout = Correction pour Carte
+            'flyer':    { conc: 4,  corr: 2,    layout: 2 },
+            'carte':    { conc: 1,  corr: 0.5,  layout: 0.5 },
             'depliant': { conc: 8,  corr: 3,    layout: 3 },
             'entete':   { conc: 4,  corr: 2,    layout: 2 },
             'affiches': { conc: 7,  corr: 1,    layout: 1 },
-            'brochure': { conc: 8,  corr: 0.17, layout: 0.34, perPage: true }, // Format A4
-            'livre':    { conc: 12, corr: 0.17, layout: 0.25, perPage: true }  // Format A4
+            'brochure': { conc: 8,  corr: 0.17, layout: 0.34, perPage: true },
+            'livre':    { conc: 12, corr: 0.17, layout: 0.25, perPage: true }
         };
-
-        // Ajustements pour Format A5 (< A4)
         const PAO_A5_FACTOR = {
             'brochure': { corr: 0.119, layout: 0.238 },
             'livre':    { corr: 0.119, layout: 0.175 }
         };
-
         const PAO_RATES = { 'conception': 55, 'layout': 40, 'correction': 40 };
 
         let TARIFS = {};
@@ -186,7 +182,6 @@
             if(sheets < 500) return 1.6; return 1.5;
         }
         function getPricePerSheetRecto(sheets) { return getPricePerSheetCouleur(sheets) - 0.2; }
-        
         function calculatePriceWithSmoothing(tarifArray, quantity) {
             if(!tarifArray || !tarifArray.length) return { totalPrice: 0 };
             let lower = tarifArray[0], upper = tarifArray[0];
@@ -196,7 +191,7 @@
             return { totalPrice: lower.price + (upper.price - lower.price) * ratio };
         }
 
-        // --- CALCUL CENTRAL AVEC PAO INTÉGRÉ ---
+        // --- CALCUL CENTRAL ---
         function calculateQuote() {
             const type = document.getElementById('prod-type').value;
             const qty = parseInt(document.getElementById('qty').value);
@@ -206,7 +201,6 @@
 
             let totalPrice = 0;
             try {
-                // 1. PRIX IMPRESSION
                 if(type === 'flyer') {
                     const mode = document.querySelector('input[name="flyer-type"]:checked').value;
                     const paper = document.getElementById('flyer-paper').value;
@@ -276,7 +270,6 @@
 
                 totalPrice = Math.max(totalPrice, PRIX_FIXES.min_price);
 
-                // 2. PRIX PAO (Création Graphique)
                 let paoCost = 0;
                 let paoDetails = "Aucun frais supplémentaire.";
                 
@@ -284,36 +277,20 @@
                     let hours = 0;
                     let rate = PAO_RATES[paoOption];
                     const data = PAO_DATA[type];
-
-                    // Clé pour chercher les heures (conc, corr, layout)
                     let key = (paoOption === 'conception') ? 'conc' : (paoOption === 'layout' ? 'layout' : 'corr');
                     
                     if(data.perPage) {
-                        // Logique Brochure/Livre (Par Page)
-                        let pages = 0;
-                        let format = '';
-                        if(type === 'brochure') {
-                            pages = parseInt(document.getElementById('brochure-pages').value) || 0;
-                            format = document.getElementById('brochure-format').value;
-                        } else {
-                            pages = parseInt(document.getElementById('livre-pages').value) || 0;
-                            format = document.getElementById('livre-format').value;
-                        }
+                        let pages = type === 'brochure' ? (parseInt(document.getElementById('brochure-pages').value) || 0) : (parseInt(document.getElementById('livre-pages').value) || 0);
+                        let format = type === 'brochure' ? document.getElementById('brochure-format').value : document.getElementById('livre-format').value;
 
-                        // Si Conception, c'est Forfaitaire (Pas par page)
                         if(paoOption === 'conception') {
                             hours = data.conc;
                         } else {
-                            // Si Correction/Layout, c'est par page
-                            // Check si format A5 pour appliquer tarif réduit
                             let unitHours = data[key];
-                            if(format === 'a5' && PAO_A5_FACTOR[type]) {
-                                unitHours = PAO_A5_FACTOR[type][key];
-                            }
+                            if(format === 'a5' && PAO_A5_FACTOR[type]) unitHours = PAO_A5_FACTOR[type][key];
                             hours = unitHours * pages;
                         }
                     } else {
-                        // Logique Simple (Flyer, etc.)
                         hours = data[key];
                     }
 
@@ -340,7 +317,6 @@
             }
         }
 
-        // GENERATION CONFIG
         function generateConfigString(type) {
             try {
                 let baseConfig = "";
@@ -382,6 +358,20 @@
             const prodLabel = document.getElementById('prod-type').selectedOptions[0].text;
             const details = generateConfigString(prodType) + "\nNote: " + userDesc + (file ? "\n[Fichier]: " + file.name : "");
 
+            // --- NOUVEAUTÉ : ON FORCE LE STATUT "À VALIDER" ---
+            const orderObj = {
+                ref: ref,
+                client: user.name,
+                prod: prodLabel,
+                qty: qty,
+                price: currentCalculatedPrice,
+                desc: details,
+                user: "CLIENT WEB",
+                statusProd: "À Valider (Web)", // L'Atelier ignore ce statut
+                statusCompta: "Non payé",
+                date: new Date().toLocaleDateString()
+            };
+
             const formData = new FormData();
             formData.append("Date", new Date().toLocaleString());
             formData.append("Ref", ref);
@@ -391,10 +381,14 @@
             formData.append("Prix HT", currentCalculatedPrice);
             formData.append("Détails", details);
             formData.append("Commercial", "CLIENT WEB");
+            // Sécurisation Cloud
+            formData.append("statusProd", orderObj.statusProd);
+            formData.append("statusCompta", orderObj.statusCompta);
+            formData.append("jsonFull", JSON.stringify(orderObj)); 
 
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
-            .then(r => { alert("✅ Commande envoyée !"); window.location.reload(); })
-            .catch(e => { alert("Erreur."); btn.disabled = false; });
+            .then(r => { alert("✅ Commande envoyée ! En attente de validation commerciale."); window.location.reload(); })
+            .catch(e => { alert("Erreur réseau."); btn.disabled = false; btn.textContent = "✅ VALIDER LA COMMANDE";});
         }
 
         document.getElementById('prod-type').addEventListener('change', function() {
