@@ -1,8 +1,7 @@
 // --- CONFIGURATION CLOUD ---
-// 🔴 COLLEZ VOTRE LIEN SCRIPT GOOGLE ICI (ENTRE LES GUILLEMETS) :
+// 🔴 COLLEZ VOTRE LIEN SCRIPT GOOGLE ICI :
 const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbwgafAjdP97KC60fsc8DpNBUYgCbDlNY4T5rs5tQ28nwqkdGJ_ELdefEnSQ-g9DXmLw1g/exec"; 
 
-// BASE DE DONNÉES UTILISATEURS
 const USERS = [
     { id: 'youssef', pass: 'youssef123', role: 'superadmin', name: 'Youssef (PDG)', redirect: 'hub.html' },
     { id: 'admin01', pass: 'simpact2026', role: 'admin', name: 'Admin Simpact', redirect: 'admin.html' },
@@ -16,10 +15,7 @@ const USERS = [
 function login(user, pass) {
     if(!user || !pass) return null;
     const foundUser = USERS.find(u => u.id.toLowerCase() === user.toLowerCase() && u.pass === pass);
-    if (foundUser) {
-        localStorage.setItem('SIMPACT_USER', JSON.stringify(foundUser));
-        return foundUser;
-    }
+    if (foundUser) { localStorage.setItem('SIMPACT_USER', JSON.stringify(foundUser)); return foundUser; }
     return null;
 }
 
@@ -44,31 +40,30 @@ function getOrders() {
     catch(e) { return []; }
 }
 
-// ⚙️ MOTEUR D'ENVOI CENTRALISÉ ET SÉCURISÉ
 function saveOrder(orderData) {
-    // 1. Sauvegarde locale (Garantie de ne rien perdre sur ce PC)
+    // 1. Sauvegarde Locale Rapide
     let orders = getOrders();
+    orders = orders.filter(o => o.ref !== orderData.ref); // Évite les doublons
     orders.unshift(orderData);
     if(orders.length > 100) orders.pop();
     localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
 
-    // 2. Envoi au Google Sheet (Format strict en minuscules)
+    // 2. Envoi au Drive avec les NOMS EXACTS de votre tableau
     if(CLOUD_API_URL && CLOUD_API_URL.startsWith("http")) {
         const formData = new FormData();
-        formData.append("ref", orderData.ref);
-        formData.append("client", orderData.client);
-        formData.append("prod", orderData.prod);
-        formData.append("qty", orderData.qty);
-        formData.append("price", orderData.price);
-        formData.append("desc", orderData.desc);
-        formData.append("user", orderData.user);
-        formData.append("statusProd", orderData.statusProd);
-        formData.append("statusCompta", orderData.statusCompta);
-        formData.append("jsonFull", JSON.stringify(orderData));
+        formData.append("Date", orderData.date);
+        formData.append("Ref", orderData.ref);
+        formData.append("Client", orderData.client);
+        formData.append("Produit", orderData.prod);
+        formData.append("Quantité", orderData.qty);
+        formData.append("Prix HT", orderData.price);
+        formData.append("Détails", orderData.desc); // <- Répare les caractéristiques
+        formData.append("Commercial", orderData.user);
+        
+        // Donnée invisible pour que le Commercial puisse télécharger
+        formData.append("JSON_FULL", JSON.stringify(orderData));
 
-        // Le "mode: no-cors" est vital pour empêcher le navigateur de bloquer le Drive
-        fetch(CLOUD_API_URL, { method: 'POST', body: formData, mode: 'no-cors' })
-        .catch(e => console.error("Erreur Drive", e));
+        fetch(CLOUD_API_URL, { method: 'POST', body: formData }).catch(e => console.log("Erreur silencieuse"));
     }
 }
 
@@ -78,23 +73,18 @@ function updateOrderStatus(ref, newStatus, type) {
     if(order) {
         if(type === 'prod') order.statusProd = newStatus;
         if(type === 'compta') order.statusCompta = newStatus;
-        localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(orders));
-        saveOrder(order); // Renvoie la mise à jour au Drive
+        saveOrder(order); // Relance la sauvegarde
     }
 }
 
-// 🔄 SYNCHRONISATION BLINDÉE
 async function syncWithCloud() {
     if(!CLOUD_API_URL || !CLOUD_API_URL.startsWith("http")) return;
     try {
         const response = await fetch(CLOUD_API_URL);
         const cloudData = await response.json();
         
-        // Sécurité : On ne remplace les données que si le Drive n'est pas "vide à cause d'une erreur"
         if(Array.isArray(cloudData) && cloudData.length > 0) {
             localStorage.setItem('SIMPACT_ORDERS', JSON.stringify(cloudData));
-            
-            // Rafraîchissement des écrans en direct
             if(typeof renderOrders === 'function') renderOrders();
             if(typeof loadStats === 'function') loadStats();
             if(typeof loadWebOrders === 'function') loadWebOrders();
@@ -102,5 +92,5 @@ async function syncWithCloud() {
     } catch(e) {}
 }
 
-setInterval(syncWithCloud, 6000); // Scanne le Drive toutes les 6 secondes
+setInterval(syncWithCloud, 6000);
 syncWithCloud();
